@@ -1,0 +1,58 @@
+----------  Thu 05 Nov 20, hpt/lnx 1.9.0-cur 2020-10-16
+1 16:27:29  Start
+C 16:27:29  Start areafix...
+8 16:27:29  Process command: -*
+8 16:27:29  areafix: 1:23/456 unlinked from area 'xpehobo.mhe'
+8 16:27:29  areafix: 1:23/456 unlinked from area 'yahoonews'
+8 16:27:29  areafix: 1:23/456 unlinked from area 'robots'
+8 16:27:29  areafix: Successfully done for 1:23/456
+C 16:27:29  End areafix...
+1 16:27:29  End
+
+----------  Thu 05 Nov 20, hpt/lnx 1.9.0-cur 2020-10-16
+1 16:27:30  Start
+C 16:27:30  Start areafix...
+8 16:27:30  Process command: -*
+8 16:27:30  areafix: 2:345/678 unlinked from area 'xpehobo.mhe'
+8 16:27:30  areafix: 2:345/678 unlinked from area 'yahoonews'
+8 16:27:30  areafix: 2:345/678 unlinked from area 'robots'
+8 16:27:30  areafix: Successfully done for 2:345/678
+C 16:27:30  End areafix...
+1 16:27:30  End
+
+----------  Thu 05 Nov 20, hpt/lnx 1.9.0-cur 2020-10-16
+1 16:27:30  Start
+1 16:27:30  Start posting...
+5 16:27:31  Posting msg from 2:5020/1042.0 -> 2:5020/1042 in area: netmail with subject: Removing link 2:345/678
+1 16:27:31  End posting
+1 16:27:31  End
+
+----------  Thu 05 Nov 20, hpt/lnx 1.9.0-cur 2020-10-16
+1 16:27:54  Start
+C 16:27:54  Start areafix...
+8 16:27:54  Process command: -*
+8 16:27:54  areafix: 1:23/456 unlinked from area 'xpehobo.mhe'
+8 16:27:54  areafix: 1:23/456 unlinked from area 'yahoonews'
+8 16:27:54  areafix: 1:23/456 unlinked from area 'robots'
+8 16:27:54  areafix: Successfully done for 1:23/456
+C 16:27:54  End areafix...
+1 16:27:54  End
+
+----------  Thu 05 Nov 20, hpt/lnx 1.9.0-cur 2020-10-16
+1 16:27:54  Start
+C 16:27:54  Start areafix...
+8 16:27:54  Process command: -*
+8 16:27:54  areafix: 2:345/678 unlinked from area 'xpehobo.mhe'
+8 16:27:54  areafix: 2:345/678 unlinked from area 'yahoonews'
+8 16:27:54  areafix: 2:345/678 unlinked from area 'robots'
+8 16:27:54  areafix: Successfully done for 2:345/678
+C 16:27:54  End areafix...
+1 16:27:54  End
+
+----------  Thu 05 Nov 20, hpt/lnx 1.9.0-cur 2020-10-16
+1 16:27:54  Start
+1 16:27:54  Start posting...
+5 16:27:55  Posting msg from 2:5020/1042.0 -> 2:5020/1042 in area: netmail with subject: Removing link 2:345/678
+1 16:27:55  End posting
+1 16:27:55  End
+

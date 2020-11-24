@@ -1,0 +1,108 @@
+2020-11-05 16:27:30  ###### 08_rmOrphanFilesFromOutbound.t ######
+2020-11-05 16:27:30  test#1
+2020-11-05 16:27:30  Deleting orphan files from outbound
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/2642378c.mon deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/33a8ea05.suh deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/65a7665f.suk deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/7c818e90.fr7 deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/9e3e7c75.sus deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/acc82078.suh deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/c5d40fd7.mo5 deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/cc3d6396.suh deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/f6c43b3f.wem deleted
+2020-11-05 16:27:30  9 files were deleted
+2020-11-05 16:27:30  test#1dry
+2020-11-05 16:27:30  ### It is a dry-run, no actual changes will be made ###
+2020-11-05 16:27:30  Deleting orphan files from outbound
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/00f8d740.suc deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/34ffa6ce.tu1 deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/697d6dac.thd deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/6dcf38b4.thq deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/89bd1d20.sa3 deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/a1fec589.mo0 deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/ac6c7c00.mof deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/dbb3791d.frt deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/e31b372e.tua deleted
+2020-11-05 16:27:30  9 files were deleted
+2020-11-05 16:27:30  test#2
+2020-11-05 16:27:30  Deleting orphan files from outbound
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/0000f03f.mof deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/118ae346.tub deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/1e3fd3c5.tu0 deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/23736d84.fra deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/3519c6b2.suk deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/55081ad8.sap deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/60020e34.mos deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/7703d7df.wer deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/8f137665.wem deleted
+2020-11-05 16:27:30  9 files were deleted
+2020-11-05 16:27:30  test#2dry
+2020-11-05 16:27:30  ### It is a dry-run, no actual changes will be made ###
+2020-11-05 16:27:30  Deleting orphan files from outbound
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/100aa4f5.th4 deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/1e2d365c.tus deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/425b8ae8.mo0 deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/7b0735eb.weq deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/7d169bf8.fr1 deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/89b08968.su4 deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/a1d35a9f.wef deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/b51154f7.su1 deleted
+2020-11-05 16:27:30  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/c234cea2.we7 deleted
+2020-11-05 16:27:30  9 files were deleted
+2020-11-05 16:27:30  test#3
+2020-11-05 16:27:30  test#3dry
+2020-11-05 16:27:30  ### It is a dry-run, no actual changes will be made ###
+2020-11-05 16:27:54  ###### 08_rmOrphanFilesFromOutbound.t ######
+2020-11-05 16:27:54  test#1
+2020-11-05 16:27:54  Deleting orphan files from outbound
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/2a5b289b.mo1 deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/338bbc93.frt deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/35e3ff32.moa deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/5d297040.th2 deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/6eb1f145.sut deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/92db8bb6.mo9 deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/99429b93.tuv deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/cc72d780.sa2 deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/e7164f02.thd deleted
+2020-11-05 16:27:54  9 files were deleted
+2020-11-05 16:27:54  test#1dry
+2020-11-05 16:27:54  ### It is a dry-run, no actual changes will be made ###
+2020-11-05 16:27:54  Deleting orphan files from outbound
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/4f8a18bc.sa5 deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/62c051ef.mot deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/6c958616.sah deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/897782e9.mog deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/9f22d5bd.moo deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/b1dc0838.san deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/c8299a2c.sad deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/ca905acd.suv deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/d5a84727.wer deleted
+2020-11-05 16:27:54  9 files were deleted
+2020-11-05 16:27:54  test#2
+2020-11-05 16:27:54  Deleting orphan files from outbound
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/11a94a37.wey deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/1278eaff.tup deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/638dc87d.suz deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/71b4a803.we8 deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/721f9dbc.moc deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/76f82cad.moi deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/a195f423.sao deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/de3573f6.mom deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/f271c847.sad deleted
+2020-11-05 16:27:54  9 files were deleted
+2020-11-05 16:27:54  test#2dry
+2020-11-05 16:27:54  ### It is a dry-run, no actual changes will be made ###
+2020-11-05 16:27:54  Deleting orphan files from outbound
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/09e73309.sut deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/3a671163.thr deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/77d90e9d.su5 deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/90a00899.tup deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/ac2109d7.sac deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/b447d9d6.wet deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/cc8258b7.thi deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/d6800062.mom deleted
+2020-11-05 16:27:54  /home/mike/huskyproject/utils/Husky-Rmfiles/t/fido/out/outbound/e136c9ad.sui deleted
+2020-11-05 16:27:54  9 files were deleted
+2020-11-05 16:27:54  test#3
+2020-11-05 16:27:54  test#3dry
+2020-11-05 16:27:54  ### It is a dry-run, no actual changes will be made ###
