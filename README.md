@@ -4,15 +4,15 @@ Utilities
 Here you may find Perl utilities using functions from Fidoconfig::Token and
 Husky::Rmfiles packages.
 
-showold.pl - prints out to STDOUT how much netmail, echomail and files
+**showold.pl** - prints out to STDOUT how much netmail, echomail and files
              are stored for every link in the outbound and fileboxes and
              for how long they are stored.
 
-rmLinkMail.pl - remove netmail, echomail and files of a link.
+**rmLinkMail.pl** - remove netmail, echomail and files of a link.
 
-rmLink.pl - remove a link
+**rmLink.pl** - remove a link
 
-fixOutbound.pl - remove from outbound the echomail bundles not referred
+**fixOutbound.pl** - remove from outbound the echomail bundles not referred
                  by any flow file
 
 To see a short information for a <utility> run
