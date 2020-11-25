@@ -20,7 +20,7 @@ use strict;
 use warnings;
 
 my $VERSION;
-$VERSION = 1.0;
+$VERSION = 1.1;
 
 sub usage
 {
@@ -88,7 +88,7 @@ $fromname = "rmLink Robot";
 @header = ("  ", "$link did not pick up mail for 180 or more days.",
            "I am deleting all his netmail, echomail and filechos.");
 @footer = ("$link has been removed from $address configuration files.", " ");
-publishReport($subject, $fromname, @header, @footer);
+publishReport($subject, $fromname, \@header, \@footer);
 
 __END__
 
