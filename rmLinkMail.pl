@@ -28,7 +28,7 @@ use warnings;
 
 our (
      $loname, $flowFile, @filesToRemove, $fileBoxesDir, $zone, $net, $node,
-     $point, $box, $boxh, $boxH, $fileboxname, @reportLines, $logfile, $lockFile,
+     $point, $box, $boxh, $boxH, $fileboxname, $logfile, $lockFile,
      $debuglog, $filebox, $advisoryLock, $fh, $lh, $dh, $asoname, $VERSION,
      $debug);
 my ($fidoconfig, $defZone, $defOutbound, $link);
@@ -40,6 +40,18 @@ $VERSION = 1.1;
 sub usage
 {
     pod2usage("-verbose" => 99, "-sections" => "NAME|SYNOPSIS", "-exitval" => 1);
+}
+
+sub finish
+{
+    my $exitCode = shift;
+    close($lh) if($log != 0);
+    if($debug == 1 && defined($dh))
+    {
+        *STDERR = *OLD_STDERR;
+        close($dh);
+    }
+    exit $exitCode;
 }
 
 ###################### The main program starts here ##########################
