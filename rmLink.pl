@@ -85,9 +85,9 @@ $commentChar = '#';
 my ($path, $address) = findTokenValue($fidoconfig, "address");
 $subject = "Removing link $link";
 $fromname = "rmLink Robot";
-@header = ("  ", "$link did not pick up mail for 180 days.",
+@header = ("  ", "$link did not pick up mail for 180 or more days.",
            "I am deleting all his netmail, echomail and filechos.");
-@footer = ("$link has been removed from $address configuration files.");
+@footer = ("$link has been removed from $address configuration files.", " ");
 publishReport($subject, $fromname, @header, @footer);
 
 __END__
