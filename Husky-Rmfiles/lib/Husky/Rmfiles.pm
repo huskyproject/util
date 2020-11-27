@@ -14,7 +14,9 @@ our ($fidoconfig, $link, $delete, $backup, $report, $log,
      $listterm, $listlog, $listreport, $dryrun);
 
 # The package version
-$VERSION = 1.1;
+my $VER_MAJOR = 1;
+my $VER_MINOR = 2;
+$VERSION = "$VER_MAJOR.$VER_MINOR";
 
 use Exporter;
 @ISA = qw(Exporter);
@@ -370,7 +372,7 @@ sub getFlowFileToRemove
     if(-f $File::Find::name)
     {
         my $base = basename($File::Find::name);
-        if($base =~ /^$loname\.[icdfh]lo$/i ||
+        if(!$echomail && !$fileecho && $base =~ /^$loname\.[icdfh]lo$/i ||
            !$netmail && $base =~ /^$loname\.[icdoh]ut$/i ||
            !$netmail && !$echomail && !$fileecho && 
            ($base =~ /^$loname\.try$/i ||
