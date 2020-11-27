@@ -1067,7 +1067,7 @@ sub publishReport
 
     if($reportToEcho)
     {
-        push(@post, ("-e", "$report"));
+        push(@post, ("-e", "$report", "-af", "$address", "-nt", "All"));
     }
     else
     {
