@@ -14,9 +14,7 @@ our ($fidoconfig, $link, $delete, $backup, $report, $log,
      $listterm, $listlog, $listreport, $dryrun);
 
 # The package version
-my $VER_MAJOR = 1;
-my $VER_MINOR = 2;
-$VERSION = "$VER_MAJOR.$VER_MINOR";
+$VERSION = "1.2";
 
 use Exporter;
 @ISA = qw(Exporter);

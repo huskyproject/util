@@ -13,9 +13,7 @@ use Husky::Rmfiles;
 use strict;
 use warnings;
 
-my $VER_MAJOR = 1;
-my $VER_MINOR = 2;
-our $VERSION = "$VER_MAJOR.$VER_MINOR";
+our $VERSION = "1.2";
 
 sub version
 {

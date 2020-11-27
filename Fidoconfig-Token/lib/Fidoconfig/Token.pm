@@ -9,9 +9,7 @@ package Fidoconfig::Token;
 our (@ISA, @EXPORT, $VERSION, $commentChar, $module);
 
 # The package version
-my $VER_MAJOR = 2;
-my $VER_MINOR = 1;
-$VERSION = "$VER_MAJOR.$VER_MINOR";
+$VERSION = "2.2";
 
 use Exporter;
 @ISA = qw(Exporter);
