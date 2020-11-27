@@ -13,48 +13,31 @@
 use Getopt::Long;
 use Pod::Usage;
 use Fcntl qw(:flock);
-use File::Find qw/&find/;
 use File::Spec;
 use Config;
-use File::Basename;
-use Fidoconfig::Token 1.5;
-use Husky::Rmfiles;
-use Data::Dumper::Simple as => 'display', autowarn => 1;
+use Fidoconfig::Token 2.0;
+use Husky::Rmfiles 1.1;
 use strict;
 use warnings;
 
-#
-##### There is nothing to change below this line #####
+my $VER_MAJOR = 1;
+my $VER_MINOR = 2;
+our $VERSION = "$VER_MAJOR.$VER_MINOR";
 
-our (
-     $loname, $flowFile, @filesToRemove, $fileBoxesDir, $zone, $net, $node,
-     $point, $box, $boxh, $boxH, $fileboxname, $logfile, $lockFile,
-     $debuglog, $filebox, $advisoryLock, $fh, $lh, $dh, $asoname, $VERSION,
-     $debug);
-my ($fidoconfig, $defZone, $defOutbound, $link);
-$debug = $quiet = $netmail = $echomail = $fileecho = $otherfile = $filebox = 0;
-$log = 1;
-
-$VERSION = 1.1;
+sub version
+{
+    use File::Basename;
+    my $base = basename($0);
+    print "$base  version=$VERSION\n";
+    print "    uses Fidoconfig::Token v.$Fidoconfig::Token::VERSION\n";
+    print "    and  Husky::Rmfiles    v.$Husky::Rmfiles::VERSION\n";
+    exit(1);
+}
 
 sub usage
 {
     pod2usage("-verbose" => 99, "-sections" => "NAME|SYNOPSIS", "-exitval" => 1);
 }
-
-sub finish
-{
-    my $exitCode = shift;
-    close($lh) if($log != 0);
-    if($debug == 1 && defined($dh))
-    {
-        *STDERR = *OLD_STDERR;
-        close($dh);
-    }
-    exit $exitCode;
-}
-
-###################### The main program starts here ##########################
 
 
 # Prevent running another copy of the same script
@@ -68,6 +51,8 @@ unless(flock(SELF, LOCK_EX | LOCK_NB))
 # Just check that the current OS is supported
 getOS();
 
+$quiet = $netmail = $echomail = $fileecho = $otherfile = $filebox = 0;
+$log = 1;
 
 $fidoconfig = $ENV{FIDOCONFIG} if defined $ENV{FIDOCONFIG};
 
@@ -81,27 +66,15 @@ GetOptions(
             "fileecho"  => \$fileecho,
             "other-files"=>\$otherfile,
             "box"       => \$filebox,
-            "report:s"  => \$report,
+#            "report:s"  => \$report,
             "log!"      => \$log,
-            "quiet"     => \$quiet,
-            "debug"     => \$debug,
+            "quiet!"    => \$quiet,
+            "dry-run!"  => \$dryrun,
+            "version"   => \&version,
             "help"      => \&usage,
           )
 or die("Error in command line arguments\n");
 
-if($debug == 1)
-{
-    display($debug);
-    display($fidoconfig) if(defined($fidoconfig));
-    display($link) if(defined($link));
-    display($netmail);
-    display($echomail);
-    display($fileecho);
-    display($filebox);
-    display($report) if(defined($report));
-    display($log) if(defined($log));
-    display($quiet) if(defined($log));
-}
 
 if (!(defined($fidoconfig) && -f $fidoconfig && -s $fidoconfig))
 {
@@ -115,250 +88,27 @@ if(!defined($link))
     usage();
 }
 
-($zone, $net, $node, $point) = $link =~ m!(\d+):(\d+)/(\d+)(?:\.(\d+))?!;
+my $zone = $link =~ m!(\d+):\d+/\d+(?:\.\d+)?!;
 if(!defined($zone))
 {
     print STDERR "\naddress=$link but it should be zone:net/node or zone:net/node.point\n\n";
     exit 2;
 }
-$point = 0 if(!defined($point));
 
-my ($address, $path, $logfileDir);
-$fidoconfig = normalize($fidoconfig);
+$log = "rmLinkMail.log" if($log);
 
-$Husky::Fidoconfig::module = "hpt";
-
-if($log != 0)
-{
-    $Husky::Fidoconfig::commentChar = '#';
-    ($path, $logfileDir) = findTokenValue($fidoconfig, "LogFileDir");
-    $logfileDir = expandVars($logfileDir) if($logfileDir ne "");
-    $logfile = ($logfileDir eq "") ? "" : File::Spec->catfile($logfileDir, "rmLinkMail.log");
-    if($logfile ne "")
-    {
-        if(!open($lh, ">>", $logfile))
-        {
-            print STDERR "Cannot open $logfile\n";
-            exit(2);
-        }
-        if($debug == 1)
-        {
-            $debuglog = ($logfileDir eq "") ? "" : File::Spec->catfile($logfileDir, "rmLinkMail_debug.log");
-            if(!open($dh, ">>", $debuglog))
-            {
-                print STDERR "Cannot open $debuglog\n";
-                exit(2);
-            }
-            *OLD_STDERR = *STDERR;
-            *STDERR = $dh;
-        }
-    }
-}
-
-if(defined($report) && $report eq "")
-{
-    # fetch ReportTo from fidoconfig
-    $Husky::Fidoconfig::commentChar = '#';
-    ($path, $report) = findTokenValue($fidoconfig, "ReportTo");
-    if($report eq "no")
-    {
-        $report = "";
-        error("ReportTo is not defined in your fidoconfig; no report will be issued.");
-    }
-}
-
-my $separateBundles;
-$Husky::Fidoconfig::commentChar = '#';
-($path, $separateBundles) = findTokenValue($fidoconfig, "SeparateBundles");
-if(isOn($separateBundles))
-{
-    error("SeparateBundles mode is not supported");
-    finish(2);
-}
-
-$Husky::Fidoconfig::commentChar = '#';
-($path, $address) = findTokenValue($fidoconfig, "address");
-$defZone = $1 if($address ne "" && $address =~ /^(\d+):\d+\/\d+(?:\.\d+)?(?:@\w+)?$/);
-if(!defined($defZone))
-{
-    error("Your FTN address is not defined or has a syntax error");
-    finish(2);
-}
-
-$Husky::Fidoconfig::commentChar = '#';
-($path, $fileBoxesDir) = findTokenValue($fidoconfig, "FileBoxesDir");
-if($fileBoxesDir ne "")
-{
-    if(! -d $fileBoxesDir)
-    {
-        error("fileBoxesDir \'$fileBoxesDir\' is not a directory");
-        finish(2);
-    }
-    $fileBoxesDir = normalize($fileBoxesDir);
-}
-
-# Default outbound
-$Husky::Fidoconfig::commentChar = '#';
-($path, $defOutbound) = findTokenValue($fidoconfig, "Outbound");
-if($defOutbound eq "")
-{
-    error("Outbound is not defined");
-    finish(2);
-}
-
-my $outbound;
-if(! -d $defOutbound)
-{
-    error("Outbound directory $defOutbound does not exist");
-}
-else
-{
-    $defOutbound = normalize($defOutbound);
-
-    # Enumerate ASO files to delete
-    $asoname = "$zone.$net.$node.$point";
-    find(\&getAsoFileToRemove, $defOutbound);
-
-    # Flow filename
-    $loname = sprintf("%04x%04x", $net, $node);
-    # Outbound hex extension
-    my $hexzone = sprintf("%03x", $zone);
-    $outbound = ($zone != $defZone) ? "$defOutbound.$hexzone" : $defOutbound;
-    if(! -d $outbound)
-    {
-        error("Outbound directory $outbound does not exist");
-    }
-    else
-    {
-        my $outboundExists = 1;
-        if($point != 0)
-        {
-            $outbound = File::Spec->catdir($outbound,  $loname . ".pnt");
-            $loname = sprintf("%08x", $point);
-            if(! -d $outbound)
-            {
-                $outboundExists = 0;
-                error("Directory $outbound does not exist");
-            }
-        }
-
-        if($outboundExists == 1)
-        {
-            # Remove files from $outbound
-            find(\&getFlowFile, $outbound);
-            rmFilesFromLo($flowFile) if(defined($flowFile) && $flowFile ne "" && -f $flowFile);
-
-            find(\&getFileToRemove, $outbound);
-        }
-
-        for my $file (@filesToRemove)
-        {
-            my $num = unlink $file;
-            if($num == 1)
-            {
-                put("$file deleted");
-            }
-            else
-            {
-                error("Cannot delete $file");
-            }
-        }
-    }
-}
-
-# Remove files from filebox
-rmFilesFromFilebox() if($fileBoxesDir ne "");
-
-# Remove files without tics (AKA widow files) from passFileAreaDir
-# (tics are taken either from passFileAreaDir or from ticOutbound)
-my $passFileAreaDir;
-$Husky::Fidoconfig::module = "htick";
-$Husky::Fidoconfig::commentChar = '#';
-($path, $passFileAreaDir) = findTokenValue($fidoconfig, "passFileAreaDir");
-
-if($passFileAreaDir ne "" && -d $passFileAreaDir)
-{
-    my $ticOutbound;
-    ($path, $ticOutbound) = findTokenValue($fidoconfig, "ticOutbound");
-    display($ticOutbound) if($debug == 1);
-    my $ticDir = ($ticOutbound ne "" && -d $ticOutbound) ? $ticOutbound : $passFileAreaDir;
-    display($ticDir) if($debug == 1);
-
-    if(!opendir(DIR, $passFileAreaDir))
-    {
-        error("Can't open $passFileAreaDir directory ($!)");
-        finish(2);
-    }
-    my @files = grep(-f File::Spec->catfile($passFileAreaDir, $_) && !/\.tic$/, readdir(DIR));
-    closedir(DIR);
-    display(@files) if($debug == 1);
-
-    if(!opendir(DIR, $ticDir))
-    {
-        error("Can't open $ticDir directory ($!)");
-        finish(2);
-    }
-    my @tics = grep(/\.tic$/, readdir(DIR));
-    closedir(DIR);
-    display(@tics) if($debug == 1);
-
-    my %filenames;
-    foreach my $ticname (@tics)
-    {
-        my $ticpath = File::Spec->catfile($ticDir, $ticname);
-        display($ticpath) if($debug == 1);
-        if(!open(TIC, "<", $ticpath))
-        {
-            error("Can't open $ticpath $!");
-            finish(2);
-        }
-        my @lines = grep {s/[\r\n]+//;} readline(TIC);
-        close(TIC);
-        display(@lines) if($debug == 1);
-        my ($catched) = grep(/^File \S+$/i, @lines);
-        display($catched) if($debug == 1);
-        $catched =~ /^File (\S+)$/i;
-        my $usedFile = $1;
-        display($usedFile) if($debug == 1);
-        if($usedFile ne "")
-        {
-            $filenames{$usedFile} = $ticpath;
-            print STDERR "filenames\{$usedFile\}=$filenames{$usedFile}\n" if($debug == 1);
-        }
-    }
-
-    my $n = 0;
-    foreach my $file (@files)
-    {
-        my $used = 0;
-        foreach my $usedFile (keys %filenames)
-        {
-            if(lc($file) eq lc($usedFile))
-            {
-                $used = 1;
-                last;
-            }
-        }
-        display($used) if($debug == 1);
-        if($used == 0)
-        {
-            my $path = File::Spec->catfile($passFileAreaDir, $file);
-            display($path) if($debug == 1);
-            if(!unlink($path))
-            {
-                error("Can't delete file \"$path\" ($!)");
-                finish(2);
-            }
-            put("File $path deleted");
-            $n++;
-        }
-    }
-    put("$n widow files deleted") if($n > 0);
-}
-
-
-
-finish(0);
+init();
+$listterm = $listlog = $listreport = 1;
+rmFilesFromOutbound();
+rmFilesFromFilebox();
+rmOrphanFilesFromPassFileAreaDir();
+exit if(!$report);
+my ($subject, $fromname, @header, @footer);
+$subject = "Removing files of $link";
+$fromname = "rmLinkMail Robot";
+@header = ("  ");
+@footer = ("  ");
+publishReport($subject, $fromname, \@header, \@footer);
 
 
 __END__
@@ -379,9 +129,9 @@ perl rmLinkMail.pl [options]
     --fileecho              exclude fileechomail from the files to be deleted
     --other-files           exclude other files in the link's filebox
     --box                   do not delete an empty filebox
-    --report [area]         send a report to the echo area
     --nolog                 do not log anything in the rmLinkMail.log file
     --quiet                 do not print to terminal window
+    --version               print version and exit
     --help                  print help and exit
 
   To print full documentation run `perldoc rmLinkMail.pl`.
@@ -441,6 +191,12 @@ fileechomail from the files to be deleted.
 
 Do not delete an empty filebox. On default the empty filebox is deleted.
 
+=back
+
+=cut
+
+=begin comment
+
 =item B<-r> [area]
 
 =item B<--report> [area]
@@ -452,6 +208,10 @@ in fidoconfig is used.
 
 If the whole option is omitted, a report will not be sent.
 
+=end comment
+
+=over 4
+
 =item B<-l>
 
 =item B<--log>
@@ -461,15 +221,33 @@ It is not necessary to use it since on default logging is switched on.
 
 =item B<--nolog>
 
-Do not print anything to rmLinkMail.log file. This option does not influence sending
-a report or printing to terminal window.
+Do not print anything to rmLinkMail.log file. This option does not influence
+printing to terminal window.
 
 =item B<-q>
 
 =item B<--quiet>
 
-Do not print to terminal window. This option does not influence sending
-a report or printing to a log file.
+=item B<--noquiet>
+
+On default (or when --noquiet option is used), printing to terminal window is
+switched on. If the --quiet option is used, the script does not print to the
+terminal window. This option does not influence printing
+to a log file.
+
+=item B<--dry-run>
+
+=item B<--nodry-run>
+
+If C<--dry-run> is used, perform a trial run with no changes made. Nothing is deleted, but the same
+output is produced as in a real run except the error messages that may appear
+during the actual run.
+
+=item B<-v>
+
+=item B<--version>
+
+Print the program version and exit
 
 =item B<-h>
 
@@ -481,8 +259,8 @@ Print a brief help and exit
 
 =head1 EXIT CODE
 
-If required operation is successfully done, the exit code is 0. If help is
-printed, the exit code is 1, otherwise it is 2.
+If required operation is successfully done, the exit code is 0. If help or
+version is printed, the exit code is 1, otherwise it is 2.
 
 =head1 RESTRICTION
 
