@@ -19,8 +19,19 @@ use Husky::Rmfiles;
 use strict;
 use warnings;
 
-my $VERSION;
-$VERSION = 1.1;
+my $VER_MAJOR = 1;
+my $VER_MINOR = 2;
+our $VERSION = "$VER_MAJOR.$VER_MINOR";
+
+sub version
+{
+    use File::Basename;
+    my $base = basename($0);
+    print "$base  version=$VERSION\n";
+    print "    uses Fidoconfig::Token v.$Fidoconfig::Token::VERSION\n";
+    print "    and  Husky::Rmfiles    v.$Husky::Rmfiles::VERSION\n";
+    exit(1);
+}
 
 sub usage
 {
@@ -58,6 +69,7 @@ GetOptions(
             "log-list!"     => \$listlog,
             "term-list!"    => \$listterm,
             "dry-run!"      => \$dryrun,
+            "version"       => \&version,
             "help"          => \&usage,
           )
 or die("Error in command line arguments\n");
@@ -230,6 +242,12 @@ to print the list of deleted files to the terminal window.
 If C<--dry-run> is used, perform a trial run with no changes made. Nothing is deleted, but the same
 output is produced as in a real run except the error messages that may appear
 during the actual run.
+
+=item B<-v>
+
+=item B<--version>
+
+Print the program version and exit
 
 =item B<-h>
 
