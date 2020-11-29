@@ -141,9 +141,9 @@ all the necessary information from fidoconfig.
 
 =head1 OPTIONS
 
-All options are case insensitive and their names may be abbreviated to uniqueness.
-One may also use single-character option names with one dash instead of long option
-names with two dashes.
+All options are case insensitive and their names may be abbreviated to
+uniqueness. One may also use single-character option names with one dash
+instead of long option names with two dashes.
 
 =over 4
 
@@ -214,8 +214,9 @@ If the whole option is omitted, a report will not be sent.
 
 =item B<--log>
 
-Log all actions to rmLinkMail.log file if B<LogFileDir> is defined in fidoconfig.
-It is not necessary to use it since on default logging is switched on.
+Log all actions to rmLinkMail.log file if B<LogFileDir> is defined in
+fidoconfig. It is not necessary to use it since on default logging is switched
+on.
 
 =item B<--nolog>
 
@@ -237,9 +238,9 @@ to a log file.
 
 =item B<--nodry-run>
 
-If C<--dry-run> is used, perform a trial run with no changes made. Nothing is deleted, but the same
-output is produced as in a real run except the error messages that may appear
-during the actual run.
+If C<--dry-run> is used, perform a trial run with no changes made. Nothing is
+deleted, but the same output is produced as in a real run except the error
+messages that may appear during the actual run.
 
 =item B<-v>
 

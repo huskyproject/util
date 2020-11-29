@@ -131,16 +131,16 @@ perl rmLink.pl [options]
 
 =head1 DESCRIPTION
 
-rmLink.pl unsubscribes the specified link from all echos and file echos, removes
-netmail, echomail and files intended for the link taking all the necessary
-information from fidoconfig and comments out or deletes the lines of the link
-definition.
+rmLink.pl unsubscribes the specified link from all echos and file echos,
+removes netmail, echomail and files intended for the link taking all the
+necessary information from fidoconfig and comments out or deletes the lines of
+the link definition.
 
 =head1 OPTIONS
 
-All options are case insensitive and their names may be abbreviated to uniqueness.
-One may also use single-character option names with one dash instead of long option
-names with two dashes for some options.
+All options are case insensitive and their names may be abbreviated to
+uniqueness. One may also use single-character option names with one dash
+instead of long option names with two dashes for some options.
 
 =over 4
 
@@ -172,8 +172,8 @@ If --delete option is used, the link definition is deleted.
 
 =item B<--nobackup>
 
-On default (or when --nobackup is used), the configuration file is not backed up
-before deleting link definition from it.  If the --backup option is used, a
+On default (or when --nobackup is used), the configuration file is not backed
+up before deleting link definition from it.  If the --backup option is used, a
 backup of the configuration file with the link definition is made with the .bak
 filename extension.
 
@@ -192,11 +192,11 @@ influence printing to the log file or to the terminal.
 =item B<--nolog>
 
 On default (or when --log option is used), logging to rmLink.log is switched
-on. If the --nolog option is used, the script does not print anything to the log
-file. This option does not influence sending a report or printing to terminal
-window. The rmLink.log file is created in the directory defined by B<logFileDir>
-statement in fidoconfig. If the statement is absent, there is no logging even
-when --log option is used.
+on. If the --nolog option is used, the script does not print anything to the
+log file. This option does not influence sending a report or printing to
+terminal window. The rmLink.log file is created in the directory defined by
+B<logFileDir> statement in fidoconfig. If the statement is absent, there is no
+logging even when --log option is used.
 
 =item B<-q>
 
@@ -221,25 +221,25 @@ the list of deleted files in the report.
 
 =item B<--nolog-list>
 
-On default (or when --log-list is used), the list of deleted files is
-included in the log file. Please use --nolog-list if you want to exclude
-the list of deleted files from the log file.
+On default (or when --log-list is used), the list of deleted files is included
+in the log file. Please use --nolog-list if you want to exclude the list of
+deleted files from the log file.
 
 =item B<--term-list>
 
 =item B<--noterm-list>
 
-On default (or when --term-list is used), the list of deleted files is
-printed to the terminal window. Please use --nolog-list if you do not want
-to print the list of deleted files to the terminal window.
+On default (or when --term-list is used), the list of deleted files is printed
+to the terminal window. Please use --nolog-list if you do not want to print the
+list of deleted files to the terminal window.
 
 =item B<--dry-run>
 
 =item B<--nodry-run>
 
-If C<--dry-run> is used, perform a trial run with no changes made. Nothing is deleted, but the same
-output is produced as in a real run except the error messages that may appear
-during the actual run.
+If C<--dry-run> is used, perform a trial run with no changes made. Nothing is
+deleted, but the same output is produced as in a real run except the error
+messages that may appear during the actual run.
 
 =item B<-v>
 

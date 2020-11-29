@@ -125,7 +125,8 @@ __END__
 
 =head1 NAME
 
-fixOutbound.pl - remove from outbound the echomail bundles not referred by any flow file
+ fixOutbound.pl - remove from outbound the echomail bundles not referred by any
+                  flow file
 
 =head1 SYNOPSIS
 
@@ -138,7 +139,8 @@ perl fixOutbound.pl [options]
     --report [area]         send a report to the echo or netmail area
     --nolog                 do not log the actions in the fixOutbound.log file
     --quiet                 do not print to terminal window
-    --noreport-list         exclude the listing of deleted files from the report
+    --noreport-list         exclude the listing of deleted files from the
+                            report
     --nolog-list            do not include the list of deleted files
                             in the log file
     --noterm-list           do not print the list of deleted files to the
@@ -158,9 +160,9 @@ of normal processing are also deleted.
 
 =head1 OPTIONS
 
-All options are case insensitive and their names may be abbreviated to uniqueness.
-One may also use single-character option names with one dash instead of long option
-names with two dashes for some options.
+All options are case insensitive and their names may be abbreviated to
+uniqueness. One may also use single-character option names with one dash
+instead of long option names with two dashes for some options.
 
 =over 4
 
@@ -175,9 +177,9 @@ variable is not defined. Otherwise you may omit the option.
 
 =item B<--age> lower_limit
 
-Here C<lower_limit> is a non-negative integer. All truncated to zero length echomail
-bundles older than C<lower_limit> days will be deleted. If you omit the option,
-the default value of 183 days (half a year) is used.
+Here C<lower_limit> is a non-negative integer. All truncated to zero length
+echomail bundles older than C<lower_limit> days will be deleted. If you omit
+the option, the default value of 183 days (half a year) is used.
 
 =item B<--report> [area]
 
@@ -193,12 +195,12 @@ influence printing to the log file or to the terminal.
 
 =item B<--nolog>
 
-On default (or when --log option is used), logging to fixOutbound.log is switched
-on. If the --nolog option is used, the script does not print anything to the log
-file. This option does not influence sending a report or printing to terminal
-window. The fixOutbound.log file is created in the directory defined by B<logFileDir>
-statement in fidoconfig. If the statement is absent, there is no logging even
-when --log option is used.
+On default (or when --log option is used), logging to fixOutbound.log is
+switched on. If the --nolog option is used, the script does not print anything
+to the log file. This option does not influence sending a report or printing to
+terminal window. The fixOutbound.log file is created in the directory defined
+by B<logFileDir> statement in fidoconfig. If the statement is absent, there is
+no logging even when --log option is used.
 
 =item B<-q>
 
@@ -239,9 +241,9 @@ to print the list of deleted files to the terminal window.
 
 =item B<--nodry-run>
 
-If C<--dry-run> is used, perform a trial run with no changes made. Nothing is deleted, but the same
-output is produced as in a real run except the error messages that may appear
-during the actual run.
+If C<--dry-run> is used, perform a trial run with no changes made. Nothing is
+deleted, but the same output is produced as in a real run except the error
+messages that may appear during the actual run.
 
 =item B<-v>
 
