@@ -395,6 +395,7 @@ sub deleteFiles
     $deleted = $notdeleted = 0;
     for my $file (@filesToDelete)
     {
+        $file = normalize($file);
         my $num = !$dryrun ? unlink $file : 1;
         if($num == 1)
         {
@@ -782,7 +783,7 @@ sub rmOrphanFilesFromOutbound
         $deleted = $notdeleted = 0;
         for my $file (@echobundles)
         {
-            $file = catfile($outbound, $file);
+            $file = normalize(catfile($outbound, $file));
             my $num = !$dryrun ? unlink $file : 1;
             if($num == 1)
             {
@@ -837,7 +838,7 @@ sub rmOrphanFilesFromPassFileAreaDir
             # If the $file is not used by any .tic
             unless(grep(/^$file$/i, @usedFiles))
             {
-                my $path = catfile($passFileAreaDir, $file);
+                my $path = normalize(catfile($passFileAreaDir, $file));
                 if(!$dryrun ? unlink($path) : 1)
                 {
                     put($list->(), "File $path deleted");
