@@ -126,7 +126,7 @@ sub init
         $commentChar = '#';
         ($path, $logfileDir) = findTokenValue($fidoconfig, "LogFileDir");
         $logfileDir = expandVars($logfileDir) if($logfileDir);
-        $logfile = (!$logfileDir) ? "" : catfile($logfileDir, $log);
+        $logfile = (!$logfileDir) ? "" : normalize(catfile($logfileDir, $log));
         if($logfile)
         {
             open($lh, ">>", $logfile) or die("Cannot open $logfile\n");
@@ -230,7 +230,7 @@ sub init
     ($path, $busyFileDir) = findTokenValue($fidoconfig, "BusyFileDir");
     unless($busyFileDir)
     {
-        $busyFileDir = catdir($defOutbound, "busy.htk");
+        $busyFileDir = normalize(catdir($defOutbound, "busy.htk"));
     }
 
     $commentChar = '#';
@@ -478,7 +478,7 @@ sub rmFilesFromOutbound
     $bsooutbound = "" if(! -d $bsooutbound);
     if($bsooutbound && $point)
     {
-        $bsooutbound = catdir($bsooutbound,  $bsoname . ".pnt");
+        $bsooutbound = normalize(catdir($bsooutbound,  $bsoname . ".pnt"));
         $bsoname = sprintf("%08x", $point);
         $bsooutbound = "" if(! -d $bsooutbound);
     }
@@ -489,7 +489,7 @@ sub rmFilesFromOutbound
         next unless($outbound);
         $loname = $style eq "aso" ? $asoname : $bsoname;
 
-        my $bsy = catfile($outbound, "$loname.bsy");
+        my $bsy = normalize(catfile($outbound, "$loname.bsy"));
         if(-f $bsy)
         {
             error($all, "\nBusy flag $bsy found!");
@@ -601,7 +601,10 @@ sub rmFilesFromFilebox
             my @ticlines = <FH>;
             close(FH);
             my ($file) = grep {s/[\r\n]//; s/^File (\S+)$/$1/i;} @ticlines;
-            push(@referredByTic, $file) if($file && -f catfile($fileboxname, $file));
+            if($file && -f normalize(catfile($fileboxname, $file)))
+            {
+                push(@referredByTic, $file) ;
+            }
         }
     }
 
@@ -683,7 +686,7 @@ sub rmFilesFromFilebox
 sub readTIC
 {
     my ($ticname) = @_;
-    my $ticpath = catfile($ticOutbound, $ticname);
+    my $ticpath = normalize(catfile($ticOutbound, $ticname));
     lastError("Cannot open $ticpath $!") if(!open(TIC, "<", $ticpath));
     my @lines = grep {s/[\r\n]+//;} readline(TIC);
     close(TIC);
@@ -815,12 +818,23 @@ sub rmOrphanFilesFromPassFileAreaDir
 {
     if($passFileAreaDir && -d $passFileAreaDir)
     {
-        lastError("Cannot open $passFileAreaDir directory ($!)") if(!opendir(DIR, $passFileAreaDir));
-        my @files = grep(-f catfile($passFileAreaDir, $_) && !/\.tic$/i, readdir(DIR));
+        if(!opendir(DIR, $passFileAreaDir))
+        {
+            lastError("Cannot open $passFileAreaDir directory ($!)");
+        }
+        my @files = grep(
+                         -f normalize(catfile($passFileAreaDir, $_)) &&
+                         !/\.tic$/i,
+                           readdir(DIR)
+                        );
         closedir(DIR);
 
         lastError("Cannot open $ticOutbound directory ($!)") if(!opendir(DIR, $ticOutbound));
-        my @tics = grep(-f catfile($ticOutbound, $_) && /\.tic$/i, readdir(DIR));
+        my @tics = grep(
+                        -f normalize(catfile($ticOutbound, $_)) &&
+                        /\.tic$/i,
+                          readdir(DIR)
+                       );
         closedir(DIR);
 
         put($all, "Deleting orphan files from PassFileAreaDir");
