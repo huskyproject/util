@@ -258,7 +258,7 @@ sub put
 {
     my ($level, $msg) = @_;
     print "$msg\n" if(!$quiet && $level & 4);
-    my $date = strftime("%F %T", localtime);
+    my $date = strftime("%Y-%m-%d %H:%M:%S", localtime);
     print $lh "$date  $msg\n" if($log && $level & 2);
     push(@reportLines, $msg) if($report && $level & 1);
 }
@@ -267,7 +267,7 @@ sub error
 {
     my ($level, $msg) = @_;
     print STDERR "$msg\n" if(!$quiet && $level & 4);
-    my $date = strftime("%F %T", localtime);
+    my $date = strftime("%Y-%m-%d %H:%M:%S", localtime);
     print $lh "$date  $msg\n" if($log && $level & 2);
     push(@reportLines, $msg) if($report && $level & 1);
 }
@@ -275,7 +275,7 @@ sub error
 sub lastError
 {
     my $msg = shift;
-    my $date = strftime("%F %T", localtime);
+    my $date = strftime("%Y-%m-%d %H:%M:%S", localtime);
     print $lh "$date  $msg\n" if($log);
     close($lh) if($log);
     push(@reportLines, $msg) if($report);
