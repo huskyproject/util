@@ -371,15 +371,6 @@ sub unsubscribeLink
     $module = "hpt";
 }
 
-my ($loname, $flowFile);
-sub getFlowFile
-{
-    if(-f $File::Find::name && basename($File::Find::name) =~ /^$loname\.[icdfh]lo$/i)
-    {
-        $flowFile = $File::Find::name;
-    }
-}
-
 my @ticsToRemove;
 sub getTIC
 {
@@ -515,7 +506,7 @@ sub rmFilesFromOutbound
     {
         $outbound = $style eq "aso" ? $defOutbound : $bsooutbound;
         next unless($outbound);
-        $loname = $style eq "aso" ? $asoname : $bsoname;
+        my $loname = $style eq "aso" ? $asoname : $bsoname;
 
         my $bsy = normalize(catfile($outbound, "$loname.bsy"));
         if(-f $bsy)
@@ -526,8 +517,16 @@ sub rmFilesFromOutbound
         }
 
         # Remove echomail and tics from $outbound
-        $flowFile = undef;
-        find(\&getFlowFile, $outbound);
+        my $flowFile;
+        my $getFlowFile = sub
+        {
+            return if($File::Find::dir ne $outbound);
+            if(-f $File::Find::name && basename($File::Find::name) =~ /^$loname\.[icdfh]lo$/i)
+            {
+                $flowFile = $File::Find::name;
+            }
+        };
+        find($getFlowFile, $outbound);
         rmFilesFromLo($flowFile) if($flowFile && -f $flowFile);
 
         # Remove flow files
