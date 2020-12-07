@@ -334,12 +334,14 @@ sub unsubscribeLink
             if($OS eq "UNIX")
             {
                 my $cmd = "hpt -c $fidoconfig afix -s $link '-*'";
-                system($cmd) == 0 or lastError("system(\"$cmd\") failed: $!");
+                my $exitcode = system("$cmd");
+                lastError("system(\"$cmd\") failed: $!") if(($exitcode >> 8) != 0);
             }
             else
             {
                 my @cmd = ("hpt", "-c", "\"$fidoconfig\"", "afix", "-s", "$link", "-*");
-                system(@cmd) == 0 or lastError("system(\"@cmd\") failed: $!");
+                my $exitcode = system(@cmd);
+                lastError("system(\"@cmd\") failed: $!") if(($exitcode >> 8) != 0);
             }
         }
         put($all, "$link was unsubscribed from all echos");
@@ -360,7 +362,8 @@ sub unsubscribeLink
             else
             {
                 my @cmd = ("htick", "-c", "\"$fidoconfig\"", "ffix", "-s", "$link", "-*");
-                system(@cmd) == 0 or lastError("system(\"@cmd\") failed: $!");
+                my $exitcode = system(@cmd);
+                lastError("system(\"@cmd\") failed: $!") if(($exitcode >> 8) != 0);
             }
         }
         put($all, "$link was unsubscribed from all fileechos");
