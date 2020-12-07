@@ -371,35 +371,6 @@ sub unsubscribeLink
     $module = "hpt";
 }
 
-my @ticsToRemove;
-sub getTIC
-{
-    if(-f $File::Find::name && basename($File::Find::name) =~ /\.tic$/i && !$fileecho)
-    {
-        open(TIC, "<", $File::Find::name) or croak("Could not open $File::Find::name: $!");
-        my $tolink = grep {m/^To\s+$link/i} <TIC>;
-        close(TIC);
-        push(@ticsToRemove, $File::Find::name) if($tolink);
-    }
-}
-
-my @filesToRemove;
-sub getFlowFileToRemove
-{
-    if(-f $File::Find::name)
-    {
-        my $base = basename($File::Find::name);
-        if(!$echomail && !$fileecho && $base =~ /^$loname\.[icdfh]lo$/i ||
-           !$netmail && $base =~ /^$loname\.[icdoh]ut$/i ||
-           !$netmail && !$echomail && !$fileecho && 
-           ($base =~ /^$loname\.try$/i ||
-            $base =~ /^$loname\.hld$/i))
-        {
-            push(@filesToRemove, $File::Find::name);
-        }
-    }
-}
-
 sub deleteTICs
 {
     return unless(@ticsToRemove);
@@ -530,8 +501,25 @@ sub rmFilesFromOutbound
         rmFilesFromLo($flowFile) if($flowFile && -f $flowFile);
 
         # Remove flow files
-        @filesToRemove = ();
-        find(\&getFlowFileToRemove, $outbound);
+        my @filesToRemove;
+        my $getFlowFileToRemove = sub
+        {
+            return if($File::Find::dir ne $outbound);
+            if(-f $File::Find::name)
+            {
+                my $base = basename($File::Find::name);
+                if(
+                   !$echomail && !$fileecho && $base =~ /^$loname\.[icdfh]lo$/i ||
+                   !$netmail && $base =~ /^$loname\.[icdoh]ut$/i ||
+                   !$netmail && !$echomail && !$fileecho &&.
+                   ($base =~ /^$loname\.try$/i || $base =~ /^$loname\.hld$/i)
+                  )
+                {
+                    push(@filesToRemove, $File::Find::name);
+                }
+            }
+        };
+        find($getFlowFileToRemove, $outbound);
         if(@filesToRemove)
         {
             put($all, "Deleting flow files from outbound");
@@ -541,8 +529,24 @@ sub rmFilesFromOutbound
 
     if(-d $busyFileDir)
     {
-        @ticsToRemove = ();
-        find(\&getTIC, $busyFileDir);
+        my @ticsToRemove;
+        my $getTIC = sub
+        {
+            return if($File::Find::dir ne $busyFileDir);
+            if(
+               -f $File::Find::name &&
+               basename($File::Find::name) =~ /\.tic$/i &&
+               !$fileecho
+              )
+            {
+                open(TIC, "<", $File::Find::name) or.
+                  croak("Could not open $File::Find::name: $!");
+                my $tolink = grep {m/^To\s+$link/i} <TIC>;
+                close(TIC);
+                push(@ticsToRemove, $File::Find::name) if($tolink);
+            }
+        };
+        find($getTIC, $busyFileDir);
         if(@ticsToRemove)
         {
             put($all, "Deleting TICs from BusyFileDir");
