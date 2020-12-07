@@ -47,12 +47,14 @@ To install Fidoconfig::Token and Husky::Rmfiles packages run the following:
     pushd Fidoconfig-Token
     perl Build.PL
     ./Build
+    ./Build test
     sudo ./Build install
     popd
 
     pushd Husky-Rmfiles
     perl Build.PL
     ./Build
+    ./Build test
     sudo ./Build install
     popd
 
@@ -87,12 +89,14 @@ commands:
     pushd Fidoconfig-Token
     perl Build.PL
     Build
+    Build test
     Build install
     popd
 
     pushd Husky-Rmfiles
     perl Build.PL
     Build
+    Build test
     Build install
     popd
 
