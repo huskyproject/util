@@ -504,7 +504,7 @@ sub rmFilesFromOutbound
                 if(
                    !$echomail && !$fileecho && $base =~ /^$loname\.[icdfh]lo$/i ||
                    !$netmail && $base =~ /^$loname\.[icdoh]ut$/i ||
-                   !$netmail && !$echomail && !$fileecho &&.
+                   !$netmail && !$echomail && !$fileecho && 
                    ($base =~ /^$loname\.try$/i || $base =~ /^$loname\.hld$/i)
                   )
                 {
@@ -532,7 +532,7 @@ sub rmFilesFromOutbound
                !$fileecho
               )
             {
-                open(TIC, "<", $File::Find::name) or.
+                open(TIC, "<", $File::Find::name) or 
                   croak("Could not open $File::Find::name: $!");
                 my $tolink = grep {m/^To\s+$link/i} <TIC>;
                 close(TIC);
@@ -546,40 +546,6 @@ sub rmFilesFromOutbound
             deleteFiles(@ticsToRemove);
         }
     }
-}
-
-my ($box, $boxh, $fileboxname);
-sub getFilebox
-{
-    if(-d $File::Find::name)
-    {
-        my $base = basename($File::Find::name);
-        if($base eq $box || lc($base) eq $boxh)
-        {
-            $fileboxname = $File::Find::name;
-        }
-    }
-}
-
-my @tics;
-sub getFileInFilebox
-{
-    my $file = $File::Find::name;
-    my $base = basename($file);
-    return if($netmail && ($base =~ /\.[icdoh]ut$/i ||
-                           $base =~ /\.try$/i ||
-                           $base =~ /\.hld$/i));
-    return if($echomail && ($base =~ /\.(?:mo|tu|we|th|fr|sa|su)[0-9a-z]$/i ||
-                            $base =~ /\.try$/i ||
-                            $base =~ /\.hld$/i));
-    if($base =~ /\.tic$/i)
-    {
-        push(@tics, $file) if(($fileecho || $otherfile) && -f $file);
-        return if($fileecho);
-    }
-    return if(($netmail || $echomail || $fileecho || $otherfile) &&
-              ($base =~ /\.try$/i || $base =~ /\.hld$/i));
-    push(@filesToRemove, $file) if(-f $file); # not a directory
 }
 
 =head2 rmFilesFromFilebox
@@ -600,22 +566,57 @@ deleted.
 sub rmFilesFromFilebox
 {
     return if(!$fileBoxesDir);
-    @filesToRemove = ();
-    @tics = ();
+    my ($box, $boxh, $fileboxname);
     $fileboxname = "";
     $box = "$zone.$net.$node.$point";
     $boxh = "$box.h";
-    find(\&getFilebox, $fileBoxesDir);
+
+    my $getFilebox = sub
+    {
+        return if($File::Find::dir ne $fileBoxesDir);
+        if(-d $File::Find::name)
+        {
+            my $base = basename($File::Find::name);
+            if($base eq $box || lc($base) eq $boxh)
+            {
+                $fileboxname = $File::Find::name;
+            }
+        }
+    };
+
+    find($getFilebox, $fileBoxesDir);
     if($fileboxname eq "")
     {
         put($all, "There is no filebox for $link");
         return;
     }
 
-    find(\&getFileInFilebox, $fileboxname);
+    my (@tics, @filesToRemove);
+    my $getFileInFilebox = sub
+    {
+        return if($File::Find::dir ne $fileboxname);
+        my $file = $File::Find::name;
+        my $base = basename($file);
+        return if($netmail && ($base =~ /\.[icdoh]ut$/i ||
+                               $base =~ /\.try$/i ||
+                               $base =~ /\.hld$/i));
+        return if($echomail && ($base =~ /\.(?:mo|tu|we|th|fr|sa|su)[0-9a-z]$/i ||
+                                $base =~ /\.try$/i ||
+                                $base =~ /\.hld$/i));
+        if($base =~ /\.tic$/i)
+        {
+            push(@tics, $file) if(($fileecho || $otherfile) && -f $file);
+            return if($fileecho);
+        }
+        return if(($netmail || $echomail || $fileecho || $otherfile) &&
+                  ($base =~ /\.try$/i || $base =~ /\.hld$/i));
+        push(@filesToRemove, $file) if(-f $file); # not a directory
+    };
+
+    find($getFileInFilebox, $fileboxname);
 
     # Collect all filenames in the filebox referred by TICs
-    my @referredByTic = ();
+    my @referredByTic;
     for my $tic (@tics)
     {
         # if $tic has non-zero size
@@ -652,12 +653,14 @@ sub rmFilesFromFilebox
         for(my $i = @filesToRemove - 1; $i >= 0; $i--)
         {
             my $base = basename($filesToRemove[$i]);
-            if($base !~ /\.[icdoh]ut$/i &&
+            if(
+               $base !~ /\.[icdoh]ut$/i &&
                $base !~ /\.(?:mo|tu|we|th|fr|sa|su)[0-9a-z]$/i &&
                $base !~ /\.tic$/i &&
                $base !~ /\.try$/i &&
                $base !~ /\.hld$/i &&
-               !grep(/^$base$/i, @referredByTic))
+               !grep(/^$base$/i, @referredByTic)
+              )
             {
                 splice(@filesToRemove, $i, 1);
             }
