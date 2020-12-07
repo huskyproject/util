@@ -12,9 +12,9 @@ our (@ISA, @EXPORT, $VERSION, $commentChar, $module);
 $VERSION = "2.2";
 
 use Exporter;
-@ISA = qw(Exporter);
+@ISA    = qw(Exporter);
 @EXPORT = qw(findTokenValue findAllTokenValues getOS normalize stripSpaces
-             stripQuotes stripComment expandVars isOn $commentChar $module);
+  stripQuotes stripComment expandVars isOn $commentChar $module);
 @EXPORT_OK = qw(cmpPattern boolExpr parseIf searchTokenValue);
 use Config;
 use File::Spec::Functions;
@@ -161,18 +161,19 @@ sub findTokenValue
     my ($tokenFile, $token, $mode, $desiredValue, @bad) = @_;
     getOS();
     croak("findTokenValue(): extra arguments") if(@bad);
-    croak("findTokenValue(): the fourth argument is not defined") if(defined($mode) && !defined($desiredValue));
+    croak("findTokenValue(): the fourth argument is not defined")
+      if(defined($mode) && !defined($desiredValue));
     if(defined($desiredValue) && $mode eq '=~')
     {
         eval {$desiredValue} or
-            croak("findTokenValue(): the fourth argument is incorrect");
+          croak("findTokenValue(): the fourth argument is incorrect");
     }
-    $ifLevel = 0;
+    $ifLevel   = 0;
     @condition = ();
-    my ($file, $value, $linenum, @lines) = searchTokenValue($tokenFile, $token, $mode, $desiredValue);
-    return ($file, $value, $linenum, @lines);
+    my ($file, $value, $linenum, @lines) =
+      searchTokenValue($tokenFile, $token, $mode, $desiredValue);
+    return($file, $value, $linenum, @lines);
 }
-
 
 =head2 findAllTokenValues($tokenFile, $token, $desiredValue)
 
@@ -192,10 +193,11 @@ sub findAllTokenValues
     my ($tokenFile, $token, $desiredValue, @bad) = @_;
     getOS();
     croak("findAllTokenValues(): extra arguments\n") if(@bad);
-    croak("findAllTokenValues(): the third argument is not defined\n") unless(defined($desiredValue));
-    eval {$desiredValue} or 
-        croak("findAllTokenValues(): the third argument is incorrect\n");
-    $ifLevel = 0;
+    croak("findAllTokenValues(): the third argument is not defined\n")
+      unless(defined($desiredValue));
+    eval {$desiredValue} or
+      croak("findAllTokenValues(): the third argument is incorrect\n");
+    $ifLevel   = 0;
     @condition = ();
     my ($file, @values) = searchAllTokenValues($tokenFile, $token, $desiredValue);
     return @values;
@@ -232,7 +234,7 @@ C<UNIX> - for UNIX-like operating systems (Linux, OS X, *BSD and others).
 sub getOS
 {
     my $OS;
-    unless ($OS = $^O)
+    unless($OS = $^O)
     {
         $OS = $Config::Config{'osname'};
     }
@@ -249,7 +251,10 @@ sub getOS
     {
         $OS = 'OS/2';
     }
-    elsif($OS =~ /^VMS/i or $OS =~ /^MacOS/i or $OS =~ /^epoc/i or $OS =~ /NetWare/i)
+    elsif($OS =~ /^VMS/i or
+          $OS =~ /^MacOS/i or
+          $OS =~ /^epoc/i  or
+          $OS =~ /NetWare/i)
     {
         croak("$OS is not supported");
     }
@@ -259,7 +264,7 @@ sub getOS
     }
     $ENV{OS} = $OS;
     return $OS;
-}
+} ## end sub getOS
 
 =head2 normalize($path)
 
@@ -287,7 +292,7 @@ is stripped of heading and trailing white spaces.
 sub stripSpaces
 {
     my @arr = @_;
-    foreach (@arr)
+    foreach(@arr)
     {
         next unless $_;
         s/^\s+//;
@@ -306,7 +311,7 @@ is stripped of a pair of heading and trailing double quote character.
 sub stripQuotes
 {
     my @arr = @_;
-    foreach (@arr)
+    foreach(@arr)
     {
         next unless $_;
         s/^\"(.+)\"$/$1/;
@@ -323,7 +328,7 @@ stripComment(@lines) returns an array of lines with stripped comment in every li
 sub stripComment
 {
     my @arr = @_;
-    foreach (@arr)
+    foreach(@arr)
     {
         next unless $_;
         next if(s/^\s*$commentChar.*$//);
@@ -352,19 +357,19 @@ sub expandVars
 
     # check whether number of backticks (\x60) is even
     my $number = $expr =~ tr/\x60//;
-    my $OS = getOS();
-    if(($OS eq 'UNIX' or $OS eq 'OS/2') && 
+    my $OS     = getOS();
+    if(($OS eq 'UNIX' or $OS eq 'OS/2') &&
         $number != 0 &&
         int($number / 2) * 2 == $number)
     {
         # execute command in backticks
-        $cmd = 1;
+        $cmd    = 1;
         $result = "";
-        while ($cmd)
+        while($cmd)
         {
             ($left, $cmd, $remainder) = split /\x60/, $expr, 3;
-            $left = "" if(!defined($left));
-            $cmd = "" if(!defined($cmd));
+            $left      = "" if(!defined($left));
+            $cmd       = "" if(!defined($cmd));
             $remainder = "" if(!defined($remainder));
             if($cmd)
             {
@@ -379,25 +384,24 @@ sub expandVars
             }
         }
         $expr = $result;
-    }
+    } ## end if(($OS eq 'UNIX' or $OS...))
 
     # substitute environment variables by their values
-    $var = 1;
+    $var    = 1;
     $result = "";
-    while ($var)
+    while($var)
     {
         ($left, $var, $remainder) = $expr =~ /^(.*)\[([a-z_][a-z0-9_]*)\](.*)$/i;
-        $left = "" if(!defined($left));
-        $var = "" if(!defined($var));
+        $left      = "" if(!defined($left));
+        $var       = "" if(!defined($var));
         $remainder = "" if(!defined($remainder));
         if($var)
         {
-            $result =
-                (
-                 lc($var) eq "module"
-                 ? "module"
-                 : ($ENV{$var} ? $ENV{$var} : "")
-                ) . $remainder . $result;
+            $result = (
+                       lc($var) eq "module" ? "module" :
+                         ($ENV{$var} ? $ENV{$var} : "")
+              ) .
+              $remainder . $result;
             last unless $left;
             $expr = $left;
         }
@@ -407,7 +411,7 @@ sub expandVars
         }
     }
     return $result;
-}
+} ## end sub expandVars
 
 # cmpPattern($string, $pattern) compares $string with $pattern
 # and returns boolean result of the comparison. The pattern
@@ -416,8 +420,8 @@ sub expandVars
 sub cmpPattern
 {
     my ($string, $pattern, @bad) = @_;
-    croak("cmpPattern(): extra arguments") if(@bad);
-    croak("cmpPattern(): string not defined") if(!defined($string));
+    croak("cmpPattern(): extra arguments")     if(@bad);
+    croak("cmpPattern(): string not defined")  if(!defined($string));
     croak("cmpPattern(): pattern not defined") if(!defined($pattern));
     $pattern =~ s/\?/./g;
     $pattern =~ s/\*/.*/g;
@@ -436,7 +440,7 @@ sub boolExpr
     ($expr) = stripSpaces($expr);
     if($expr =~ /^not\s+(.+)$/i)
     {
-        $not = 1;
+        $not  = 1;
         $expr = $1;
     }
 
@@ -471,7 +475,7 @@ sub boolExpr
     }
 
     return $not ? not $result : $result;
-}
+} ## end sub boolExpr
 
 # parseIf($line) parses $line for conditional operators
 # and returns 1 if the line should be skipped else 0.
@@ -526,13 +530,14 @@ sub parseIf
 
     return 1 if($ifLevel and not $condition[-1]);
     return 0;
-}
+} ## end sub parseIf
 
 sub searchTokenValue
 {
     my ($tokenFile, $token, $mode, $desiredValue, @bad) = @_;
-#    croak("searchTokenValue(): extra arguments") if(@bad);
-#    croak("searchTokenValue(): the fourth argument is not defined") if(defined($mode) && !defined($desiredValue));
+
+    #    croak("searchTokenValue(): extra arguments") if(@bad);
+    #    croak("searchTokenValue(): the fourth argument is not defined") if(defined($mode) && !defined($desiredValue));
     $desiredValue = "on" if(defined($desiredValue) && isOn($desiredValue));
     my $value = "";
     my $cmp;
@@ -606,12 +611,13 @@ sub searchTokenValue
         elsif($line =~ /^include\s+(.+)$/i)
         {
             my ($newTokenFile, $index, @newlines);
-            ($newTokenFile, $value, $index, @newlines) = searchTokenValue($1, $token, $mode, $desiredValue);
+            ($newTokenFile, $value, $index, @newlines) =
+              searchTokenValue($1, $token, $mode, $desiredValue);
             if($value and $newTokenFile)
             {
                 $tokenFile = $newTokenFile;
-                $i = $index;
-                @lines = @newlines;
+                $i         = $index;
+                @lines     = @newlines;
                 last;
             }
         }
@@ -632,31 +638,31 @@ sub searchTokenValue
         {
             $commentChar = $1;
         }
-    } ## end for
+    } ## end for($i = 0; $i < @lines...)
     if(!$value)
     {
-        $i = undef;
+        $i     = undef;
         @lines = ();
     }
-    return ($tokenFile, $value, $i, @lines);
+    return($tokenFile, $value, $i, @lines);
 } ## end sub searchTokenValue
 
 sub searchAllTokenValues
 {
     my ($tokenFile, $token, $desiredValue, @bad) = @_;
     croak("searchTokenValue(): extra arguments") if(@bad);
-    croak("searchTokenValue(): the third argument is not defined") unless(defined($desiredValue));
+    croak("searchTokenValue(): the third argument is not defined")
+      unless(defined($desiredValue));
     ($desiredValue) = stripSpaces($desiredValue);
     $desiredValue = lc($desiredValue);
     $desiredValue = "on" if(isOn($desiredValue));
     my $value = "";
-    my $cmp = sub
+    my $cmp   = sub
     {
         my $res = $value =~ m/$desiredValue/;
         $value = $1 if($res && $1);
         return $res;
     };
-
 
     ($tokenFile) = stripQuotes(stripSpaces($tokenFile));
     open(FIN, "<", $tokenFile) or croak("$tokenFile: $!");

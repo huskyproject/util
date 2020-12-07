@@ -9,21 +9,24 @@
 #
 package Husky::Rmfiles;
 our (@ISA, @EXPORT, $VERSION);
-our ($fidoconfig, $link, $delete, $backup, $report, $log,
-     $quiet, $netmail, $echomail, $fileecho, $otherfile, $filebox,
-     $listterm, $listlog, $listreport, $dryrun);
+our (
+     $fidoconfig, $link,    $delete,     $backup,   $report,    $log,
+     $quiet,      $netmail, $echomail,   $fileecho, $otherfile, $filebox,
+     $listterm,   $listlog, $listreport, $dryrun
+    );
 
 # The package version
 $VERSION = "1.3";
 
 use Exporter;
-@ISA = qw(Exporter);
+@ISA    = qw(Exporter);
 @EXPORT = qw(init unsubscribeLink rmFilesFromOutbound rmFilesFromFilebox
-             rmOrphanFilesFromPassFileAreaDir rmLinkDefinition publishReport
-             rmOrphanFilesFromOutbound put error lastError
-             $fidoconfig $link $delete $backup $report $log
-             $quiet $netmail $echomail $fileecho $otherfile $filebox
-             $listterm $listlog $listreport $dryrun);
+  rmOrphanFilesFromPassFileAreaDir rmLinkDefinition publishReport
+  rmOrphanFilesFromOutbound put error lastError
+  $fidoconfig $link $delete $backup $report $log
+  $quiet $netmail $echomail $fileecho $otherfile $filebox
+  $listterm $listlog $listreport $dryrun);
+
 #@EXPORT_OK = qw(put error lastError);
 
 use Carp;
@@ -41,9 +44,13 @@ use 5.008;
 use strict;
 use warnings;
 
-my ($address, $fileBoxesDir, $logfile, $lockFile, $advisoryLock, $lh,
-    $defZone, $defOutbound, $zone, $net, $node, $point, $ASO,
-    $passFileAreaDir, $ticOutbound, $busyFileDir, $OS, $reportToEcho, $list, $all);
+my (
+    $address,      $fileBoxesDir,    $logfile,     $lockFile,
+    $advisoryLock, $lh,              $defZone,     $defOutbound,
+    $zone,         $net,             $node,        $point,
+    $ASO,          $passFileAreaDir, $ticOutbound, $busyFileDir,
+    $OS,           $reportToEcho,    $list,        $all
+   );
 
 # Transliterate Windows path to Perl presentation
 sub perlpath
@@ -105,7 +112,7 @@ sub init
 {
     my ($nolink) = @_;
     ($fidoconfig && -f $fidoconfig && -s $fidoconfig) or
-        die("Please supply the path to fidoconfig\n");
+      die("Please supply the path to fidoconfig\n");
 
     if(!$nolink)
     {
@@ -114,7 +121,8 @@ sub init
         ($zone, $net, $node, $point) = $link =~ m!(\d+):(\d+)/(\d+)(?:\.(\d+))?!;
         if(!defined($zone))
         {
-            lastError("\naddress=$link but it should be zone:net/node or zone:net/node.point\n");
+            lastError(
+                     "\naddress=$link but it should be zone:net/node or zone:net/node.point\n");
         }
         $point = 0 if(!defined($point));
     }
@@ -154,7 +162,8 @@ sub init
         {
             $report = "";
             error($all, "ReportTo is not defined in your fidoconfig");
-            error($all, "and you did not specify an echo or netmail area to send report to.");
+            error($all,
+                  "and you did not specify an echo or netmail area to send report to.");
             error($all, "No report will be issued.");
         }
     }
@@ -163,15 +172,17 @@ sub init
     {
         my @areas;
         $reportToEcho = undef;
-        $commentChar = '#';
+        $commentChar  = '#';
         my $areaName;
-        ($path, $areaName) = findTokenValue($fidoconfig, "EchoArea", "=~", qr/^($report)\s/i);
+        ($path, $areaName) =
+          findTokenValue($fidoconfig, "EchoArea", "=~", qr/^($report)\s/i);
         $reportToEcho = 1 if($areaName);
 
         if(!defined($reportToEcho))
         {
             $commentChar = '#';
-            ($path, $areaName) = findTokenValue($fidoconfig, "NetmailArea", "=~", qr/^($report)\s/i);
+            ($path, $areaName) =
+              findTokenValue($fidoconfig, "NetmailArea", "=~", qr/^($report)\s/i);
             $reportToEcho = 0 if($areaName);
         }
 
@@ -228,7 +239,8 @@ sub init
     ($path, $fileBoxesDir) = findTokenValue($fidoconfig, "FileBoxesDir");
     if($fileBoxesDir)
     {
-        lastError("fileBoxesDir \'$fileBoxesDir\' is not a directory") if(! -d $fileBoxesDir);
+        lastError("fileBoxesDir \'$fileBoxesDir\' is not a directory")
+          if(!-d $fileBoxesDir);
         $fileBoxesDir = normalize($fileBoxesDir);
     }
 
@@ -262,9 +274,10 @@ sub init
     $module = "hpt";
 
     $OS = getOS();
-    put($all, "### It is a dry-run, no actual changes will be made ###") if($dryrun);
+    put($all, "### It is a dry-run, no actual changes will be made ###")
+      if($dryrun);
     return 1;
-}
+} ## end sub init
 
 my @reportLines;
 #
@@ -324,16 +337,17 @@ it before deleting files stored for it.
 sub unsubscribeLink
 {
     # Unsubscribe from all echos if the link is subscribed at least to one echo
-    $module = "hpt";
+    $module      = "hpt";
     $commentChar = '#';
-    my ($tokenFile, $value, $linenum, @lines) = findTokenValue($fidoconfig, 'EchoArea', '=~', $link);
+    my ($tokenFile, $value, $linenum, @lines) =
+      findTokenValue($fidoconfig, 'EchoArea', '=~', $link);
     if($value ne "")
     {
         if(!$dryrun)
         {
             if($OS eq "UNIX")
             {
-                my $cmd = "hpt -c $fidoconfig afix -s $link '-*'";
+                my $cmd      = "hpt -c $fidoconfig afix -s $link '-*'";
                 my $exitcode = system("$cmd");
                 lastError("system(\"$cmd\") failed: $!") if(($exitcode >> 8) != 0);
             }
@@ -346,10 +360,12 @@ sub unsubscribeLink
         }
         put($all, "$link was unsubscribed from all echos");
     }
+
     # Unsubscribe from all file echos if the link is subscribed at least to one file echo
-    $module = "htick";
+    $module      = "htick";
     $commentChar = '#';
-    ($tokenFile, $value, $linenum, @lines) = findTokenValue($fidoconfig, 'FileArea', '=~', $link);
+    ($tokenFile, $value, $linenum, @lines) =
+      findTokenValue($fidoconfig, 'FileArea', '=~', $link);
     if($value ne "")
     {
         if(!$dryrun)
@@ -373,7 +389,7 @@ sub unsubscribeLink
         put($all, "$link was not subscribed to any fileechos");
     }
     $module = "hpt";
-}
+} ## end sub unsubscribeLink
 
 sub deleteFiles
 {
@@ -408,6 +424,7 @@ sub rmFilesFromLo
     close(LO);
 
     my @files = ();
+
     # Remove echobundles and tics
     foreach my $line (@lines)
     {
@@ -418,7 +435,7 @@ sub rmFilesFromLo
         next unless(-f $fullname);
         my $basename = basename($fullname);
         if((!$echomail && $basename =~ /\.(?:mo|tu|we|th|fr|sa|su)[0-9a-z]$/i) ||
-           (!$fileecho && $basename =~ /\.tic$/i))
+            (!$fileecho && $basename =~ /\.tic$/i))
         {
             push(@files, $fullname);
         }
@@ -428,7 +445,7 @@ sub rmFilesFromLo
 
     put($all, "Deleting echomail and tics from outbound");
     deleteFiles(@files);
-}
+} ## end sub rmFilesFromLo
 
 =head2 rmFilesFromOutbound
 
@@ -450,7 +467,7 @@ sub rmFilesFromOutbound
 {
     my $outbound;
     $defOutbound = normalize($defOutbound);
-    if(! -d $defOutbound)
+    if(!-d $defOutbound)
     {
         error($all, "Outbound directory $defOutbound does not exist");
         return;
@@ -459,15 +476,16 @@ sub rmFilesFromOutbound
     # Flow filename
     my $asoname = "$zone.$net.$node.$point";
     my $bsoname = sprintf("%04x%04x", $net, $node);
+
     # Outbound hex extension
     my $hexzone = sprintf("%03x", $zone);
     my $bsooutbound = ($zone != $defZone) ? "$defOutbound.$hexzone" : $defOutbound;
-    $bsooutbound = "" if(! -d $bsooutbound);
+    $bsooutbound = "" if(!-d $bsooutbound);
     if($bsooutbound && $point)
     {
-        $bsooutbound = normalize(catdir($bsooutbound,  $bsoname . ".pnt"));
+        $bsooutbound = normalize(catdir($bsooutbound, $bsoname . ".pnt"));
         $bsoname = sprintf("%08x", $point);
-        $bsooutbound = "" if(! -d $bsooutbound);
+        $bsooutbound = "" if(!-d $bsooutbound);
     }
 
     for my $style ("aso", "bso")
@@ -480,7 +498,10 @@ sub rmFilesFromOutbound
         if(-f $bsy)
         {
             error($all, "\nBusy flag $bsy found!");
-            error($all, "You may run the script again after the software that has set the flag removes it.");
+            error(
+                $all,
+                "You may run the script again after the software that has set the flag removes it."
+            );
             lastError("If the busy flag is stale, you may remove it manually.");
         }
 
@@ -489,7 +510,8 @@ sub rmFilesFromOutbound
         my $getFlowFile = sub
         {
             return if($File::Find::dir ne $outbound);
-            if(-f $File::Find::name && basename($File::Find::name) =~ /^$loname\.[icdfh]lo$/i)
+            if(-f $File::Find::name &&
+                basename($File::Find::name) =~ /^$loname\.[icdfh]lo$/i)
             {
                 $flowFile = $File::Find::name;
             }
@@ -505,12 +527,12 @@ sub rmFilesFromOutbound
             if(-f $File::Find::name)
             {
                 my $base = basename($File::Find::name);
-                if(
-                   !$echomail && !$fileecho && $base =~ /^$loname\.[icdfh]lo$/i ||
-                   !$netmail && $base =~ /^$loname\.[icdoh]ut$/i ||
-                   !$netmail && !$echomail && !$fileecho && 
-                   ($base =~ /^$loname\.try$/i || $base =~ /^$loname\.hld$/i)
-                  )
+                if(!$echomail && !$fileecho && $base =~ /^$loname\.[icdfh]lo$/i ||
+                    !$netmail && $base =~ /^$loname\.[icdoh]ut$/i ||
+                    !$netmail &&
+                    !$echomail &&
+                    !$fileecho &&
+                    ($base =~ /^$loname\.try$/i || $base =~ /^$loname\.hld$/i))
                 {
                     push(@filesToRemove, $File::Find::name);
                 }
@@ -522,7 +544,7 @@ sub rmFilesFromOutbound
             put($all, "Deleting flow files from outbound");
             deleteFiles(@filesToRemove);
         }
-    }
+    } ## end for my $style ("aso", "bso"...)
 
     if(-d $busyFileDir)
     {
@@ -530,13 +552,11 @@ sub rmFilesFromOutbound
         my $getTIC = sub
         {
             return if($File::Find::dir ne $busyFileDir);
-            if(
-               -f $File::Find::name &&
-               basename($File::Find::name) =~ /\.tic$/i &&
-               !$fileecho
-              )
+            if(-f $File::Find::name &&
+                basename($File::Find::name) =~ /\.tic$/i &&
+                !$fileecho)
             {
-                open(TIC, "<", $File::Find::name) or 
+                open(TIC, "<", $File::Find::name) or
                   croak("Could not open $File::Find::name: $!");
                 my $tolink = grep {m/^To\s+$link/i} <TIC>;
                 close(TIC);
@@ -549,8 +569,8 @@ sub rmFilesFromOutbound
             put($all, "Deleting TICs from BusyFileDir");
             deleteFiles(@ticsToRemove);
         }
-    }
-}
+    } ## end if(-d $busyFileDir)
+} ## end sub rmFilesFromOutbound
 
 =head2 rmFilesFromFilebox
 
@@ -572,8 +592,8 @@ sub rmFilesFromFilebox
     return if(!$fileBoxesDir);
     my ($box, $boxh, $fileboxname);
     $fileboxname = "";
-    $box = "$zone.$net.$node.$point";
-    $boxh = "$box.h";
+    $box         = "$zone.$net.$node.$point";
+    $boxh        = "$box.h";
 
     my $getFilebox = sub
     {
@@ -601,20 +621,29 @@ sub rmFilesFromFilebox
         return if($File::Find::dir ne $fileboxname);
         my $file = $File::Find::name;
         my $base = basename($file);
-        return if($netmail && ($base =~ /\.[icdoh]ut$/i ||
-                               $base =~ /\.try$/i ||
-                               $base =~ /\.hld$/i));
-        return if($echomail && ($base =~ /\.(?:mo|tu|we|th|fr|sa|su)[0-9a-z]$/i ||
-                                $base =~ /\.try$/i ||
-                                $base =~ /\.hld$/i));
+        return
+          if(
+             $netmail &&
+             ($base =~ /\.[icdoh]ut$/i ||
+                $base =~ /\.try$/i ||
+                $base =~ /\.hld$/i)
+            );
+        return
+          if(
+             $echomail &&
+             ($base =~ /\.(?:mo|tu|we|th|fr|sa|su)[0-9a-z]$/i ||
+                $base =~ /\.try$/i ||
+                $base =~ /\.hld$/i)
+            );
         if($base =~ /\.tic$/i)
         {
             push(@tics, $file) if(($fileecho || $otherfile) && -f $file);
             return if($fileecho);
         }
-        return if(($netmail || $echomail || $fileecho || $otherfile) &&
-                  ($base =~ /\.try$/i || $base =~ /\.hld$/i));
-        push(@filesToRemove, $file) if(-f $file); # not a directory
+        return
+          if(($netmail || $echomail || $fileecho || $otherfile) &&
+             ($base =~ /\.try$/i || $base =~ /\.hld$/i));
+        push(@filesToRemove, $file) if(-f $file);    # not a directory
     };
 
     find($getFileInFilebox, $fileboxname);
@@ -632,7 +661,7 @@ sub rmFilesFromFilebox
             my ($file) = grep {s/[\r\n]//; s/^File (\S+)$/$1/i;} @ticlines;
             if($file && -f normalize(catfile($fileboxname, $file)))
             {
-                push(@referredByTic, $file) ;
+                push(@referredByTic, $file);
             }
         }
     }
@@ -657,23 +686,21 @@ sub rmFilesFromFilebox
         for(my $i = @filesToRemove - 1; $i >= 0; $i--)
         {
             my $base = basename($filesToRemove[$i]);
-            if(
-               $base !~ /\.[icdoh]ut$/i &&
-               $base !~ /\.(?:mo|tu|we|th|fr|sa|su)[0-9a-z]$/i &&
-               $base !~ /\.tic$/i &&
-               $base !~ /\.try$/i &&
-               $base !~ /\.hld$/i &&
-               !grep(/^$base$/i, @referredByTic)
-              )
+            if($base !~ /\.[icdoh]ut$/i &&
+                $base !~ /\.(?:mo|tu|we|th|fr|sa|su)[0-9a-z]$/i &&
+                $base !~ /\.tic$/i                              &&
+                $base !~ /\.try$/i                              &&
+                $base !~ /\.hld$/i                              &&
+                !grep(/^$base$/i, @referredByTic))
             {
                 splice(@filesToRemove, $i, 1);
             }
         }
     }
 
-    my $first = 1;
-    my $basename = basename($fileboxname);
-    my $deleted = 0;
+    my $first      = 1;
+    my $basename   = basename($fileboxname);
+    my $deleted    = 0;
     my $notdeleted = 0;
     for my $file (@filesToRemove)
     {
@@ -695,7 +722,7 @@ sub rmFilesFromFilebox
             $notdeleted++;
         }
     }
-    put($all, "$deleted files were deleted") if($deleted);
+    put($all, "$deleted files were deleted")        if($deleted);
     put($all, "$notdeleted files were not deleted") if($notdeleted);
     if(!$filebox)
     {
@@ -713,7 +740,7 @@ sub rmFilesFromFilebox
             }
         }
     }
-}
+} ## end sub rmFilesFromFilebox
 
 sub readTIC
 {
@@ -740,7 +767,7 @@ required for the bundles to be deleted.
 sub rmOrphanFilesFromOutbound
 {
     my ($outbound, $age) = @_;
-    return if(! -d $outbound);
+    return if(!-d $outbound);
 
     my $fileAge = time() - $age * 3600 * 24;
 
@@ -772,7 +799,7 @@ sub rmOrphanFilesFromOutbound
             my $basename = basename($fullname);
             $outbound = perlpath($outbound);
             if($basename =~ /\.(?:mo|tu|we|th|fr|sa|su)[0-9a-z]$/i &&
-               $fullname =~ /^$outbound/)
+                $fullname =~ /^$outbound/)
             {
                 push(@filesFromLo, $basename);
             }
@@ -784,7 +811,8 @@ sub rmOrphanFilesFromOutbound
     my $getEchomail = sub
     {
         return if($File::Find::dir ne $outbound);
-        if(-f $File::Find::name && basename($File::Find::name) =~ /\.(?:mo|tu|we|th|fr|sa|su)[0-9a-z]$/i)
+        if(-f $File::Find::name &&
+            basename($File::Find::name) =~ /\.(?:mo|tu|we|th|fr|sa|su)[0-9a-z]$/i)
         {
             # Do not push to @echobundles truncated echomail bundles newer than $age
             my @stat = stat($File::Find::name);
@@ -834,8 +862,8 @@ sub rmOrphanFilesFromOutbound
         }
         put($all, "$deleted files were deleted") if($deleted);
         error($all, "$notdeleted files were not deleted") if($notdeleted);
-    }
-}
+    } ## end if(@echobundles)
+} ## end sub rmOrphanFilesFromOutbound
 
 =head2 rmOrphanFilesFromPassFileAreaDir
 
@@ -855,19 +883,14 @@ sub rmOrphanFilesFromPassFileAreaDir
         {
             lastError("Cannot open $passFileAreaDir directory ($!)");
         }
-        my @files = grep(
-                         -f normalize(catfile($passFileAreaDir, $_)) &&
-                         !/\.tic$/i,
-                           readdir(DIR)
-                        );
+        my @files =
+          grep(-f normalize(catfile($passFileAreaDir, $_)) && !/\.tic$/i, readdir(DIR));
         closedir(DIR);
 
-        lastError("Cannot open $ticOutbound directory ($!)") if(!opendir(DIR, $ticOutbound));
-        my @tics = grep(
-                        -f normalize(catfile($ticOutbound, $_)) &&
-                        /\.tic$/i,
-                          readdir(DIR)
-                       );
+        lastError("Cannot open $ticOutbound directory ($!)")
+          if(!opendir(DIR, $ticOutbound));
+        my @tics =
+          grep(-f normalize(catfile($ticOutbound, $_)) && /\.tic$/i, readdir(DIR));
         closedir(DIR);
 
         put($all, "Deleting orphan files from PassFileAreaDir");
@@ -878,7 +901,7 @@ sub rmOrphanFilesFromPassFileAreaDir
             push(@usedFiles, $usedFile) if($usedFile);
         }
 
-        my $deleted = 0;
+        my $deleted    = 0;
         my $notdeleted = 0;
         foreach my $file (@files)
         {
@@ -900,8 +923,8 @@ sub rmOrphanFilesFromPassFileAreaDir
         }
         put($all, "$deleted orphan files were deleted");
         error($all, "$notdeleted orphan files were not deleted") if($notdeleted > 0);
-    }
-}
+    } ## end if($passFileAreaDir &&...)
+} ## end sub rmOrphanFilesFromPassFileAreaDir
 
 # Write the changed configuration file back
 sub writeConfig
@@ -909,7 +932,8 @@ sub writeConfig
     my ($file, @lines) = @_;
     if(!$advisoryLock)
     {
-        open(FILE, ">", $file) or lastError("Cannot open $file to write config back: $!");
+        open(FILE, ">", $file) or
+          lastError("Cannot open $file to write config back: $!");
         print FILE @lines;
         close(FILE);
         return;
@@ -920,7 +944,8 @@ sub writeConfig
     {
         if(flock(LOCK, LOCK_EX))
         {
-            open(FILE, ">", $file) or lastError("Cannot open $file to write config back: $!");
+            open(FILE, ">", $file) or
+              lastError("Cannot open $file to write config back: $!");
             print FILE @lines;
             close(FILE);
             close(LOCK);
@@ -935,7 +960,7 @@ sub writeConfig
     close(LOCK);
     error($all, "Could not lock $file for $advisoryLock seconds.");
     lastError("The changed configuration was not written back to $file");
-}
+} ## end sub writeConfig
 
 =head2 rmLinkDefinition
 
@@ -955,10 +980,11 @@ sub rmLinkDefinition
 {
     my $sysop;
     $commentChar = '#';
-    my ($file, $value, $linenum, @lines) = findTokenValue($fidoconfig, 'Aka', 'eq', $link);
+    my ($file, $value, $linenum, @lines) =
+      findTokenValue($fidoconfig, 'Aka', 'eq', $link);
     lastError("Line \"AKA $link\" not found") if(!defined($linenum));
-    my @index; # Line numbers to be commented out or deleted
-    # Find "Link" line
+    my @index;    # Line numbers to be commented out or deleted
+                  # Find "Link" line
     for(my $i = $linenum - 1; $i >= 0; $i--)
     {
         my $line = $lines[$i];
@@ -972,7 +998,8 @@ sub rmLinkDefinition
             last;
         }
     }
-    lastError("Cannot find 'Link' token for $link in $file") if(!defined($index[0]));
+    lastError("Cannot find 'Link' token for $link in $file")
+      if(!defined($index[0]));
 
     for(my $i = $index[0] + 1, my $j = 1; $i < @lines; $i++)
     {
@@ -984,6 +1011,7 @@ sub rmLinkDefinition
         $token = lc($token);
         if($token eq "aka")
         {
+
             if($i == $linenum)
             {
                 $index[$j++] = $i;
@@ -994,51 +1022,113 @@ sub rmLinkDefinition
                 lastError("Looks like something is wrong with $link definition in $file");
             }
         }
-        if($token eq "email" || $token eq "emailfrom" || $token eq "emailsubj" ||
-           $token eq "emailencoding" ||
-           $token eq "ouraka" || $token eq "password" || $token eq "pktpwd" ||
-           $token eq "ticpwd" || $token eq "areafixpwd" || 
-           $token eq "filefixpwd" || $token eq "bbspwd" || $token eq "sessionpwd" ||
-           $token eq "areafixname" || $token eq "filefixname" ||
-           $token eq "handle" || $token eq "packer" ||
-           $token eq "autocreate" || $token eq "areafixautocreate" || $token eq "filefixautocreate" ||
-           $token eq "autocreatefile" || $token eq "areafixautocreatefile" || $token eq "filefixautocreatefile" ||
-           $token eq "autocreatedefaults" || $token eq "areafixautocreatedefaults" || $token eq "filefixautocreatedefaults" ||
-           $token eq "autosubscribe" || $token eq "areafixautosubscribe" || $token eq "filefixautosubscribe" ||
-           $token eq "forwardrequests" || $token eq "areafixforwardrequests" || $token eq "filefixforwardrequests" ||
-           $token eq "fwddenyfile" || $token eq "areafixfwddenyfile" || $token eq "filefixfwddenyfile" ||
-           $token eq "fwddenymask" || $token eq "areafixfwddenymask" || $token eq "filefixfwddenymask" ||
-           $token eq "denyfwdreqaccess" || $token eq "areafixdenyfwdreqaccess" || $token eq "filefixdenyfwdreqaccess" ||
-           $token eq "denyuncondfwdreqaccess" || $token eq "areafixdenyuncondfwdreqaccess" || $token eq "filefixdenyuncondfwdreqaccess" ||
-           $token eq "fwdfile" || $token eq "areafixfwdfile" || $token eq "filefixfwdfile" ||
-           $token eq "fwdmask" || $token eq "areafixfwdmask" || $token eq "filefixfwdmask" ||
-           $token eq "fwdpriority" || $token eq "areafixfwdpriority" || $token eq "filefixfwdpriority" ||
-           $token eq "echolimit" || $token eq "areafixecholimit" || $token eq "filefixecholimit" ||
-           $token eq "pause" || $token eq "export" || $token eq "import" ||
-           $token eq "optgrp" || $token eq "accessgrp" || $token eq "linkgrp" ||
-           $token eq "mandatory" || $token eq "manual" ||
-           $token eq "level" || $token eq "advancedareafix" || $token eq "allowemptypktpwd" ||
-           $token eq "allowpktaddrdiffer" || $token eq "allowremotecontrol" ||
-           $token eq "arcmailsize" || $token eq "arcnetmail" || $token eq "areafix" ||
-           $token eq "autopause" || $token eq "availlist" || $token eq "dailybundles" ||
-           $token eq "denyrescan" || $token eq "echomailflavour" || $token eq "flavour" ||
-           $token eq "fileechoflavour" || $token eq "fileareadefaults" ||
-           $token eq "forwardpkts" || $token eq "filebox" || $token eq "fileboxalways" ||
-           $token eq "linkbundlenamestyle" || $token eq "linkgrp" ||
-           $token eq "linkmsgbasedir" || $token eq "netmailflavour" || $token eq "norules" ||
-           $token eq "packaka" || $token eq "pktsize" || $token eq "reducedseenby" ||
-           $token eq "rescangrp" || $token eq "rescanlimit" ||
-           $token eq "sendnotifymessages" || $token eq "unsubscribeonareadelete" ||
-           $token eq "notic" || $token eq "autofilecreatesubdirs" ||
-           $token eq "delnotreceivedtic" ||
-           $token eq "tickerpacktobox" || $token eq "linkfilebasedir" ||
-           $token eq "filefix" || $token eq "filefixfsc87subset")
+        if($token eq "email" ||
+            $token eq "emailfrom"                     ||
+            $token eq "emailsubj"                     ||
+            $token eq "emailencoding"                 ||
+            $token eq "ouraka"                        ||
+            $token eq "password"                      ||
+            $token eq "pktpwd"                        ||
+            $token eq "ticpwd"                        ||
+            $token eq "areafixpwd"                    ||
+            $token eq "filefixpwd"                    ||
+            $token eq "bbspwd"                        ||
+            $token eq "sessionpwd"                    ||
+            $token eq "areafixname"                   ||
+            $token eq "filefixname"                   ||
+            $token eq "handle"                        ||
+            $token eq "packer"                        ||
+            $token eq "autocreate"                    ||
+            $token eq "areafixautocreate"             ||
+            $token eq "filefixautocreate"             ||
+            $token eq "autocreatefile"                ||
+            $token eq "areafixautocreatefile"         ||
+            $token eq "filefixautocreatefile"         ||
+            $token eq "autocreatedefaults"            ||
+            $token eq "areafixautocreatedefaults"     ||
+            $token eq "filefixautocreatedefaults"     ||
+            $token eq "autosubscribe"                 ||
+            $token eq "areafixautosubscribe"          ||
+            $token eq "filefixautosubscribe"          ||
+            $token eq "forwardrequests"               ||
+            $token eq "areafixforwardrequests"        ||
+            $token eq "filefixforwardrequests"        ||
+            $token eq "fwddenyfile"                   ||
+            $token eq "areafixfwddenyfile"            ||
+            $token eq "filefixfwddenyfile"            ||
+            $token eq "fwddenymask"                   ||
+            $token eq "areafixfwddenymask"            ||
+            $token eq "filefixfwddenymask"            ||
+            $token eq "denyfwdreqaccess"              ||
+            $token eq "areafixdenyfwdreqaccess"       ||
+            $token eq "filefixdenyfwdreqaccess"       ||
+            $token eq "denyuncondfwdreqaccess"        ||
+            $token eq "areafixdenyuncondfwdreqaccess" ||
+            $token eq "filefixdenyuncondfwdreqaccess" ||
+            $token eq "fwdfile"                       ||
+            $token eq "areafixfwdfile"                ||
+            $token eq "filefixfwdfile"                ||
+            $token eq "fwdmask"                       ||
+            $token eq "areafixfwdmask"                ||
+            $token eq "filefixfwdmask"                ||
+            $token eq "fwdpriority"                   ||
+            $token eq "areafixfwdpriority"            ||
+            $token eq "filefixfwdpriority"            ||
+            $token eq "echolimit"                     ||
+            $token eq "areafixecholimit"              ||
+            $token eq "filefixecholimit"              ||
+            $token eq "pause"                         ||
+            $token eq "export"                        ||
+            $token eq "import"                        ||
+            $token eq "optgrp"                        ||
+            $token eq "accessgrp"                     ||
+            $token eq "linkgrp"                       ||
+            $token eq "mandatory"                     ||
+            $token eq "manual"                        ||
+            $token eq "level"                         ||
+            $token eq "advancedareafix"               ||
+            $token eq "allowemptypktpwd"              ||
+            $token eq "allowpktaddrdiffer"            ||
+            $token eq "allowremotecontrol"            ||
+            $token eq "arcmailsize"                   ||
+            $token eq "arcnetmail"                    ||
+            $token eq "areafix"                       ||
+            $token eq "autopause"                     ||
+            $token eq "availlist"                     ||
+            $token eq "dailybundles"                  ||
+            $token eq "denyrescan"                    ||
+            $token eq "echomailflavour"               ||
+            $token eq "flavour"                       ||
+            $token eq "fileechoflavour"               ||
+            $token eq "fileareadefaults"              ||
+            $token eq "forwardpkts"                   ||
+            $token eq "filebox"                       ||
+            $token eq "fileboxalways"                 ||
+            $token eq "linkbundlenamestyle"           ||
+            $token eq "linkgrp"                       ||
+            $token eq "linkmsgbasedir"                ||
+            $token eq "netmailflavour"                ||
+            $token eq "norules"                       ||
+            $token eq "packaka"                       ||
+            $token eq "pktsize"                       ||
+            $token eq "reducedseenby"                 ||
+            $token eq "rescangrp"                     ||
+            $token eq "rescanlimit"                   ||
+            $token eq "sendnotifymessages"            ||
+            $token eq "unsubscribeonareadelete"       ||
+            $token eq "notic"                         ||
+            $token eq "autofilecreatesubdirs"         ||
+            $token eq "delnotreceivedtic"             ||
+            $token eq "tickerpacktobox"               ||
+            $token eq "linkfilebasedir"               ||
+            $token eq "filefix"                       ||
+            $token eq "filefixfsc87subset")
         {
             $index[$j++] = $i;
             next;
-        }
+        } ## end if($token eq "email" ||...)
         last;
-    }
+    } ## end for(my $i = $index[0] +...)
 
     if($backup)
     {
@@ -1050,7 +1140,7 @@ sub rmLinkDefinition
     if($delete)
     {
         # Delete the lines of the $link definition
-        for(my $i = @index - 1; $i >=0 ; $i--)
+        for(my $i = @index - 1; $i >= 0; $i--)
         {
             splice(@lines, $index[$i], 1);
         }
@@ -1059,7 +1149,7 @@ sub rmLinkDefinition
     else
     {
         # Comment out the $link definition
-        for(my $i = 0; $i < @index ; $i++)
+        for(my $i = 0; $i < @index; $i++)
         {
             $lines[$index[$i]] = "$commentChar $lines[$index[$i]]";
         }
@@ -1068,7 +1158,7 @@ sub rmLinkDefinition
 
     # Write the changed configuration file back
     writeConfig($file, @lines) if(!$dryrun);
-}
+} ## end sub rmLinkDefinition
 
 =head2 publishReport($subject, $fromname, $rheader, $rfooter)
 
@@ -1103,12 +1193,13 @@ sub publishReport
     return if(!$report);
 
     my ($subject, $fromname, $rheader, $rfooter) = @_;
-    lastError("Report subject is not defined, no report is published") if(!$subject);
+    lastError("Report subject is not defined, no report is published")
+      if(!$subject);
     unshift(@reportLines, @$rheader) if(@$rheader);
     push(@reportLines, @$rfooter) if(@$rfooter);
     my $dir = tempdir(CLEANUP => 1);
     my ($fh, $reportfile) = tempfile(DIR => $dir);
-    map{print $fh "$_\n";} @reportLines;
+    map {print $fh "$_\n";} @reportLines;
     $fh->flush();
     @reportLines = ();
 
@@ -1139,13 +1230,13 @@ sub publishReport
     else
     {
         my $postdir = tempdir(CLEANUP => 1);
-        my ($ph, $postcmd) = tempfile("postXXXXXX", DIR=>$postdir, SUFFIX=>".bat");
+        my ($ph, $postcmd) = tempfile("postXXXXXX", DIR => $postdir, SUFFIX => ".bat");
         print $ph "$cmd\n";
         $ph->flush();
         my $exitcode = system("$postcmd");
         lastError("system(\"$postcmd\") failed: $!") if(($exitcode >> 8) != 0);
     }
-}
+} ## end sub publishReport
 
 1;
 
