@@ -44,6 +44,17 @@ my ($address, $fileBoxesDir, $logfile, $lockFile, $advisoryLock, $lh,
     $defZone, $defOutbound, $zone, $net, $node, $point, $ASO,
     $passFileAreaDir, $ticOutbound, $busyFileDir, $OS, $reportToEcho, $list, $all);
 
+# Transliterate Windows path to Perl presentation
+sub perlpath
+{
+    my $path = shift;
+    if(getOS ne 'UNIX')
+    {
+        $path =~ tr!\\!/!;
+    }
+    return $path;
+}
+
 =head1 NAME
 
 Husky::Rmfiles - delete files from ASO, BSO, fileboxes and so on. Delete links
@@ -735,9 +746,10 @@ sub rmOrphanFilesFromOutbound
             $line =~ s/[\n\r]//;
             my $directive = substr($line, 0, 1);
             my $fullname = $line;
-            $fullname = substr($line, 1) if $directive =~ /^[\^~\-!@\#]$/;
+            $fullname = perlpath(substr($line, 1)) if $directive =~ /^[\^~\-!@\#]$/;
             next unless(-f $fullname);
             my $basename = basename($fullname);
+            $outbound = perlpath($outbound);
             if($basename =~ /\.(?:mo|tu|we|th|fr|sa|su)[0-9a-z]$/i &&
                $fullname =~ /^$outbound/)
             {
