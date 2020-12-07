@@ -673,6 +673,7 @@ sub rmFilesFromFilebox
     my $notdeleted = 0;
     for my $file (@filesToRemove)
     {
+        $file = normalize($file);
         my $num = !$dryrun ? unlink $file : 1;
         if($num)
         {
