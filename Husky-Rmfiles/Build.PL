@@ -22,6 +22,7 @@ my %module_build_args =
     "module_name" => "Husky::Rmfiles",
     "requires" =>
     {
+        "Carp" => 0,
         "Fcntl" => 0,
         "File::Find" => 0,
         "File::Spec" => 0,
@@ -29,8 +30,9 @@ my %module_build_args =
         "File::Basename" => 0,
         "File::Temp" => 0,
         "POSIX" => 0,
-        "Fidoconfig::Token" => 2.0,
+        "Fidoconfig::Token" => 2.2,
         "File::Copy" => 0,
+        "IO::Handle" => 0,
         "perl" => "5.008",
         "strict" => 0,
         "warnings" => 0
@@ -38,7 +40,7 @@ my %module_build_args =
     "test_requires" =>
     {
         "Test::More" => "0.88",
-        "Fidoconfig::Token" => 1.6,
+        "Fidoconfig::Token" => 2.2,
         "File::Spec" => 0,
         "Cwd" => 0,
         "File::Compare" => 0,
