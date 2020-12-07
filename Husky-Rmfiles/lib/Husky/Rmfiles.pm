@@ -371,13 +371,6 @@ sub unsubscribeLink
     $module = "hpt";
 }
 
-sub deleteTICs
-{
-    return unless(@ticsToRemove);
-    put($all, "Deleting TICs from BusyFileDir");
-    deleteFiles(@ticsToRemove);
-}
-
 sub deleteFiles
 {
     my @filesToDelete = @_;
