@@ -15,8 +15,8 @@ use Pod::Usage;
 use Fcntl qw(:flock);
 use File::Spec;
 use Config;
-use Fidoconfig::Token 2.0;
-use Husky::Rmfiles 1.1;
+use Fidoconfig::Token 2.2;
+use Husky::Rmfiles 1.3;
 use strict;
 use warnings;
 
