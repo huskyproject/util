@@ -6,6 +6,7 @@ use diagnostics;
 use warnings;
 use strict;
 use Test::More;
+use Fidoconfig::Token 2.0;
 use Husky::Rmfiles;
 use File::Spec::Functions;
 use Cwd 'abs_path';
@@ -19,15 +20,26 @@ my $cfgdir = catdir($basedir, "cfg");
 $ENV{MBASEDIR} = catdir($basedir, "msg");
 $link = "1:23/456";
 $log = "rmLink.log";
-$fidoconfig = catfile($cfgdir, "09_unsub.cfg");
 
 # test#1
 $fidoconfig = catfile($cfgdir, "09_unsub.cfg");
+my @makedirs = ("tparser", "-Dmodule=hpt", "-P", "$fidoconfig");
+if(getOS() eq 'UNIX')
+{
+    my $cmd = join(" ", @makedirs);
+    my $exitcode = system($cmd);
+    lastError("system(\"$cmd\") failed: $!") if(($exitcode >> 8) != 0);
+}
+else
+{
+    my $exitcode = system(@makedirs);
+    lastError("system(\"@makedirs\") failed: $!") if(($exitcode >> 8) != 0);
+}
 my $bak = "$fidoconfig" . ".bak";
 cp("$fidoconfig", "$bak") or die "Copy to $bak failed: $!";
 init();
 put(7, '###### 04_unsubscribe.t ######');
-put(7, "test#1");
+put(6, "test#1");
 my $out;
 {
     # redirect STDOUT to a variable locally inside the block
@@ -43,7 +55,7 @@ is($num_entries, 0, "unsubscribed from echos#2");
 mv("$bak", "$fidoconfig") or die "Move from $bak failed: $!";
 
 # test#1dry
-put(7, "test#1dry");
+put(6, "test#1dry");
 $dryrun = 1;
 $fidoconfig = catfile($cfgdir, "09_unsub.cfg");
 $bak = "$fidoconfig" . ".bak";
@@ -64,12 +76,25 @@ mv("$bak", "$fidoconfig") or die "Move from $bak failed: $!";
 $dryrun = undef;
 
 # test#2
-put(7, "test#2");
+put(6, "test#2");
 $fidoconfig = catfile($cfgdir, "10_unsub.cfg");
 $ENV{FIDOCONFIG} = $fidoconfig;
 my $netmailArea = catdir($basedir, "msg", "netmail");
+@makedirs = ("tparser", "-Dmodule=htick", "-P", "$fidoconfig");
+if(getOS() eq 'UNIX')
+{
+    my $cmd = join(" ", @makedirs);
+    my $exitcode = system($cmd);
+    lastError("system(\"$cmd\") failed: $!") if(($exitcode >> 8) != 0);
+}
+else
+{
+    my $exitcode = system(@makedirs);
+    lastError("system(\"@makedirs\") failed: $!") if(($exitcode >> 8) != 0);
+}
 $bak = "$fidoconfig" . ".bak";
 cp("$fidoconfig", "$bak") or die "Copy to $bak failed: $!";
+init();
 {
     # redirect STDOUT to a variable locally inside the block
     open(local(*STDOUT), '>', \$out);
@@ -82,11 +107,9 @@ close(FC);
 $num_entries = grep {m/FileArea/i;} grep {m/$link/;} @lines;
 is($num_entries, 0, "unsubscribed from fileechos#2");
 mv("$bak", "$fidoconfig") or die "Move from $bak failed: $!";
-#### Delete netmail since "-s" option is missing for ffix ###
-unlink(glob(catfile($netmailArea, '*')));
 
 # test#2dry
-put(7, "test#2dry");
+put(6, "test#2dry");
 $dryrun = 1;
 $fidoconfig = catfile($cfgdir, "10_unsub.cfg");
 $ENV{FIDOCONFIG} = $fidoconfig;
@@ -105,8 +128,6 @@ close(FC);
 $num_entries = grep {m/FileArea/i;} grep {m/$link/;} @lines;
 is($num_entries, 3, "not unsubscribed from fileechos");
 mv("$bak", "$fidoconfig") or die "Move from $bak failed: $!";
-#### Delete netmail since "-s" option is missing for ffix ###
-unlink(glob(catfile($netmailArea, '*')));
 $dryrun = undef;
 
 done_testing();

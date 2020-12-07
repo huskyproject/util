@@ -133,17 +133,17 @@ sub createBsoMail
             close($ticpath);
         }
     }
-    for (1..13)
-    {
-        my $ticpath = catfile($busyFileDir, createBasename() . ".tic");
-        while(-f $ticpath)
-        {
-            $ticpath = catfile($busyFileDir, createBasename() . ".tic");
-        }
-        open(FH, ">", "$ticpath") or die("Cannot open $ticpath: $!");
-        print FH "To $link\n";
-        close(FH);
-    }
+#    for (1..13)
+#    {
+#        my $ticpath = catfile($busyFileDir, createBasename() . ".tic");
+#        while(-f $ticpath)
+#        {
+#            $ticpath = catfile($busyFileDir, createBasename() . ".tic");
+#        }
+#        open(FH, ">", "$ticpath") or die("Cannot open $ticpath: $!");
+#        print FH "To $link\n";
+#        close(FH);
+#    }
 }
 
 sub createFileboxMail
@@ -205,12 +205,12 @@ sub createFileboxMail
 }
 
 $ENV{FIDOCONFIG} = undef;
-my $basedir = catdir(abs_path("t"), "fido");
+my $basedir = normalize(catdir(abs_path("t"), "fido"));
 $ENV{BASEDIR} = $basedir;
-my $cfgdir = catdir($basedir, "cfg");
-my $sampleDir = catdir($cfgdir, "sample");
+my $cfgdir = normalize(catdir($basedir, "cfg"));
 $ENV{CFGDIR} = $cfgdir;
-$ENV{MBASEDIR} = catdir($basedir, "msg");
+my $sampleDir = normalize(catdir($cfgdir, "sample"));
+$ENV{MBASEDIR} = normalize(catdir($basedir, "msg"));
 my $outbound = catdir($basedir, "out", "outbound");
 my $busyFileDir = catdir($outbound, "busy.htk");
 my $PassFileAreaDir = catdir($basedir, "pass");
@@ -227,11 +227,11 @@ $listlog = 1;
 my ($subject, $fromname, @header, @footer);
 $subject = "Removing link $link";
 $fromname = "rmLink Robot";
-@header = ("  ", "$link did not pick up mail for 90 days.",
+@header = ("  ", "$link did not pick up mail for 183 days.",
            "I am deleting all its netmail, echomail and fileechos.", "  ");
 @footer = ("", "$link has been removed from 2:5020/1042 configuration files.", "  ");
 
-# test#1
+# test #1
 $fidoconfig = catfile($cfgdir, "14_rmFiles.cfg");
 my $error;
 {
@@ -239,19 +239,55 @@ my $error;
     open(local(*STDERR), '>', \$error);
     init();
 }
-put(7, "###### 10_report.t ######");
-put(7, "test#1");
+put(6, "###### 10_report.t ######");
+put(6, "test #1");
 like($error, qr/ReportTo is not defined in your fidoconfig/, "ReportTo is not defined");
 
-# test#2
-put(7, "test#2");
-$fidoconfig = catfile($cfgdir, "21_report.cfg");
+TEST2:
+# test #2 Report to an echo area
+$fidoconfig = normalize(catfile($cfgdir, "21_report.cfg"));
 $ENV{FIDOCONFIG} = $fidoconfig;
+init();
+put(6, "test #2");
+# create necessary directories
+my @makedirs = ("tparser", "-Dmodule=hpt", "-P", "$fidoconfig");
+if(getOS() eq 'UNIX')
+{
+    my $cmd = join(" ", @makedirs);
+    (system($cmd) >> 8) == 0 or die("system(\"$cmd\") failed: $!");
+}
+else
+{
+    (system(@makedirs) >> 8) == 0 or die("system(\"@makedirs\") failed: $!");
+}
+# initialize JAM msgbase
+my $srcdir = catdir($sampleDir, "jam");
+my $destdir = catdir($ENV{MBASEDIR}, "jam");
+sub initJAM
+{
+    if(!-d $destdir)
+    {
+        mkdir($destdir) or die("Cannot create $destdir: $!");
+    }
+    if(-f catfile($destdir, "qqq.jhr"))
+    {
+        my $files_to_delete = catfile($destdir, "*");
+        unlink glob($files_to_delete);
+    }
+    my $files_to_copy = catfile($srcdir, "qqq.*");
+    for my $file (glob($files_to_copy))
+    {
+        cp($file, $destdir);
+    }
+}
+initJAM();
+# backup config
 my $bak = "$fidoconfig" . ".bak";
 cp("$fidoconfig", "$bak") or die "Copy to $bak failed: $!";
+# create test data
 createBsoMail($outbound, $PassFileAreaDir, $ticOutbound, $busyFileDir, $loname);
 createFileboxMail($fileboxname, $loname);
-init();
+# run the tested functions
 unsubscribeLink();
 rmFilesFromOutbound();
 rmFilesFromFilebox();
@@ -259,50 +295,18 @@ rmOrphanFilesFromPassFileAreaDir();
 rmOrphanFilesFromOutbound($outbound, 183);
 rmLinkDefinition();
 publishReport($subject, $fromname, \@header, \@footer);
-opendir(DIR, $netmailDir) or die "Could not open $netmailDir";
-my @netmailFiles = grep(/^\d+\.msg$/, readdir(DIR));
-closedir(DIR);
-my ($reportNetmail) = grep {my $file = $_; open(FH, "<", catfile($netmailDir, $file));
-                            my @lines = <FH>; close(FH);
-                            grep(/Removing link 2:345\/678/, @lines) ? $file : undef} @netmailFiles;
-open(FH, "<", catfile($netmailDir, $reportNetmail));
-my $line = <FH>;
-close(FH);
-my @lines = split /\r/, $line;
-for(my $i = 0; $i < @lines; $i++)
+# test
+my $sample = normalize(catfile($sampleDir, "qqq.jdt"));
+my $result = normalize(catfile($destdir, "qqq.jdt"));
+my $reported = is(compare($result, $sample), 0, "report to JAM echobase");
+# restore config
+mv("$bak", "$fidoconfig") or die("Restoring $fidoconfig failed: $!");
+# clean
+if($reported)
 {
-    if($lines[$i] =~ /\001TID/)
-    {
-        splice(@lines, $#lines, 1);
-        splice(@lines, 0, $i + 1);
-    }
+    put(6, "Report was posted to qqq echo");
+    initJAM();
 }
-open(FH, "<", catfile($sampleDir, "20_report.cfg"));
-my @sample = grep {s/\n//} <FH>;
-close(FH);
-my $cmp = 1;
-if(@lines != @sample)
-{
-    $cmp = 0;
-    print STDERR "Size not equal\n";
-    my $numlines = @lines;
-    my $numsample = @sample;
-    print STDERR "numlines=$numlines  numsample=$numsample\n";
-}
-else
-{
-    for(my $i = 0; $i < @lines; $i++)
-    {
-        if($lines[$i] ne $sample[$i])
-        {
-            $cmp = 0;
-            print STDERR "i=$i\n";
-            last;
-        }
-    }
-}
-is($cmp, 1, "test#2");
-mv("$bak", "$fidoconfig") or die "Move from $bak failed: $!";
 my $files_to_delete = catfile($outbound, "*");
 my $num = unlink glob($files_to_delete);
 $files_to_delete = catfile($busyFileDir, "*.tic");
@@ -315,4 +319,110 @@ $files_to_delete = catfile($fileboxname, "*");
 $num = unlink glob($files_to_delete);
 rmdir($fileboxname);
 
+TEST3:
+# test #3  Post report to netmail in Opus msgbase
+$ENV{FIDOCONFIG} = undef;
+$report = "";
+$fidoconfig = normalize(catfile($cfgdir, "22_report.cfg"));
+$ENV{FIDOCONFIG} = $fidoconfig;
+init();
+put(6, "test #3");
+put(6, "FIDOCONFIG=$ENV{FIDOCONFIG}");
+# create necessary directories
+@makedirs = ("tparser", "-Dmodule=hpt", "-P", "$fidoconfig");
+if(getOS() eq 'UNIX')
+{
+    my $cmd = join(" ", @makedirs);
+    (system($cmd) == 0 >> 8) or die("system(\"$cmd\") failed: $!");
+}
+else
+{
+    (system(@makedirs) >> 8) == 0 or die("system(\"@makedirs\") failed: $!");
+}
+# backup config
+$bak = "$fidoconfig" . ".bak";
+cp("$fidoconfig", "$bak") or die "Copy to $bak failed: $!";
+# create test data
+createBsoMail($outbound, $PassFileAreaDir, $ticOutbound, $busyFileDir, $loname);
+createFileboxMail($fileboxname, $loname);
+# run the tested functions
+unsubscribeLink();
+rmFilesFromOutbound();
+rmFilesFromFilebox();
+rmOrphanFilesFromPassFileAreaDir();
+rmOrphanFilesFromOutbound($outbound, 183);
+rmLinkDefinition();
+publishReport($subject, $fromname, \@header, \@footer);
+# restore config
+mv("$bak", "$fidoconfig") or die("Restoring $fidoconfig failed: $!");
+# extract text from netmail
+opendir(DIR, $netmailDir) or die "Could not open $netmailDir";
+my @netmailFiles = grep(/^\d+\.msg$/, readdir(DIR));
+closedir(DIR);
+my ($reportNetmail) = grep {
+                            my $file = $_; my $path = catfile($netmailDir, $file);
+                            open(FH, "<", $path) or die("Cannot open $path: $!");
+                            my @lines = <FH>; close(FH);
+                            grep(m%Removing link 2:345/678%, @lines) ? $file : undef
+                           } @netmailFiles;
+my $reportPath = catfile($netmailDir, $reportNetmail);
+open(FH, "<", $reportPath) or die("Cannot open $reportPath: $!");
+my $line = <FH>;
+close(FH);
+my @lines = split /\r/, $line;
+for(my $i = 0; $i < @lines; $i++)
+{
+    if($lines[$i] =~ /^\001PID:/)
+    {
+        splice(@lines, $#lines, 1);
+        splice(@lines, 0, $i + 1);
+        last;
+    }
+}
+my $sampleText = catfile($sampleDir, "20_report.cfg");
+open(FH, "<", $sampleText) or die("Cannot open $sampleText: $!");;
+my @sample = grep {s/\n//} <FH>;
+close(FH);
+my $cmp = 1;
+if(@lines != @sample)
+{
+    $cmp = 0;
+    put(6, "Size not equal");
+    my $numlines = @lines;
+    my $numsample = @sample;
+    put(6, "numlines=$numlines  numsample=$numsample");
+}
+else
+{
+    for(my $i = 0; $i < @lines; $i++)
+    {
+        if($lines[$i] ne $sample[$i])
+        {
+            $cmp = 0;
+            put(6, "Line number $i differs from the sample!!!");
+            put(6, "Line #$i: $lines[$i]");
+            last;
+        }
+    }
+}
+is($cmp, 1, "test #3");
+# clean
+if($cmp == 1)
+{
+    $files_to_delete = catfile($netmailDir, "*");
+    unlink glob($files_to_delete);
+}
+$files_to_delete = catfile($outbound, "*");
+$num = unlink glob($files_to_delete);
+$files_to_delete = catfile($busyFileDir, "*.tic");
+$num = unlink glob($files_to_delete);
+$files_to_delete = catfile($ticOutbound, "*.tic");
+$num = unlink glob($files_to_delete);
+$files_to_delete = catfile($PassFileAreaDir, "*");
+$num = unlink glob($files_to_delete);
+$files_to_delete = catfile($fileboxname, "*");
+$num = unlink glob($files_to_delete);
+rmdir($fileboxname);
+
+END:
 done_testing();

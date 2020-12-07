@@ -112,8 +112,8 @@ $listlog = 1;
 $fidoconfig = catfile($cfgdir, "14_rmFiles.cfg");
 createBsoMail($outbound, 4, 7, 9);
 init("nolink");
-put(7, "###### 08_rmOrphanFilesFromOutbound.t ######");
-put(7, "test#1");
+put(6, "###### 08_rmOrphanFilesFromOutbound.t ######");
+put(6, "test#1");
 my $out;
 {
     # redirect STDOUT to a variable locally inside the block
@@ -129,7 +129,7 @@ $num = unlink glob($files_to_delete);
 is($num, 51, "test#1 remained in outbound");
 
 # test#1dry
-put(7, "test#1dry");
+put(6, "test#1dry");
 $dryrun = 1;
 $fidoconfig = catfile($cfgdir, "14_rmFiles.cfg");
 createBsoMail($outbound, 4, 7, 9);
@@ -149,7 +149,7 @@ is($num, 60, "test#1dry remained in outbound");
 $dryrun = undef;
 
 # test#2
-put(7, "test#2");
+put(6, "test#2");
 $fidoconfig = catfile($cfgdir, "14_rmFiles.cfg");
 createBsoMail($outbound, 0, 7, 9);
 init("nolink");
@@ -167,7 +167,7 @@ $num = unlink glob($files_to_delete);
 is($num, 7, "test#2 remained in outbound");
 
 # test#2dry
-put(7, "test#2dry");
+put(6, "test#2dry");
 $dryrun = 1;
 $fidoconfig = catfile($cfgdir, "14_rmFiles.cfg");
 createBsoMail($outbound, 0, 7, 9);
@@ -187,7 +187,7 @@ is($num, 16, "test#2dry remained in outbound");
 $dryrun = undef;
 
 # test#3
-put(7, "test#3");
+put(6, "test#3");
 $fidoconfig = catfile($cfgdir, "14_rmFiles.cfg");
 createBsoMail($outbound, 4, 7, 0);
 init("nolink");
@@ -205,7 +205,7 @@ $num = unlink glob($files_to_delete);
 is($num, 51, "test#3 remained in outbound");
 
 # test#3dry
-put(7, "test#3dry");
+put(6, "test#3dry");
 $dryrun = 1;
 $fidoconfig = catfile($cfgdir, "14_rmFiles.cfg");
 createBsoMail($outbound, 4, 7, 0);

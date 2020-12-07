@@ -6,9 +6,11 @@ use diagnostics -warntrace;
 use warnings;
 use strict;
 use Test::More;
+use Fidoconfig::Token 2.0;
 use Husky::Rmfiles;
 use File::Spec::Functions;
 use Cwd 'abs_path';
+use File::Copy;
 use 5.008;
 
 sub createBasename
@@ -66,11 +68,25 @@ sub createBsoMail
     my ($outbound, $ticOutbound, $busyFileDir, $loname) = @_;
     my $files_to_delete = catfile($busyFileDir, "*.[tT][iI][cC]");
     unlink glob($files_to_delete);
+    if(!-d $outbound)
+    {
+        mkdir($outbound) or die("Cannot create $outbound: $!");
+    }
     $files_to_delete = catfile($outbound, "*");
     unlink glob($files_to_delete);
     $files_to_delete = catfile($ticOutbound, "*");
     unlink glob($files_to_delete);
-    mkdir($busyFileDir);
+    my $notUsedDir = catdir($outbound, "notused");
+    if(-d $notUsedDir)
+    {
+        $files_to_delete = catfile($notUsedDir, "*");
+        unlink glob($files_to_delete);
+    }
+    else
+    {
+        mkdir($notUsedDir) or die("Cannot create $notUsedDir: $!");
+    }
+    mkdir($busyFileDir) or die("Cannot create $busyFileDir: $!") if(!-d $busyFileDir);
     createFile(catfile($outbound, "$loname.hut"));
     createFile(catfile($outbound, "$loname.try"));
     createFile(catfile($outbound, "$loname.hld"));
@@ -86,9 +102,11 @@ sub createBsoMail
             $filepath = catfile($outbound, $filename);
         }
         createFile($filepath);
+        copy($filepath, catfile($notUsedDir, $filename));
         open(FH, ">>", "$hlo") or die("Cannot open $hlo: $!");
         print FH "#$filepath\n";
         close(FH);
+        copy($hlo, catfile($notUsedDir, "$loname.hlo"));
     }
     for (1..9)
     {
@@ -192,8 +210,8 @@ $listlog = 1;
 $fidoconfig = catfile($cfgdir, "11_rmFiles.cfg");
 $link = "1:23/456.666";
 init();
-put(7, "###### 05_rmFilesFromOutbound.t ######");
-put(7, "test#1");
+put(6, "###### 05_rmFilesFromOutbound.t ######");
+put(6, "test#1");
 my $error;
 {
     # redirect STDERR to a variable locally inside the block
@@ -225,9 +243,36 @@ like($error, qr/^Outbound directory \S+ does not exist$/, "Outbound does not exi
 
 # test#4
 $fidoconfig = catfile($cfgdir, "13_rmFiles.cfg");
+my @makedirs = ("tparser", "-P", "$fidoconfig");
+if(getOS() eq 'UNIX')
+{
+    my $cmd = join(" ", @makedirs);
+    my $out = "";
+    my $failed = 0;
+    my $msg;
+    {
+        # redirect STDERR to a variable locally inside the block
+        open(local(*STDOUT), '>', \$out);
+        my $exitcode = system($cmd) >> 8;
+        if($exitcode != 0)
+        {
+            $failed = 1;
+            $msg = $!;
+        }
+    }
+    if($failed)
+    {
+        print $out;
+        die("system(\"$cmd\") failed: $msg");
+    }
+}
+else
+{
+    (system(@makedirs) >> 8) == 0 or lastError("system(\"@makedirs\") failed: $!");
+}
 $link = "1:23/456.666";
 init();
-put(7, "test#4");
+put(6, "test#4");
 # create netmail and echomail in ASO outbound for testing
 createAsoMail($outbound, "1.23.456.666");
 my $out;
@@ -245,7 +290,7 @@ my $files_to_delete = catfile($outbound, "*");
 unlink glob($files_to_delete);
 
 # test#4dry
-put(7, "test#4dry");
+put(6, "test#4dry");
 $dryrun = 1;
 $fidoconfig = catfile($cfgdir, "13_rmFiles.cfg");
 $link = "1:23/456.666";
@@ -268,7 +313,7 @@ is($num, 22, "ASO#1dry remained");
 $dryrun = undef;
 
 # test#5
-put(7, "test#5");
+put(6, "test#5");
 $fidoconfig = catfile($cfgdir, "13_rmFiles.cfg");
 $link = "1:23/456.666";
 init();
@@ -288,9 +333,19 @@ unlink glob($files_to_delete);
 
 # test#6
 $fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
+@makedirs = ("tparser", "-P", "$fidoconfig");
+if(getOS() eq 'UNIX')
+{
+    my $cmd = join(" ", @makedirs);
+    (system($cmd) >> 8) == 0 or die("system(\"$cmd\") failed: $!");
+}
+else
+{
+    (system(@makedirs) >> 8) == 0 or lastError("system(\"@makedirs\") failed: $!");
+}
 $link = "2:345/678";
 init();
-put(7, "test#6");
+put(6, "test#6");
 # create netmail, echomail in default outbound and tics for testing
 createBsoMail($outbound, $passFileAreaDir, $busyFileDir, "015902a6");
 {
@@ -320,13 +375,17 @@ is($num, 9, "BSO#1 remained in outbound");
 $files_to_delete = catfile($passFileAreaDir, "*.[tT][iI][cC]");
 $num = unlink glob($files_to_delete);
 is($num, 11, "BSO#1 remained in ticOutbound");
+my $notUsedDir = catdir($outbound, "notused");
+$files_to_delete = catfile($notUsedDir, "*");
+$num = unlink glob($files_to_delete);
+is($num, 8, "BSO#1 files in notused directory");
 
 # test#6dry
 $dryrun = 1;
 $fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
 $link = "2:345/678";
 init();
-put(7, "test#6dry");
+put(6, "test#6dry");
 # create netmail, echomail in default outbound and tics for testing
 createBsoMail($outbound, $passFileAreaDir, $busyFileDir, "015902a6");
 {
@@ -357,12 +416,16 @@ $files_to_delete = catfile($passFileAreaDir, "*.[tT][iI][cC]");
 $num = unlink glob($files_to_delete);
 is($num, 16, "BSO#1dry remained in ticOutbound");
 $dryrun = undef;
+$notUsedDir = catdir($outbound, "notused");
+$files_to_delete = catfile($notUsedDir, "*");
+$num = unlink glob($files_to_delete);
+is($num, 8, "BSO#1 files in notused directory");
 
 # test#7
 $fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
 $link = "1:23/456";
 init();
-put(7, "test#7");
+put(6, "test#7");
 # create netmail and echomail in non-default outbound for testing
 createBsoMail($outbound1, $passFileAreaDir, $busyFileDir, "001701c8");
 {
@@ -391,13 +454,17 @@ is($num, 9, "BSO#2 remained in outbound");
 $files_to_delete = catfile($passFileAreaDir, "*.[tT][iI][cC]");
 $num = unlink glob($files_to_delete);
 is($num, 11, "BSO#2 remained in ticOutbound");
+$notUsedDir = catdir($outbound1, "notused");
+$files_to_delete = catfile($notUsedDir, "*");
+$num = unlink glob($files_to_delete);
+is($num, 8, "BSO#2 files in notused directory");
 
 # test#7dry
 $dryrun = 1;
 $fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
 $link = "1:23/456";
 init();
-put(7, "test#7dry");
+put(6, "test#7dry");
 # create netmail and echomail in non-default outbound for testing
 createBsoMail($outbound1, $passFileAreaDir, $busyFileDir, "001701c8");
 {
@@ -426,13 +493,17 @@ is($num, 20, "BSO#2dry remained in outbound");
 $files_to_delete = catfile($passFileAreaDir, "*.[tT][iI][cC]");
 $num = unlink glob($files_to_delete);
 is($num, 16, "BSO#2dry remained in ticOutbound");
+$notUsedDir = catdir($outbound1, "notused");
+$files_to_delete = catfile($notUsedDir, "*");
+$num = unlink glob($files_to_delete);
+is($num, 8, "BSO#2dry files in notused directory");
 $dryrun = undef;
 
 # test#8
 $fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
 $link = "1:23/456";
 init();
-put(7, "test#8");
+put(6, "test#8");
 # create netmail and echomail in non-default outbound for testing
 createBsoMail($outbound1, $passFileAreaDir, $busyFileDir, "001701c8");
 createFile(catfile($outbound1, "001701c8.bsy"));
@@ -454,13 +525,17 @@ is($num, 21, "BSO#3 remained in outbound");
 $files_to_delete = catfile($passFileAreaDir, "*.[tT][iI][cC]");
 $num = unlink glob($files_to_delete);
 is($num, 16, "BSO#3 remained in ticOutbound");
+$notUsedDir = catdir($outbound1, "notused");
+$files_to_delete = catfile($notUsedDir, "*");
+$num = unlink glob($files_to_delete);
+is($num, 8, "BSO#3 files in notused directory");
 
 # test#9
 $fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
 $link = "2:345/678";
 $netmail = 1;
 init();
-put(7, "test#9");
+put(6, "test#9");
 # create netmail, echomail in default outbound and tics for testing
 createBsoMail($outbound, $passFileAreaDir, $busyFileDir, "015902a6");
 # Run rmFilesFromOutbound()
@@ -490,6 +565,10 @@ is($num, 12, "BSO#4 remained in outbound");
 $files_to_delete = catfile($passFileAreaDir, "*.[tT][iI][cC]");
 $num = unlink glob($files_to_delete);
 is($num, 11, "BSO#4 remained in ticOutbound");
+$notUsedDir = catdir($outbound, "notused");
+$files_to_delete = catfile($notUsedDir, "*");
+$num = unlink glob($files_to_delete);
+is($num, 8, "BSO#4 files in notused directory");
 $netmail = 0;
 
 # test#9dry
@@ -498,7 +577,7 @@ $fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
 $link = "2:345/678";
 $netmail = 1;
 init();
-put(7, "test#9dry");
+put(6, "test#9dry");
 # create netmail, echomail in default outbound and tics for testing
 createBsoMail($outbound, $passFileAreaDir, $busyFileDir, "015902a6");
 # Run rmFilesFromOutbound()
@@ -528,6 +607,10 @@ is($num, 20, "BSO#4dry remained in outbound");
 $files_to_delete = catfile($passFileAreaDir, "*.[tT][iI][cC]");
 $num = unlink glob($files_to_delete);
 is($num, 16, "BSO#4dry remained in ticOutbound");
+$notUsedDir = catdir($outbound, "notused");
+$files_to_delete = catfile($notUsedDir, "*");
+$num = unlink glob($files_to_delete);
+is($num, 8, "BSO#4dry files in notused directory");
 $netmail = 0;
 $dryrun = undef;
 
@@ -536,7 +619,7 @@ $fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
 $link = "2:345/678";
 $echomail = 1;
 init();
-put(7, "test#10");
+put(6, "test#10");
 # create netmail, echomail in default outbound and tics for testing
 createBsoMail($outbound, $passFileAreaDir, $busyFileDir, "015902a6");
 # Run rmFilesFromOutbound()
@@ -566,6 +649,10 @@ is($num, 19, "BSO#5 remained in outbound");
 $files_to_delete = catfile($passFileAreaDir, "*.[tT][iI][cC]");
 $num = unlink glob($files_to_delete);
 is($num, 11, "BSO#5 remained in ticOutbound");
+$notUsedDir = catdir($outbound, "notused");
+$files_to_delete = catfile($notUsedDir, "*");
+$num = unlink glob($files_to_delete);
+is($num, 8, "BSO#5 files in notused directory");
 $echomail = 0;
 
 # test#10dry
@@ -574,7 +661,7 @@ $fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
 $link = "2:345/678";
 $echomail = 1;
 init();
-put(7, "test#10dry");
+put(6, "test#10dry");
 # create netmail, echomail in default outbound and tics for testing
 createBsoMail($outbound, $passFileAreaDir, $busyFileDir, "015902a6");
 # Run rmFilesFromOutbound()
@@ -604,6 +691,10 @@ is($num, 20, "BSO#5dry remained in outbound");
 $files_to_delete = catfile($passFileAreaDir, "*.[tT][iI][cC]");
 $num = unlink glob($files_to_delete);
 is($num, 16, "BSO#5dry remained in ticOutbound");
+$notUsedDir = catdir($outbound, "notused");
+$files_to_delete = catfile($notUsedDir, "*");
+$num = unlink glob($files_to_delete);
+is($num, 8, "BSO#5dry files in notused directory");
 $echomail = 0;
 $dryrun = undef;
 
@@ -612,7 +703,7 @@ $fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
 $link = "2:345/678";
 $fileecho = 1;
 init();
-put(7, "test#11");
+put(6, "test#11");
 # create netmail, echomail in default outbound and tics for testing
 createBsoMail($outbound, $passFileAreaDir, $busyFileDir, "015902a6");
 {
@@ -641,6 +732,10 @@ is($num, 12, "BSO#6 remained in outbound");
 $files_to_delete = catfile($passFileAreaDir, "*.[tT][iI][cC]");
 $num = unlink glob($files_to_delete);
 is($num, 16, "BSO#6 remained in ticOutbound");
+$notUsedDir = catdir($outbound, "notused");
+$files_to_delete = catfile($notUsedDir, "*");
+$num = unlink glob($files_to_delete);
+is($num, 8, "BSO#6 files in notused directory");
 $fileecho = 0;
 
 # test#11dry
@@ -649,7 +744,7 @@ $fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
 $link = "2:345/678";
 $fileecho = 1;
 init();
-put(7, "test#11dry");
+put(6, "test#11dry");
 # create netmail, echomail in default outbound and tics for testing
 createBsoMail($outbound, $passFileAreaDir, $busyFileDir, "015902a6");
 {
@@ -678,14 +773,28 @@ is($num, 20, "BSO#6dry remained in outbound");
 $files_to_delete = catfile($passFileAreaDir, "*.[tT][iI][cC]");
 $num = unlink glob($files_to_delete);
 is($num, 16, "BSO#6dry remained in ticOutbound");
+$notUsedDir = catdir($outbound, "notused");
+$files_to_delete = catfile($notUsedDir, "*");
+$num = unlink glob($files_to_delete);
+is($num, 8, "BSO#6 files in notused directory");
 $fileecho = 0;
 $dryrun = undef;
 
 # test#12
 $fidoconfig = catfile($cfgdir, "14_rmFiles.cfg");
+@makedirs = ("tparser", "-P", "$fidoconfig");
+if(getOS() eq 'UNIX')
+{
+    my $cmd = join(" ", @makedirs);
+    (system($cmd) >> 8) == 0 or die("system(\"$cmd\") failed: $!");
+}
+else
+{
+    (system(@makedirs) >> 8) == 0 or lastError("system(\"@makedirs\") failed: $!");
+}
 $link = "2:345/678";
 init();
-put(7, "test#12");
+put(6, "test#12");
 # create netmail, echomail in default outbound and tics for testing
 createBsoMail($outbound, $ticOutbound, $busyFileDir, "015902a6");
 # Run rmFilesFromOutbound()
@@ -715,13 +824,17 @@ is($num, 9, "BSO#7 remained in outbound");
 $files_to_delete = catfile($ticOutbound, "*.[tT][iI][cC]");
 $num = unlink glob($files_to_delete);
 is($num, 11, "BSO#7 remained in ticOutbound");
+$notUsedDir = catdir($outbound, "notused");
+$files_to_delete = catfile($notUsedDir, "*");
+$num = unlink glob($files_to_delete);
+is($num, 8, "BSO#7 files in notused directory");
 
 # test#12dry
 $dryrun = 1;
 $fidoconfig = catfile($cfgdir, "14_rmFiles.cfg");
 $link = "2:345/678";
 init();
-put(7, "test#12dry");
+put(6, "test#12dry");
 # create netmail, echomail in default outbound and tics for testing
 createBsoMail($outbound, $ticOutbound, $busyFileDir, "015902a6");
 # Run rmFilesFromOutbound()
@@ -751,6 +864,10 @@ is($num, 20, "BSO#7dry remained in outbound");
 $files_to_delete = catfile($ticOutbound, "*.[tT][iI][cC]");
 $num = unlink glob($files_to_delete);
 is($num, 16, "BSO#7dry remained in ticOutbound");
+$notUsedDir = catdir($outbound, "notused");
+$files_to_delete = catfile($notUsedDir, "*");
+$num = unlink glob($files_to_delete);
+is($num, 8, "BSO#7 files in notused directory");
 $dryrun = undef;
 
 

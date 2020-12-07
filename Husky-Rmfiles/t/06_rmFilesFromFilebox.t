@@ -97,42 +97,42 @@ sub createFileboxMail
 }
 
 $ENV{FIDOCONFIG} = undef;
-my $basedir = catdir(abs_path("t"), "fido");
+my $basedir = normalize(catdir(abs_path("t"), "fido"));
 $ENV{BASEDIR} = $basedir;
-my $cfgdir = catdir($basedir, "cfg");
-$ENV{MBASEDIR} = catdir($basedir, "msg");
+my $cfgdir = normalize(catdir($basedir, "cfg"));
+$ENV{MBASEDIR} = normalize(catdir($basedir, "msg"));
 $log = "rmLink.log";
 $listterm = 1;
 $listlog = 1;
-my $fileBoxesDir = catdir($basedir, "out", "boxes");
+my $fileBoxesDir = normalize(catdir($basedir, "out", "boxes"));
 
 # test#1
-$fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
+$fidoconfig = normalize(catfile($cfgdir, "12_rmFiles.cfg"));
 $link = "2:345/678";
-my $fileboxname = catdir($fileBoxesDir, "2.345.678.0");
+my $fileboxname = normalize(catdir($fileBoxesDir, "2.345.678.0"));
 if(-d $fileboxname)
 {
-    my $files_to_delete = catfile($filebox, "*");
+    my $files_to_delete = catfile($fileboxname, "*");
     unlink glob($files_to_delete);
-    rmdir($fileboxname);
+    rmdir($fileboxname) or die("Cannot delete directory $fileboxname: $!");
 }
 $fileboxname = catdir($fileBoxesDir, "2.345.678.0.h");
 if(-d $fileboxname)
 {
     my $files_to_delete = catfile($fileboxname, "*");
     unlink glob($files_to_delete);
-    rmdir($fileboxname);
+    rmdir($fileboxname) or die("Cannot delete directory $fileboxname: $!");
 }
 $fileboxname = catdir($fileBoxesDir, "2.345.678.0.H");
 if(-d $fileboxname)
 {
     my $files_to_delete = catfile($fileboxname, "*");
     unlink glob($files_to_delete);
-    rmdir($fileboxname);
+    rmdir($fileboxname) or die("Cannot delete directory $fileboxname: $!");
 }
 init();
-put(7, "###### 06_rmFilesFromFilebox.t ######");
-put(7, "test#1");
+put(6, "###### 06_rmFilesFromFilebox.t ######");
+put(6, "test#1");
 my $out;
 {
     # redirect STDOUT to a variable locally inside the block
@@ -142,11 +142,23 @@ my $out;
 like($out, qr%^There is no filebox for 2:345/678%, "no filebox");
 
 # test#2
-put(7, "test#2");
+$fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
+$link = "2:345/678";
+my @makedirs = ("tparser", "-P", "$fidoconfig");
+if(getOS() eq 'UNIX')
+{
+    my $cmd = join(" ", @makedirs);
+    (system($cmd) >> 8) == 0 or die("system(\"$cmd\") failed: $!");
+}
+else
+{
+    (system(@makedirs) >> 8) == 0 or lastError("system(\"@makedirs\") failed: $!");
+}
+init();
+put(6, "test#2");
 $filebox = 0;
 $fileboxname = catdir($fileBoxesDir, "2.345.678.0");
 createFileboxMail($fileboxname, "015902a6");
-init();
 {
     # redirect STDOUT to a variable locally inside the block
     open(local(*STDOUT), '>', \$out);
@@ -160,12 +172,14 @@ is(grep(/^Filebox 2.345.678.0 was deleted/, @lines), 1, "test#2 Footer");
 ok(! -d $fileboxname, "test#2 filebox deleted");
 
 # test#2dry
-put(7, "test#2dry");
+$fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
+$link = "2:345/678";
+init();
+put(6, "test#2dry");
 $dryrun = 1;
 $filebox = 0;
 $fileboxname = catdir($fileBoxesDir, "2.345.678.0");
 createFileboxMail($fileboxname, "015902a6");
-init();
 {
     # redirect STDOUT to a variable locally inside the block
     open(local(*STDOUT), '>', \$out);
@@ -177,14 +191,19 @@ $num = grep(/^\S+ deleted$/, @lines);
 is($num, 23, "test#2dry filebox 2.345.678.0");
 is(grep(/^Filebox 2.345.678.0 was deleted/, @lines), 1, "test#2dry Footer");
 ok(-d $fileboxname, "test#2dry filebox not deleted");
+#clean
+my $files_to_del = catfile($fileboxname, "*");
+unlink glob($files_to_del);
 rmdir($fileboxname);
 $dryrun = undef;
 
 # test#3
-put(7, "test#3");
+$fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
+$link = "2:345/678";
+init();
+put(6, "test#3");
 $filebox = 1;
 createFileboxMail($fileboxname, "015902a6");
-init();
 {
     # redirect STDOUT to a variable locally inside the block
     open(local(*STDOUT), '>', \$out);
@@ -195,14 +214,18 @@ is(grep(/^Deleting files from filebox 2.345.678.0/, @lines), 1, "test#3 Header")
 $num = grep(/^\S+ deleted$/, @lines);
 is($num, 23, "test#3 filebox 2.345.678.0");
 ok(-d $fileboxname, "test#3 filebox not deleted");
+# clean
+$files_to_del = catfile($fileboxname, "*");
+unlink glob($files_to_del);
 rmdir($fileboxname);
 
 # test#3dry
-put(7, "test#3dry");
+$fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
+init();
+put(6, "test#3dry");
 $dryrun = 1;
 $filebox = 1;
 createFileboxMail($fileboxname, "015902a6");
-init();
 {
     # redirect STDOUT to a variable locally inside the block
     open(local(*STDOUT), '>', \$out);
@@ -218,14 +241,18 @@ $num = unlink glob($files_to_delete);
 is($num, 23, "test#3dry remained");
 rmdir($fileboxname);
 ok(! -d $fileboxname, "test#3dry filebox deleted");
+# clean
+$files_to_del = catfile($fileboxname, "*");
+unlink glob($files_to_del);
+rmdir($fileboxname);
 $dryrun = undef;
 
 # test#4 hold flavour
-put(7, "test#4 hold flavour");
+init();
+put(6, "test#4 hold flavour");
 $filebox = 0;
 $fileboxname = catdir($fileBoxesDir, "2.345.678.0.H");
 createFileboxMail($fileboxname, "015902a6");
-init();
 {
     # redirect STDOUT to a variable locally inside the block
     open(local(*STDOUT), '>', \$out);
@@ -239,10 +266,12 @@ is(grep(/^Filebox 2.345.678.0.H was deleted/, @lines), 1, "test#4 Footer");
 ok(! -d $fileboxname, "test#4 filebox deleted");
 
 # test#5
-put(7, "test#5");
-$fileboxname = catdir($fileBoxesDir, "2.345.678.0");
+$fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
+init();
+put(6, "test#5");
+$fileboxname = normalize(catdir($fileBoxesDir, "2.345.678.0"));
 mkdir($fileboxname);
-my $zip = catfile($fileboxname, createBasename().".zip");
+my $zip = normalize(catfile($fileboxname, createBasename().".zip"));
 createFile($zip);
 if(getOS() eq "UNIX")
 {
@@ -251,16 +280,16 @@ if(getOS() eq "UNIX")
 else
 {
     my @cmd = ("attrib", "+R", "\"$fileboxname\"");
-    system(@cmd) == 0 or die("system(\"@cmd\") failed: $?");
+    (system(@cmd) >> 8) == 0 or die("system(\"@cmd\") failed: $!");
 }
-init();
 my $error;
 {
     # redirect STDERR to a variable locally inside the block
     open(local(*STDERR), '>', \$error);
     rmFilesFromFilebox();
 }
-like($error, qr%Could not delete $zip%, "Cannot delete file");
+@lines = split(/\n/, $error);
+is(grep(/Could not delete /, @lines), 1, "Cannot delete file");
 
 if(getOS() eq "UNIX")
 {
@@ -269,18 +298,19 @@ if(getOS() eq "UNIX")
 else
 {
     my @cmd = ("attrib", "-R", "\"$fileboxname\"");
-    system(@cmd) == 0 or die("system(\"@cmd\") failed: $?");
+    (system(@cmd) >> 8) == 0 or die("system(\"@cmd\") failed: $!");
 }
 unlink $zip;
 rmdir($fileboxname);
 ok(! -d $fileboxname, "test#5 filebox deleted");
 
 # test#6
-put(7, "test#6");
+$fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
+init();
+put(6, "test#6");
 $netmail = 1;
 $fileboxname = catdir($fileBoxesDir, "2.345.678.0");
 createFileboxMail($fileboxname, "015902a6");
-init();
 {
     # redirect STDOUT to a variable locally inside the block
     open(local(*STDOUT), '>', \$out);
@@ -300,12 +330,13 @@ ok(! -d $fileboxname, "test#6 filebox deleted");
 $netmail = 0;
 
 # test#6dry
-put(7, "test#6dry");
+$fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
+init();
+put(6, "test#6dry");
 $dryrun = 1;
 $netmail = 1;
 $fileboxname = catdir($fileBoxesDir, "2.345.678.0");
 createFileboxMail($fileboxname, "015902a6");
-init();
 {
     # redirect STDOUT to a variable locally inside the block
     open(local(*STDOUT), '>', \$out);
@@ -326,11 +357,12 @@ $netmail = 0;
 $dryrun = undef;
 
 # test#7
-put(7, "test#7");
+$fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
+init();
+put(6, "test#7");
 $echomail = 1;
 $fileboxname = catdir($fileBoxesDir, "2.345.678.0");
 createFileboxMail($fileboxname, "015902a6");
-init();
 {
     # redirect STDOUT to a variable locally inside the block
     open(local(*STDOUT), '>', \$out);
@@ -350,12 +382,13 @@ ok(! -d $fileboxname, "test#7 filebox deleted");
 $echomail = 0;
 
 # test#7dry
-put(7, "test#7dry");
+$fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
+init();
+put(6, "test#7dry");
 $dryrun = 1;
 $echomail = 1;
 $fileboxname = catdir($fileBoxesDir, "2.345.678.0");
 createFileboxMail($fileboxname, "015902a6");
-init();
 {
     # redirect STDOUT to a variable locally inside the block
     open(local(*STDOUT), '>', \$out);
@@ -376,11 +409,12 @@ $echomail = 0;
 $dryrun = undef;
 
 # test#8
-put(7, "test#8");
+$fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
+init();
+put(6, "test#8");
 $fileecho = 1;
 $fileboxname = catdir($fileBoxesDir, "2.345.678.0");
 createFileboxMail($fileboxname, "015902a6");
-init();
 {
     # redirect STDOUT to a variable locally inside the block
     open(local(*STDOUT), '>', \$out);
@@ -416,12 +450,13 @@ ok(! -d $fileboxname, "test#8 filebox deleted");
 $fileecho = 0;
 
 # test#8dry
-put(7, "test#8dry");
+$fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
+init();
+put(6, "test#8dry");
 $dryrun = 1;
 $fileecho = 1;
 $fileboxname = catdir($fileBoxesDir, "2.345.678.0");
 createFileboxMail($fileboxname, "015902a6");
-init();
 {
     # redirect STDOUT to a variable locally inside the block
     open(local(*STDOUT), '>', \$out);
@@ -458,11 +493,12 @@ $fileecho = 0;
 $dryrun = undef;
 
 # test#9
-put(7, "test#9");
+$fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
+init();
+put(6, "test#9");
 $otherfile = 1;
 $fileboxname = catdir($fileBoxesDir, "2.345.678.0");
 createFileboxMail($fileboxname, "015902a6");
-init();
 {
     # redirect STDOUT to a variable locally inside the block
     open(local(*STDOUT), '>', \$out);
@@ -482,12 +518,13 @@ ok(! -d $fileboxname, "test#9 filebox deleted");
 $otherfile = 0;
 
 # test#9dry
-put(7, "test#9dry");
+$fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
+init();
+put(6, "test#9dry");
 $dryrun = 1;
 $otherfile = 1;
 $fileboxname = catdir($fileBoxesDir, "2.345.678.0");
 createFileboxMail($fileboxname, "015902a6");
-init();
 {
     # redirect STDOUT to a variable locally inside the block
     open(local(*STDOUT), '>', \$out);

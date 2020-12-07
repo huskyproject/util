@@ -81,8 +81,8 @@ $listlog = 1;
 $fidoconfig = catfile($cfgdir, "14_rmFiles.cfg");
 $link = "2:345/678";
 init();
-put(7, "###### 07_rmOrphanFiles.t ######");
-put(7, "test#1");
+put(6, "###### 07_rmOrphanFiles.t ######");
+put(6, "test#1");
 createPassAreaFiles($passAreaDir, $ticOutbound);
 my $out;
 {
@@ -105,7 +105,7 @@ $num = unlink glob($files_to_delete);
 is($num, 5, "test#1 .tic remained in ticOutbound");
 
 # test#1dry
-put(7, "test#1dry");
+put(6, "test#1dry");
 $dryrun = 1;
 $fidoconfig = catfile($cfgdir, "14_rmFiles.cfg");
 $link = "2:345/678";

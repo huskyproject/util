@@ -6,6 +6,7 @@ use diagnostics;
 use warnings;
 use strict;
 use Test::More;
+use Fidoconfig::Token;
 use Husky::Rmfiles;
 use File::Spec::Functions;
 use Cwd 'abs_path';
@@ -15,8 +16,15 @@ $ENV{FIDOCONFIG} = undef;
 eval {init()};
 like($@, qr/^Please supply the path to fidoconfig/, "path to fidoconfig");
 
-my $cfgdir = catdir(Cwd::abs_path("t"), "fido", "cfg");
-$fidoconfig = catfile($cfgdir, "01_init.cfg");
+my $cfgdir = normalize(catdir(Cwd::abs_path("t"), "fido", "cfg"));
+if(getOS() eq "UNIX")
+{
+    $fidoconfig = catfile($cfgdir, "01_init.cfg");
+}
+else
+{
+    $fidoconfig = normalize(catfile($cfgdir, "01w_init.cfg"));
+}
 
 eval {init()};
 like($@, qr/^Please supply the link FTN address/, "link FTN address");
@@ -27,7 +35,14 @@ is($@, "", "no link FTN address");
 $link = "1:23/456";
 $log = "rmLink.log";
 eval {init()};
-like($@, qr%^Cannot open /home/user8CTpbI97/fido/log/rmLink.log%, "wrong LogFileDir");
+if(getOS() eq "UNIX")
+{
+    like($@, qr%^Cannot open /home/user8CTpbI97/fido/log/rmLink.log%, "wrong LogFileDir");
+}
+else
+{
+    like($@, qr%^Cannot open C:\\Users\\user8CTpbI97\\fido\\log\\rmLink.log%, "wrong LogFileDir");
+}
 
 $log = undef;
 $ENV{BASEDIR} = "/home/user8CTpbI97/fido";
