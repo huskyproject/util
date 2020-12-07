@@ -157,6 +157,7 @@ sub init
             error($all, "No report will be issued.");
         }
     }
+
     if($report)
     {
         my @areas;
@@ -265,6 +266,22 @@ sub init
 }
 
 my @reportLines;
+#
+# put($level, $msg) - print a string to terminal, logfile and to the report.
+#   $level is a number from 0 to 7 and it is a bitmask containing 3 bits.
+#       A 1 in the most significant bit allows printing to terminal,
+#       a 1 in the middle bit allows printing to logfile and
+#       a 1 in the least significant bit allows printing to the report.
+#       So $level == 7 means printing everywhere,
+#          $level == 6 means printing to terminal and logfile,
+#          $level == 5 means printing to terminal and report,
+#          $level == 4 means printing to terminal,
+#          $level == 3 means printing to logfile and report,
+#          $level == 2 means printing to logfile,
+#          $level == 1 means printing to report,
+#          $level == 0 - do not print.
+#   $msg is the string to print.
+#
 sub put
 {
     my ($level, $msg) = @_;
