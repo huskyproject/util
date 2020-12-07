@@ -333,12 +333,12 @@ sub unsubscribeLink
             if($OS eq "UNIX")
             {
                 my $cmd = "hpt -c $fidoconfig afix -s $link '-*'";
-                system($cmd) == 0 or lastError("system(\"$cmd\") failed: $?");
+                system($cmd) == 0 or lastError("system(\"$cmd\") failed: $!");
             }
             else
             {
                 my @cmd = ("hpt", "-c", "\"$fidoconfig\"", "afix", "-s", "$link", "-*");
-                system(@cmd) == 0 or lastError("system(\"@cmd\") failed: $?");
+                system(@cmd) == 0 or lastError("system(\"@cmd\") failed: $!");
             }
         }
         put($all, "$link was unsubscribed from all echos");
@@ -354,12 +354,12 @@ sub unsubscribeLink
             if($OS eq "UNIX")
             {
                 my $cmd = "htick -c \"$fidoconfig\" ffix -s $link '-*'";
-                !qx($cmd) or lastError("qx(\"$cmd\") failed: $?");
+                !qx($cmd) or lastError("qx(\"$cmd\") failed: $!");
             }
             else
             {
                 my @cmd = ("htick", "-c", "\"$fidoconfig\"", "ffix", "-s", "$link", "-*");
-                system(@cmd) == 0 or lastError("system(\"@cmd\") failed: $?");
+                system(@cmd) == 0 or lastError("system(\"@cmd\") failed: $!");
             }
         }
         put($all, "$link was unsubscribed from all fileechos");
@@ -1126,11 +1126,11 @@ sub publishReport
     if(getOS() eq 'UNIX')
     {
         $cmd = join(" ", @post);
-        system($cmd) == 0 or lastError("system(\"$cmd\") failed: $?");
+        system($cmd) == 0 or lastError("system(\"$cmd\") failed: $!");
     }
     else
     {
-        system(@post) == 0 or lastError("system(\"@post\") failed: $?");
+        system(@post) == 0 or lastError("system(\"@post\") failed: $!");
     }
     close($fh);
 }
