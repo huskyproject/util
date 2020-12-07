@@ -30,18 +30,18 @@ is($file, $fidoconfig, "env var#2");
 $Fidoconfig::Token::commentChar = '#';
 ($file, $value) = findTokenValue($fidoconfig, "ROBOT");
 is($value, "AreaFix", "if#1");
-is($file, File::Spec->catfile($cfgdir, "02_findTokenValue.cfg"), "if#2");
+is(normalize($file), normalize(File::Spec->catfile($cfgdir, "02_findTokenValue.cfg")), "if#2");
 
 $Fidoconfig::Token::commentChar = '#';
 $Fidoconfig::Token::module = "htick";
 ($file, $value) = findTokenValue($fidoconfig, "roBOT");
 is($value, "FileFix", "if#3");
-is($file, File::Spec->catfile($cfgdir, "03_findTokenValue.cfg"), "if#4");
+is(normalize($file), normalize(File::Spec->catfile($cfgdir, "03_findTokenValue.cfg")), "if#4");
 
 $Fidoconfig::Token::commentChar = '#';
 ($file, $value) = findTokenValue($fidoconfig, "KillRequests");
 is($value, "on", "empty value#1");
-is($file, File::Spec->catfile($cfgdir, "03_findTokenValue.cfg"), "empty value#2");
+is(normalize($file), normalize(File::Spec->catfile($cfgdir, "03_findTokenValue.cfg")), "empty value#2");
 
 $Fidoconfig::Token::commentChar = '#';
 ($file, $value) = findTokenValue($fidoconfig, "FileAreaCreatePerms");
@@ -52,17 +52,17 @@ $Fidoconfig::Token::commentChar = '#';
 $Fidoconfig::Token::module = "hpt";
 ($file, $value) = findTokenValue($fidoconfig, "AdvStatisticsFile");
 like($value, qr%log/hpt.sta$%, "set#1");
-is($file, File::Spec->catfile($cfgdir, "02_findTokenValue.cfg"), "set#2");
+is(normalize($file), normalize(File::Spec->catfile($cfgdir, "02_findTokenValue.cfg")), "set#2");
 
 $Fidoconfig::Token::commentChar = '#';
 ($file, $value) = findTokenValue($fidoconfig, "HelpFile");
 like($value, qr%/etc/husky/areafix.hlp$%, "set#3");
-is($file, File::Spec->catfile($cfgdir, "02_findTokenValue.cfg"), "set#4");
+is(normalize($file), normalize(File::Spec->catfile($cfgdir, "02_findTokenValue.cfg")), "set#4");
 
 $Fidoconfig::Token::commentChar = '#';
 ($file, $value) = findTokenValue($fidoconfig, "HptPerlFile");
 like($value, qr%/filter.pl$%, "set#4");
-is($file, File::Spec->catfile($cfgdir, "02_findTokenValue.cfg"), "set#5");
+is(normalize($file), normalize(File::Spec->catfile($cfgdir, "02_findTokenValue.cfg")), "set#5");
 
 $Fidoconfig::Token::commentChar = '#';
 $Fidoconfig::Token::module = "hpt";
