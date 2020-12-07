@@ -14,7 +14,7 @@ our ($fidoconfig, $link, $delete, $backup, $report, $log,
      $listterm, $listlog, $listreport, $dryrun);
 
 # The package version
-$VERSION = "1.2";
+$VERSION = "1.3";
 
 use Exporter;
 @ISA = qw(Exporter);
@@ -36,6 +36,7 @@ use File::Temp qw(tempfile tempdir);
 use POSIX qw(strftime);
 use Fidoconfig::Token 2.0;
 use File::Copy qw/cp/;
+use IO::Handle;
 use 5.008;
 use strict;
 use warnings;
@@ -1097,42 +1098,50 @@ in the report.
 sub publishReport
 {
     return if(!$report);
+
     my ($subject, $fromname, $rheader, $rfooter) = @_;
     lastError("Report subject is not defined, no report is published") if(!$subject);
     unshift(@reportLines, @$rheader) if(@$rheader);
     push(@reportLines, @$rfooter) if(@$rfooter);
     my $dir = tempdir(CLEANUP => 1);
-    my ($fh, $filename) = tempfile(DIR => $dir);
+    my ($fh, $reportfile) = tempfile(DIR => $dir);
     map{print $fh "$_\n";} @reportLines;
-    my @post = ("hpt", "-c", "\'$fidoconfig\'", "post");
-    push(@post, ("-nf", "\'$fromname\'")) if($fromname);
+    $fh->flush();
+    @reportLines = ();
 
+    my $cmd = "hpt post ";
+    $cmd .= "-nf \"$fromname\" " if($fromname);
     if($reportToEcho)
     {
-        push(@post, ("-e", "$report", "-af", "$address", "-nt", "All"));
+        $cmd .= "-e \"$report\" -af \"$address\" -nt \"All\"";
+        $cmd .= " -s \"$subject\" -z \"Husky::Rmfiles\"";
+        $cmd .= " -f loc -x \"$reportfile\"";
     }
     else
     {
         my ($path, $sysop);
         $commentChar = '#';
         ($path, $sysop) = findTokenValue($fidoconfig, "sysop");
-        push(@post, ("-nt", "\"$sysop\"", "-at", "$address"));
+        $cmd .= "-af \"$address\" -nt \"$sysop\" -at \"$address\"";
+        $cmd .= " -s \"$subject\" -z \"Husky::Rmfiles\"";
+        $cmd .= " -f loc \"$reportfile\"";
     }
 
-    push(@post, ("-s", "\"$subject\"",
-                 "-z", "\'Rmfiles.pm v.$VERSION\'",
-                 "-f", "loc", "-x", "-d", "$filename"));
-    my $cmd;
+    $ENV{FIDOCONFIG} = normalize($fidoconfig);
     if(getOS() eq 'UNIX')
     {
-        $cmd = join(" ", @post);
-        system($cmd) == 0 or lastError("system(\"$cmd\") failed: $!");
+        my $exitcode = system("$cmd");
+        lastError("system(\"$cmd\") failed: $!") if(($exitcode >> 8) != 0);
     }
     else
     {
-        system(@post) == 0 or lastError("system(\"@post\") failed: $!");
+        my $postdir = tempdir(CLEANUP => 1);
+        my ($ph, $postcmd) = tempfile("postXXXXXX", DIR=>$postdir, SUFFIX=>".bat");
+        print $ph "$cmd\n";
+        $ph->flush();
+        my $exitcode = system("$postcmd");
+        lastError("system(\"$postcmd\") failed: $!") if(($exitcode >> 8) != 0);
     }
-    close($fh);
 }
 
 1;
