@@ -16,7 +16,7 @@ our (
     );
 
 # The package version
-$VERSION = "1.3";
+$VERSION = "1.4";
 
 use Exporter;
 @ISA    = qw(Exporter);

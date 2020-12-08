@@ -9,7 +9,7 @@ use Cwd 'abs_path';
 use File::Spec::Functions;
 use Fcntl qw(:flock);
 use Fidoconfig::Token 2.2;
-use Husky::Rmfiles 1.3;
+use Husky::Rmfiles 1.4;
 use strict;
 use warnings;
 
