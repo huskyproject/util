@@ -64,7 +64,7 @@ GetOptions(
             "fileecho"  => \$fileecho,
             "other-files"=>\$otherfile,
             "box"       => \$filebox,
-#            "report:s"  => \$report,
+            "report:s"  => \$report,
             "log!"      => \$log,
             "quiet!"    => \$quiet,
             "dry-run!"  => \$dryrun,
@@ -189,12 +189,6 @@ fileechomail from the files to be deleted.
 
 Do not delete an empty filebox. On default the empty filebox is deleted.
 
-=back
-
-=cut
-
-=begin comment
-
 =item B<-r> [area]
 
 =item B<--report> [area]
@@ -205,10 +199,6 @@ If the name of the area is omitted, then  B<ReportTo> statement
 in fidoconfig is used.
 
 If the whole option is omitted, a report will not be sent.
-
-=end comment
-
-=over 4
 
 =item B<-l>
 
