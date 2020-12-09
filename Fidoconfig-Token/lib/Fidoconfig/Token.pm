@@ -6,15 +6,15 @@
 # see http://dev.perl.org/licenses/
 #
 package Fidoconfig::Token;
-our (@ISA, @EXPORT, $VERSION, $commentChar, $module);
+our (@ISA, @EXPORT, $VERSION, $commentChar, $module, $valueType);
 
 # The package version
-$VERSION = "2.2";
+$VERSION = "2.3";
 
 use Exporter;
 @ISA    = qw(Exporter);
 @EXPORT = qw(findTokenValue findAllTokenValues getOS normalize stripSpaces
-  stripQuotes stripComment expandVars isOn $commentChar $module);
+  stripQuotes stripComment expandVars isOn $commentChar $module $valueType);
 @EXPORT_OK = qw(cmpPattern boolExpr parseIf searchTokenValue);
 use Config;
 use File::Spec::Functions;
@@ -84,6 +84,15 @@ C<commentChar> - the character used to mark a comment. On default C<'#'> is used
                  file, which may be the value of C<FIDOCONFIG> environment
                  variable, then you must set C<$commentChar>
                  to C<'#'>.
+
+=item *
+
+C<valueType> - the value type you want to find using findTokenValue() or
+               findAllTokenValues(). If you want to find an integer value, then
+               assign the string "integer" to the variable before calling
+               either of the two subroutines. In any other case leave the
+               variable undefined. If you have assigned the value, it will be
+               undefined on the return from the subroutine.
 
 =back
 
@@ -199,7 +208,7 @@ sub findAllTokenValues
       croak("findAllTokenValues(): the third argument is incorrect\n");
     $ifLevel   = 0;
     @condition = ();
-    my ($file, @values) = searchAllTokenValues($tokenFile, $token, $desiredValue);
+    my @values = searchAllTokenValues($tokenFile, $token, $desiredValue);
     return @values;
 }
 
@@ -538,7 +547,10 @@ sub searchTokenValue
 
     #    croak("searchTokenValue(): extra arguments") if(@bad);
     #    croak("searchTokenValue(): the fourth argument is not defined") if(defined($mode) && !defined($desiredValue));
-    $desiredValue = "on" if(defined($desiredValue) && isOn($desiredValue));
+    if(!defined($valueType) || $valueType ne "integer")
+    {
+        $desiredValue = "on" if(defined($desiredValue) && isOn($desiredValue));
+    }
     my $value = "";
     my $cmp;
     if(defined($mode))
@@ -576,7 +588,15 @@ sub searchTokenValue
         if($line =~ /^$token\s+(.+)$/i)
         {
             ($value) = stripSpaces($1);
-            $value = "on" if(isOn($value));
+            if(!defined($valueType) || $valueType ne "integer")
+            {
+                $value = "on" if(isOn($value));
+            }
+            elsif($valueType eq "integer" &&
+                   (lc($value) eq "on" || lc($value) eq "yes"))
+            {
+                $value = "";
+            }
             if(defined($mode))
             {
                 if($cmp->())
@@ -593,7 +613,14 @@ sub searchTokenValue
         }
         elsif($line =~ /^$token$/i)
         {
-            $value = "on";
+            if(!defined($valueType) || $valueType ne "integer")
+            {
+                $value = "on";
+            }
+            else
+            {
+                $value = "";
+            }
             if(defined($mode))
             {
                 if($cmp->())
@@ -644,6 +671,7 @@ sub searchTokenValue
         $i     = undef;
         @lines = ();
     }
+    $valueType = undef;
     return($tokenFile, $value, $i, @lines);
 } ## end sub searchTokenValue
 
@@ -655,7 +683,10 @@ sub searchAllTokenValues
       unless(defined($desiredValue));
     ($desiredValue) = stripSpaces($desiredValue);
     $desiredValue = lc($desiredValue);
-    $desiredValue = "on" if(isOn($desiredValue));
+    if(!defined($valueType) || $valueType ne "integer")
+    {
+        $desiredValue = "on" if(isOn($desiredValue));
+    }
     my $value = "";
     my $cmp   = sub
     {
@@ -680,15 +711,29 @@ sub searchAllTokenValues
         if($line =~ /^$token\s+(.+)$/i)
         {
             ($value) = stripSpaces($1);
-            $value = lc($value);
-            $value = "on" if(isOn($value));
+            if(!defined($valueType) || $valueType ne "integer")
+            {
+                $value = "on" if(isOn($value));
+            }
+            elsif($valueType eq "integer" &&
+                   (lc($value) eq "on" || lc($value) eq "yes"))
+            {
+                $value = "";
+            }
             push(@values, $value) if($cmp->());
             $value = "";
             next;
         }
         elsif($line =~ /^$token$/i)
         {
-            $value = "on";
+            if(!defined($valueType) || $valueType ne "integer")
+            {
+                $value = "on";
+            }
+            else
+            {
+                $value = "";
+            }
             push(@values, $value) if($cmp->());
             $value = "";
             next;
@@ -716,6 +761,7 @@ sub searchAllTokenValues
             $commentChar = $1;
         }
     } ## end for my $line (@lines)
+    $valueType = undef;
     return @values;
 } ## end sub searchAllTokenValues
 

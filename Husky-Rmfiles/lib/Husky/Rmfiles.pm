@@ -16,7 +16,7 @@ our (
     );
 
 # The package version
-$VERSION = "1.4";
+$VERSION = "1.5";
 
 use Exporter;
 @ISA    = qw(Exporter);
@@ -37,7 +37,7 @@ use Config;
 use File::Basename;
 use File::Temp qw(tempfile tempdir);
 use POSIX qw(strftime);
-use Fidoconfig::Token 2.0;
+use Fidoconfig::Token 2.3;
 use File::Copy qw/cp/;
 use IO::Handle;
 use 5.008;
@@ -208,6 +208,7 @@ sub init
     lastError("SeparateBundles mode is not supported") if(isOn($separateBundles));
 
     $commentChar = '#';
+    $valueType = "integer";
     ($path, $advisoryLock) = findTokenValue($fidoconfig, "advisoryLock");
     if($advisoryLock)
     {

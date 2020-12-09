@@ -5,7 +5,7 @@ use diagnostics;
 use warnings;
 use strict;
 use Test::More;
-use Fidoconfig::Token qw(:DEFAULT findTokenValue);
+use Fidoconfig::Token 2.3 qw(:DEFAULT findTokenValue);
 use Cwd 'abs_path';
 use File::Spec;
 
@@ -74,5 +74,22 @@ is($file, $fidoconfig, "commentChar#2");
 ($file, $value) = findTokenValue($fidoconfig, "MsgBaseDir");
 isnt($value, "passthrough", "bad comment#1");
 is($file, $fidoconfig, "bad comment#2");
+
+$fidoconfig = File::Spec->catfile($cfgdir, "07_findTokenValue.cfg");
+$Fidoconfig::Token::commentChar = '#';
+($file, $value) = findTokenValue($fidoconfig, "AdvisoryLock");
+is($value, "on", "wrong AdvisoryLock#1");
+
+$Fidoconfig::Token::valueType = "integer";
+($file, $value) = findTokenValue($fidoconfig, "AdvisoryLock");
+is($value, "", "wrong AdvisoryLock#2");
+
+$fidoconfig = File::Spec->catfile($cfgdir, "08_findTokenValue.cfg");
+($file, $value) = findTokenValue($fidoconfig, "AdvisoryLock");
+is($value, "on", "wrong result since valueType was not specified");
+
+$Fidoconfig::Token::valueType = "integer";
+($file, $value) = findTokenValue($fidoconfig, "AdvisoryLock");
+is($value, "1", "correct AdvisoryLock value");
 
 done_testing();
