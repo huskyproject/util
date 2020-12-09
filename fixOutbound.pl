@@ -146,6 +146,7 @@ perl fixOutbound.pl [options]
     --noterm-list           do not print the list of deleted files to the
                             terminal
     --dry-run               a trial run with no changes made
+    --version               print version and exit
     --help                  print help and exit
 
   To view full documentation run `perldoc fixOutbound.pl`.

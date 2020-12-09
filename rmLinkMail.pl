@@ -127,6 +127,7 @@ perl rmLinkMail.pl [options]
     --fileecho              exclude fileechomail from the files to be deleted
     --other-files           exclude other files in the link's filebox
     --box                   do not delete an empty filebox
+    --report                send a report to the echo or netmail area
     --nolog                 do not log anything in the rmLinkMail.log file
     --quiet                 do not print to terminal window
     --version               print version and exit
@@ -193,7 +194,7 @@ Do not delete an empty filebox. On default the empty filebox is deleted.
 
 =item B<--report> [area]
 
-Send a report about the deleted files to the echo area.
+Send a report about the deleted files to the echo or netmail area.
 
 If the name of the area is omitted, then  B<ReportTo> statement
 in fidoconfig is used.

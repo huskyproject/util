@@ -125,6 +125,7 @@ perl rmLink.pl [options]
     --noterm-list           do not print the list of deleted files to the
                             terminal
     --dry-run               perform a trial run with no changes made
+    --version               print version and exit
     --help                  print help and exit
 
   To print full documentation run `perldoc rmLink.pl`.
