@@ -16,7 +16,7 @@ our (
     );
 
 # The package version
-$VERSION = "1.5";
+$VERSION = "1.6";
 
 use Exporter;
 @ISA    = qw(Exporter);
@@ -37,7 +37,7 @@ use Config;
 use File::Basename;
 use File::Temp qw(tempfile tempdir);
 use POSIX qw(strftime);
-use Fidoconfig::Token 2.3;
+use Fidoconfig::Token 2.4;
 use File::Copy qw/cp/;
 use IO::Handle;
 use 5.008;
@@ -212,7 +212,7 @@ sub init
     ($path, $advisoryLock) = findTokenValue($fidoconfig, "advisoryLock");
     if($advisoryLock)
     {
-        if($advisoryLock eq "on")
+        if($advisoryLock eq "non-integer")
         {
             lastError("advisoryLock should be a non-negative integer");
         }

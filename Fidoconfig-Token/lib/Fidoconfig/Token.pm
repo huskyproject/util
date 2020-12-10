@@ -9,7 +9,7 @@ package Fidoconfig::Token;
 our (@ISA, @EXPORT, $VERSION, $commentChar, $module, $valueType);
 
 # The package version
-$VERSION = "2.3";
+$VERSION = "2.4";
 
 use Exporter;
 @ISA    = qw(Exporter);
@@ -595,7 +595,7 @@ sub searchTokenValue
             elsif($valueType eq "integer" &&
                    (lc($value) eq "on" || lc($value) eq "yes"))
             {
-                $value = "";
+                $value = "non-integer";
             }
             if(defined($mode))
             {

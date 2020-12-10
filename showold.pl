@@ -12,7 +12,7 @@
 use File::Spec;
 use File::Find;
 use Config;
-use Fidoconfig::Token 2.3;
+use Fidoconfig::Token 2.4;
 use strict;
 use warnings;
 

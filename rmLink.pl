@@ -14,8 +14,8 @@ use Getopt::Long;
 use Pod::Usage;
 use Config;
 use Fcntl qw(:flock);
-use Fidoconfig::Token 2.3;
-use Husky::Rmfiles 1.5;
+use Fidoconfig::Token 2.4;
+use Husky::Rmfiles 1.6;
 use strict;
 use warnings;
 
