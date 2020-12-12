@@ -9,7 +9,7 @@ package Fidoconfig::Token;
 our (@ISA, @EXPORT, $VERSION, $commentChar, $module, $valueType);
 
 # The package version
-$VERSION = "2.4";
+$VERSION = "2.5";
 
 use Exporter;
 @ISA    = qw(Exporter);
@@ -90,9 +90,8 @@ C<commentChar> - the character used to mark a comment. On default C<'#'> is used
 C<valueType> - the value type you want to find using findTokenValue() or
                findAllTokenValues(). If you want to find an integer value, then
                assign the string "integer" to the variable before calling
-               either of the two subroutines. In any other case leave the
-               variable undefined. If you have assigned the value, it will be
-               undefined on the return from the subroutine.
+               either of the two subroutines and assign undef to the variable
+               after the call. In any other case leave the variable undefined.
 
 =back
 
@@ -545,8 +544,6 @@ sub searchTokenValue
 {
     my ($tokenFile, $token, $mode, $desiredValue, @bad) = @_;
 
-    #    croak("searchTokenValue(): extra arguments") if(@bad);
-    #    croak("searchTokenValue(): the fourth argument is not defined") if(defined($mode) && !defined($desiredValue));
     if(!defined($valueType) || $valueType ne "integer")
     {
         $desiredValue = "on" if(defined($desiredValue) && isOn($desiredValue));
@@ -592,11 +589,7 @@ sub searchTokenValue
             {
                 $value = "on" if(isOn($value));
             }
-            elsif($valueType eq "integer" &&
-                   (lc($value) eq "on" || lc($value) eq "yes"))
-            {
-                $value = "non-integer";
-            }
+
             if(defined($mode))
             {
                 if($cmp->())
@@ -671,7 +664,6 @@ sub searchTokenValue
         $i     = undef;
         @lines = ();
     }
-    $valueType = undef;
     return($tokenFile, $value, $i, @lines);
 } ## end sub searchTokenValue
 

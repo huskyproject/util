@@ -70,7 +70,7 @@ like($@, qr/SeparateBundles mode is not supported/, "SeparateBundles");
 
 $fidoconfig = catfile($cfgdir, "03_init.cfg");
 eval {init()};
-like($@, qr/Negative advisoryLock is not supported/, "advisoryLock");
+like($@, qr/advisoryLock should be a non-negative integer/, "advisoryLock");
 
 $fidoconfig = catfile($cfgdir, "04_init.cfg");
 eval {init()};

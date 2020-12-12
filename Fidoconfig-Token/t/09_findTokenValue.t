@@ -82,7 +82,8 @@ is($value, "on", "wrong AdvisoryLock#1");
 
 $Fidoconfig::Token::valueType = "integer";
 ($file, $value) = findTokenValue($fidoconfig, "AdvisoryLock");
-is($value, "non-integer", "wrong AdvisoryLock#2");
+$Fidoconfig::Token::valueType = undef;
+is($value, "yes", "wrong AdvisoryLock#2");
 
 $fidoconfig = File::Spec->catfile($cfgdir, "08_findTokenValue.cfg");
 ($file, $value) = findTokenValue($fidoconfig, "AdvisoryLock");

@@ -16,7 +16,7 @@ our (
     );
 
 # The package version
-$VERSION = "1.6";
+$VERSION = "1.7";
 
 use Exporter;
 @ISA    = qw(Exporter);
@@ -37,7 +37,7 @@ use Config;
 use File::Basename;
 use File::Temp qw(tempfile tempdir);
 use POSIX qw(strftime);
-use Fidoconfig::Token 2.4;
+use Fidoconfig::Token 2.5;
 use File::Copy qw/cp/;
 use IO::Handle;
 use 5.008;
@@ -116,7 +116,7 @@ sub init
 
     if(!$nolink)
     {
-        $link or die("Please supply the link FTN address\n");
+        $link or die("Please supply the link's FTN address\n");
 
         ($zone, $net, $node, $point) = $link =~ m!(\d+):(\d+)/(\d+)(?:\.(\d+))?!;
         if(!defined($zone))
@@ -208,17 +208,20 @@ sub init
     lastError("SeparateBundles mode is not supported") if(isOn($separateBundles));
 
     $commentChar = '#';
-    $valueType = "integer";
+    $Fidoconfig::Token::valueType = "integer";
     ($path, $advisoryLock) = findTokenValue($fidoconfig, "advisoryLock");
+    $Fidoconfig::Token::valueType = undef;
+
+    sub is_non_negative_integer
+    {
+        defined $_[0] && $_[0] =~ /^\d+$/;
+    }
+
     if($advisoryLock)
     {
-        if($advisoryLock eq "non-integer")
+        if(!is_non_negative_integer($advisoryLock))
         {
             lastError("advisoryLock should be a non-negative integer");
-        }
-        elsif($advisoryLock < 0)
-        {
-            lastError("Negative advisoryLock is not supported");
         }
         elsif($advisoryLock > 0)
         {
