@@ -46,7 +46,7 @@ my $age = 183;  # 183 days
 $log = 1;
 $listlog = 1;
 $listterm = 1;
-$dryrun = 1;
+$dryrun = 0;
 $fidoconfig = $ENV{FIDOCONFIG} if defined $ENV{FIDOCONFIG};
 
 my $help;
