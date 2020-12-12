@@ -57,19 +57,30 @@ $fidoconfig = $ENV{FIDOCONFIG} if defined $ENV{FIDOCONFIG};
 Getopt::Long::Configure("auto_abbrev", "gnu_compat", "permute");
 GetOptions( 
             "config=s"  => \$fidoconfig,
+            "c=s"       => \$fidoconfig,
             "address=s" => \$link,
+            "a=s"       => \$link,
             "n"         => \$netmail,
             "netmail"   => \$netmail,
             "echomail"  => \$echomail,
+            "e"         => \$echomail,
             "fileecho"  => \$fileecho,
+            "f"         => \$fileecho,
             "other-files"=>\$otherfile,
+            "o"         => \$otherfile,
             "box"       => \$filebox,
+            "b"         => \$filebox,
             "report:s"  => \$report,
+            "r:s"       => \$report,
             "log!"      => \$log,
+            "l"         => \$log,
             "quiet!"    => \$quiet,
+            "q"         => \$quiet,
             "dry-run!"  => \$dryrun,
             "version"   => \&version,
+            "v"         => \&version,
             "help"      => \&usage,
+            "h"         => \&usage,
           )
 or die("Error in command line arguments\n");
 
@@ -82,7 +93,7 @@ if (!(defined($fidoconfig) && -f $fidoconfig && -s $fidoconfig))
 
 if(!defined($link))
 {
-    print STDERR "\nPlease supply the link FTN address\n\n";
+    print STDERR "\nPlease supply the link's FTN address\n\n";
     usage();
 }
 

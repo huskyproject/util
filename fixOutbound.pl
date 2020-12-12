@@ -13,7 +13,7 @@ use Husky::Rmfiles 1.6;
 use strict;
 use warnings;
 
-our $VERSION = "1.2";
+our $VERSION = "1.3";
 
 sub version
 {
@@ -55,16 +55,22 @@ $help = 1 unless(@ARGV);
 Getopt::Long::Configure("auto_abbrev", "gnu_compat", "permute");
 GetOptions(
             "config=s"      => \$fidoconfig,
+            "c=s"           => \$fidoconfig,
             "age=i"         => \$age,
+            "a=i"           => \$age,
             "report:s"      => \$report,
             "log!"          => \$log,
             "quiet!"        => \$quiet,
+            "q"             => \$quiet,
             "report-list!"  => \$listreport,
             "log-list!"     => \$listlog,
             "term-list!"    => \$listterm,
             "dry-run!"      => \$dryrun,
+            "d"             => \$dryrun,
             "version"       => \&version,
+            "v"             => \&version,
             "help"          => \$help,
+            "h"             => \$help,
           )
 or die("Error in command line arguments\n");
 
@@ -238,13 +244,15 @@ On default (or when --term-list is used), the list of deleted files is
 printed to the terminal window. Please use --nolog-list if you do not want
 to print the list of deleted files to the terminal window.
 
+=item B<-d>
+
 =item B<--dry-run>
 
 =item B<--nodry-run>
 
-If C<--dry-run> is used, perform a trial run with no changes made. Nothing is
-deleted, but the same output is produced as in a real run except the error
-messages that may appear during the actual run.
+If C<--dry-run> or C<-d> is used, perform a trial run with no changes made.
+Nothing is deleted, but the same output is produced as in a real run except the
+error messages that may appear during the actual run.
 
 =item B<-v>
 
