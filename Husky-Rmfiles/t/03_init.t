@@ -27,7 +27,7 @@ else
 }
 
 eval {init()};
-like($@, qr/^Please supply the link FTN address/, "link FTN address");
+like($@, qr/^Please supply the link's FTN address/, "link FTN address");
 
 eval {Husky::Rmfiles::init("nolink");};
 is($@, "", "no link FTN address");
