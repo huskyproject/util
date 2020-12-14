@@ -1,3 +1,21 @@
 Build.PL
 lib/Fidoconfig/Token.pm
 MANIFEST			This list of files
+t/01_load.t
+t/02_OS.t
+t/03_norm.t
+t/04_strip.t
+t/05_expandVars.t
+t/06_cmpPattern.t
+t/07_boolExpr.t
+t/08_parseIf.t
+t/09_findTokenValue.t
+t/10_findByValue.t
+t/fido/cfg/01_findTokenValue.cfg
+t/fido/cfg/02_findTokenValue.cfg
+t/fido/cfg/03_findTokenValue.cfg
+t/fido/cfg/04_findByValue.cfg
+t/fido/cfg/05_tokenFile
+t/fido/cfg/06_findByValue.cfg
+t/fido/cfg/07_findTokenValue.cfg
+t/fido/cfg/08_findTokenValue.cfg
