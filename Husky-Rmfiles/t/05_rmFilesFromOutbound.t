@@ -243,33 +243,6 @@ like($error, qr/^Outbound directory \S+ does not exist$/, "Outbound does not exi
 
 # test#4
 $fidoconfig = catfile($cfgdir, "13_rmFiles.cfg");
-my @makedirs = ("tparser", "-P", "$fidoconfig");
-if(getOS() eq 'UNIX')
-{
-    my $cmd = join(" ", @makedirs);
-    my $out = "";
-    my $failed = 0;
-    my $msg;
-    {
-        # redirect STDERR to a variable locally inside the block
-        open(local(*STDOUT), '>', \$out);
-        my $exitcode = system($cmd) >> 8;
-        if($exitcode != 0)
-        {
-            $failed = 1;
-            $msg = $!;
-        }
-    }
-    if($failed)
-    {
-        print $out;
-        die("system(\"$cmd\") failed: $msg");
-    }
-}
-else
-{
-    (system(@makedirs) >> 8) == 0 or lastError("system(\"@makedirs\") failed: $!");
-}
 $link = "1:23/456.666";
 init();
 put(6, "test#4");
@@ -333,16 +306,6 @@ unlink glob($files_to_delete);
 
 # test#6
 $fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
-@makedirs = ("tparser", "-P", "$fidoconfig");
-if(getOS() eq 'UNIX')
-{
-    my $cmd = join(" ", @makedirs);
-    (system($cmd) >> 8) == 0 or die("system(\"$cmd\") failed: $!");
-}
-else
-{
-    (system(@makedirs) >> 8) == 0 or lastError("system(\"@makedirs\") failed: $!");
-}
 $link = "2:345/678";
 init();
 put(6, "test#6");
@@ -782,16 +745,6 @@ $dryrun = undef;
 
 # test#12
 $fidoconfig = catfile($cfgdir, "14_rmFiles.cfg");
-@makedirs = ("tparser", "-P", "$fidoconfig");
-if(getOS() eq 'UNIX')
-{
-    my $cmd = join(" ", @makedirs);
-    (system($cmd) >> 8) == 0 or die("system(\"$cmd\") failed: $!");
-}
-else
-{
-    (system(@makedirs) >> 8) == 0 or lastError("system(\"@makedirs\") failed: $!");
-}
 $link = "2:345/678";
 init();
 put(6, "test#12");

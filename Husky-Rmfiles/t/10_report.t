@@ -249,17 +249,6 @@ $fidoconfig = normalize(catfile($cfgdir, "21_report.cfg"));
 $ENV{FIDOCONFIG} = $fidoconfig;
 init();
 put(6, "test #2");
-# create necessary directories
-my @makedirs = ("tparser", "-Dmodule=hpt", "-P", "$fidoconfig");
-if(getOS() eq 'UNIX')
-{
-    my $cmd = join(" ", @makedirs);
-    (system($cmd) >> 8) == 0 or die("system(\"$cmd\") failed: $!");
-}
-else
-{
-    (system(@makedirs) >> 8) == 0 or die("system(\"@makedirs\") failed: $!");
-}
 # initialize JAM msgbase
 my $srcdir = catdir($sampleDir, "jam");
 my $destdir = catdir($ENV{MBASEDIR}, "jam");
@@ -327,18 +316,6 @@ $fidoconfig = normalize(catfile($cfgdir, "22_report.cfg"));
 $ENV{FIDOCONFIG} = $fidoconfig;
 init();
 put(6, "test #3");
-put(6, "FIDOCONFIG=$ENV{FIDOCONFIG}");
-# create necessary directories
-@makedirs = ("tparser", "-Dmodule=hpt", "-P", "$fidoconfig");
-if(getOS() eq 'UNIX')
-{
-    my $cmd = join(" ", @makedirs);
-    (system($cmd) == 0 >> 8) or die("system(\"$cmd\") failed: $!");
-}
-else
-{
-    (system(@makedirs) >> 8) == 0 or die("system(\"@makedirs\") failed: $!");
-}
 # backup config
 $bak = "$fidoconfig" . ".bak";
 cp("$fidoconfig", "$bak") or die "Copy to $bak failed: $!";

@@ -25,17 +25,10 @@ $log = "rmLink.log";
 if(getOS() eq 'UNIX')
 {
     $fidoconfig = catfile($cfgdir, "09_unsub.cfg");
-    my @makedirs = ("tparser", "-Dmodule=hpt", "-P", "$fidoconfig");
-    my $cmd = join(" ", @makedirs);
-    my $exitcode = system($cmd) >> 8;
-    die("system(\"$cmd\") failed: $!") if($exitcode != 0);
 }
 else
 {
     $fidoconfig = normalize(catfile($cfgdir, "09w_unsub.cfg"));
-    my @makedirs = ("tparser", "-Dmodule=hpt", "-P", "$fidoconfig");
-    my $exitcode = system(@makedirs) >> 8;
-    die("system(\"@makedirs\") failed: $!") if($exitcode != 0);
 }
 my $bak = "$fidoconfig" . ".bak";
 cp("$fidoconfig", "$bak") or die "Copy to $bak failed: $!";
@@ -62,17 +55,10 @@ $dryrun = 1;
 if(getOS() eq 'UNIX')
 {
     $fidoconfig = catfile($cfgdir, "09_unsub.cfg");
-    my @makedirs = ("tparser", "-Dmodule=hpt", "-P", "$fidoconfig");
-    my $cmd = join(" ", @makedirs);
-    my $exitcode = system($cmd) >> 8;
-    die("system(\"$cmd\") failed: $!") if($exitcode != 0);
 }
 else
 {
     $fidoconfig = normalize(catfile($cfgdir, "09w_unsub.cfg"));
-    my @makedirs = ("tparser", "-Dmodule=hpt", "-P", "$fidoconfig");
-    my $exitcode = system(@makedirs) >> 8;
-    die("system(\"@makedirs\") failed: $!") if($exitcode != 0);
 }
 $bak = "$fidoconfig" . ".bak";
 cp("$fidoconfig", "$bak") or die "Copy to $bak failed: $!";
@@ -96,18 +82,6 @@ put(6, "test#2");
 $fidoconfig = catfile($cfgdir, "10_unsub.cfg");
 $ENV{FIDOCONFIG} = $fidoconfig;
 my $netmailArea = catdir($basedir, "msg", "netmail");
-my @makedirs = ("tparser", "-Dmodule=htick", "-P", "$fidoconfig");
-if(getOS() eq 'UNIX')
-{
-    my $cmd = join(" ", @makedirs);
-    my $exitcode = system($cmd) >> 8;
-    die("system(\"$cmd\") failed: $!") if($exitcode != 0);
-}
-else
-{
-    my $exitcode = system(@makedirs) >> 8;
-    die("system(\"@makedirs\") failed: $!") if($exitcode != 0);
-}
 $bak = "$fidoconfig" . ".bak";
 cp("$fidoconfig", "$bak") or die "Copy to $bak failed: $!";
 init();

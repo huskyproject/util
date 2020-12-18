@@ -144,16 +144,6 @@ like($out, qr%^There is no filebox for 2:345/678%, "no filebox");
 # test#2
 $fidoconfig = catfile($cfgdir, "12_rmFiles.cfg");
 $link = "2:345/678";
-my @makedirs = ("tparser", "-P", "$fidoconfig");
-if(getOS() eq 'UNIX')
-{
-    my $cmd = join(" ", @makedirs);
-    (system($cmd) >> 8) == 0 or die("system(\"$cmd\") failed: $!");
-}
-else
-{
-    (system(@makedirs) >> 8) == 0 or lastError("system(\"@makedirs\") failed: $!");
-}
 init();
 put(6, "test#2");
 $filebox = 0;
