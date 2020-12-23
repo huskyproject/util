@@ -242,6 +242,7 @@ my $htick;
 if($huskyBinDir ne "" && -d $huskyBinDir)
 {
     $htick   = normalize(catfile($huskyBinDir, "htick".$exe));
+    $Husky::Rmfiles::huskyBinDir = $huskyBinDir;
 }
 else
 {
@@ -266,6 +267,9 @@ my $error;
 put(6, "###### 10_report.t ######");
 put(6, "test #1");
 like($error, qr/ReportTo is not defined in your fidoconfig/, "ReportTo is not defined");
+
+# Skip the tests not using htick if htick is accessible
+goto WITH_HTICK if($htick_exists);
 
 TEST2:
 # test #2 Report to an echo area (file areas are absent)
@@ -318,7 +322,6 @@ mv("$bak", "$fidoconfig") or die("Restoring $fidoconfig failed: $!");
 if($reported)
 {
     put(6, "Report was posted to qqq echo");
-    initJAM();
 }
 my $files_to_delete = catfile($outbound, "*");
 my $num = unlink glob($files_to_delete);
@@ -428,7 +431,7 @@ rmdir($fileboxname);
 # Skip the tests using htick if there is no htick
 goto END unless($htick_exists);
 
-
+WITH_HTICK:
 TEST4:
 # test #4 Report to an echo area (file areas are absent)
 $fidoconfig = normalize(catfile($cfgdir, "23_report.cfg"));
@@ -463,7 +466,6 @@ mv("$bak", "$fidoconfig") or die("Restoring $fidoconfig failed: $!");
 if($reported)
 {
     put(6, "Report was posted to qqq echo");
-    initJAM();
 }
 $files_to_delete = catfile($outbound, "*");
 $num = unlink glob($files_to_delete);
@@ -476,6 +478,7 @@ $num = unlink glob($files_to_delete);
 $files_to_delete = catfile($fileboxname, "*");
 $num = unlink glob($files_to_delete);
 rmdir($fileboxname);
+goto END;
 
 TEST5:
 # test #5  Post report to netmail in Opus msgbase

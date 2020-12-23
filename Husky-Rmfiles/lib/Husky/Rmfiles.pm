@@ -12,11 +12,11 @@ our (@ISA, @EXPORT, $VERSION);
 our (
      $fidoconfig, $link,    $delete,     $backup,   $report,    $log,
      $quiet,      $netmail, $echomail,   $fileecho, $otherfile, $filebox,
-     $listterm,   $listlog, $listreport, $dryrun
+     $listterm,   $listlog, $listreport, $dryrun,   $huskyBinDir
     );
 
 # The package version
-$VERSION = "1.7";
+$VERSION = "1.8";
 
 use Exporter;
 @ISA    = qw(Exporter);
@@ -25,7 +25,7 @@ use Exporter;
   rmOrphanFilesFromOutbound put error lastError
   $fidoconfig $link $delete $backup $report $log
   $quiet $netmail $echomail $fileecho $otherfile $filebox
-  $listterm $listlog $listreport $dryrun);
+  $listterm $listlog $listreport $dryrun $huskyBinDir);
 
 #@EXPORT_OK = qw(put error lastError);
 
@@ -343,21 +343,30 @@ sub unsubscribeLink
     # Unsubscribe from all echos if the link is subscribed at least to one echo
     $module      = "hpt";
     $commentChar = '#';
+    my ($hpt, $htick);
     my ($tokenFile, $value, $linenum, @lines) =
       findTokenValue($fidoconfig, 'EchoArea', '=~', $link);
     if($value ne "")
     {
         if(!$dryrun)
         {
+            if(defined($huskyBinDir) && $huskyBinDir ne "" && -d $huskyBinDir)
+            {
+                $hpt = normalize(catfile($huskyBinDir, "hpt"));
+            }
+            else
+            {
+                $hpt = "hpt";
+            }
             if($OS eq "UNIX")
             {
-                my $cmd      = "hpt -c $fidoconfig afix -s $link '-*'";
+                my $cmd      = "$hpt -c $fidoconfig afix -s $link '-*'";
                 my $exitcode = system("$cmd");
                 lastError("system(\"$cmd\") failed: $!") if(($exitcode >> 8) != 0);
             }
             else
             {
-                my @cmd = ("hpt", "-c", "\"$fidoconfig\"", "afix", "-s", "$link", "-*");
+                my @cmd = ("$hpt".".exe", "-c", "\"$fidoconfig\"", "afix", "-s", "$link", "-*");
                 my $exitcode = system(@cmd);
                 lastError("system(\"@cmd\") failed: $!") if(($exitcode >> 8) != 0);
             }
@@ -374,14 +383,22 @@ sub unsubscribeLink
     {
         if(!$dryrun)
         {
+            if(defined($huskyBinDir) && $huskyBinDir ne "" && -d $huskyBinDir)
+            {
+                $htick = normalize(catfile($huskyBinDir, "htick"));
+            }
+            else
+            {
+                $htick = "htick";
+            }
             if($OS eq "UNIX")
             {
-                my $cmd = "htick -c \"$fidoconfig\" ffix -s $link '-*'";
+                my $cmd = "$htick -c \"$fidoconfig\" ffix -s $link '-*'";
                 !qx($cmd) or lastError("qx(\"$cmd\") failed: $!");
             }
             else
             {
-                my @cmd = ("htick", "-c", "\"$fidoconfig\"", "ffix", "-s", "$link", "-*");
+                my @cmd = ("$htick".".exe", "-c", "\"$fidoconfig\"", "ffix", "-s", "$link", "-*");
                 my $exitcode = system(@cmd);
                 lastError("system(\"@cmd\") failed: $!") if(($exitcode >> 8) != 0);
             }
@@ -1207,7 +1224,17 @@ sub publishReport
     $fh->flush();
     @reportLines = ();
 
-    my $cmd = "hpt post ";
+    my $hpt;
+    if(defined($huskyBinDir) && $huskyBinDir ne "" && -d $huskyBinDir)
+    {
+        $hpt = normalize(catfile($huskyBinDir, "hpt"));
+    }
+    else
+    {
+        $hpt = "hpt";
+    }
+    $hpt .= ".exe" if(getOS() ne 'UNIX');
+    my $cmd = "$hpt post ";
     $cmd .= "-nf \"$fromname\" " if($fromname);
     if($reportToEcho)
     {
@@ -1256,6 +1283,11 @@ It must be the full path to fidoconfig. The value is required.
 
 It is a 3D or 4D FTN address of your link. The value is required only when
 you want to delete files of a specific link.
+
+=head2 $huskyBinDir
+
+It is the directory where hpt and htick binaries reside. You MUST use the
+variable if hpt and htick are not in your PATH.
 
 =head2 $report
 

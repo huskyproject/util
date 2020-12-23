@@ -32,6 +32,7 @@ my $htick;
 if($huskyBinDir ne "" && -d $huskyBinDir)
 {
     $htick   = normalize(catfile($huskyBinDir, "htick".$exe));
+    $Husky::Rmfiles::huskyBinDir = $huskyBinDir;
 }
 else
 {
