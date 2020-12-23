@@ -5,8 +5,21 @@ use Module::Build 0.28;
 use strict;
 use warnings;
 
-my %module_build_args =
-(
+my $class = Module::Build->subclass(
+    class => "Module::Build::Husky",
+    code => <<'SUBCLASS' );
+
+sub ACTION_test
+{
+    my $self = shift;
+    my $dir = $ARGV[1];
+    $ENV{HUSKYBINDIR} = $dir if(defined($dir) && $dir ne "" && -d $dir);
+    $self->SUPER::ACTION_test;
+}
+SUBCLASS
+
+my $build = $class->new
+  (
     "configure_requires" =>
     {
         "Module::Build" => "0.28"
@@ -50,7 +63,5 @@ my %module_build_args =
         "strict" => 0,
         "warnings" => 0
     }
-);
-
-my $build = Module::Build->new(%module_build_args);
+  );
 $build->create_build_script;

@@ -21,7 +21,12 @@ else
 {
     $hpt   = "hpt".$exe;
 }
-my $hpt_exists = grep(/hpt/, qx($hpt -h)) > 1 ? 1 : 0;
+my $hpt_exists = grep(/hpt/,
+  eval
+  {
+    no warnings 'all';
+    qx($hpt -h)
+  }) > 1 ? 1 : 0;
 $hpt_exists or die "Cannot access $hpt";
 
 # Create a directory structure for use in the later tests
