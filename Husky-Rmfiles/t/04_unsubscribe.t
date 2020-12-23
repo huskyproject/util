@@ -8,18 +8,42 @@ use strict;
 use Test::More;
 use Fidoconfig::Token 2.0;
 use Husky::Rmfiles;
-use File::Spec::Functions;
-use Cwd 'abs_path';
+use File::Spec::Functions qw/splitdir catdir catfile/;
+use Cwd qw/cwd abs_path/;
 use File::Copy qw/cp mv/;
 use 5.008;
 
 $ENV{FIDOCONFIG} = undef;
-my $basedir = normalize(catdir(Cwd::abs_path("t"), "fido"));
+my $cwd = cwd();
+my @dirs = splitdir($cwd);
+my $t;
+$t = $dirs[$#dirs] eq "t" ? $cwd : normalize(catdir($cwd, "t"));
+my $basedir = normalize(catdir($t, "fido"));
 $ENV{BASEDIR} = $basedir;
 my $cfgdir = normalize(catdir($basedir, "cfg"));
 $ENV{MBASEDIR} = normalize(catdir($basedir, "msg"));
 $link = "1:23/456";
 $log = "rmLink.log";
+
+# Check whether htick is accessible
+my $huskyBinDir = defined($ENV{HUSKYBINDIR}) ? $ENV{HUSKYBINDIR} : "";
+my $exe = getOS() ne 'UNIX' ? ".exe" : "";
+my $htick;
+if($huskyBinDir ne "" && -d $huskyBinDir)
+{
+    $htick   = normalize(catfile($huskyBinDir, "htick".$exe));
+}
+else
+{
+    $htick   = "htick".$exe;
+}
+my $htick_exists = grep(/htick/,
+  eval
+  {
+    no warnings 'all';
+    qx($htick -h)
+  }) > 1 ? 1 : 0;
+
 
 # test#1
 if(getOS() eq 'UNIX')
@@ -77,6 +101,9 @@ is($num_entries, 3, "not unsubscribed from echos");
 mv("$bak", "$fidoconfig") or die "Move from $bak failed: $!";
 $dryrun = undef;
 
+# Skip the test using htick if there is no htick
+goto END unless($htick_exists);
+
 # test#2
 put(6, "test#2");
 $fidoconfig = catfile($cfgdir, "10_unsub.cfg");
@@ -120,4 +147,5 @@ is($num_entries, 3, "not unsubscribed from fileechos");
 mv("$bak", "$fidoconfig") or die "Move from $bak failed: $!";
 $dryrun = undef;
 
+END:
 done_testing();

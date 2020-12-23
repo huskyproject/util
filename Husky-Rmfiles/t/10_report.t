@@ -8,8 +8,8 @@ use strict;
 use Test::More;
 use Fidoconfig::Token 2.0;
 use Husky::Rmfiles;
-use File::Spec::Functions;
-use Cwd 'abs_path';
+use File::Spec::Functions qw/splitdir catdir catfile/;
+use Cwd qw/cwd abs_path/;
 use File::Compare;
 use File::Copy qw/cp mv/;
 use 5.008;
@@ -205,7 +205,11 @@ sub createFileboxMail
 }
 
 $ENV{FIDOCONFIG} = undef;
-my $basedir = normalize(catdir(abs_path("t"), "fido"));
+my $cwd = cwd();
+my @dirs = splitdir($cwd);
+my $t;
+$t = $dirs[$#dirs] eq "t" ? $cwd : normalize(catdir($cwd, "t"));
+my $basedir = normalize(catdir($t, "fido"));
 $ENV{BASEDIR} = $basedir;
 my $cfgdir = normalize(catdir($basedir, "cfg"));
 $ENV{CFGDIR} = $cfgdir;
@@ -231,6 +235,26 @@ $fromname = "rmLink Robot";
            "I am deleting all its netmail, echomail and fileechos.", "  ");
 @footer = ("", "$link has been removed from 2:5020/1042 configuration files.", "  ");
 
+# Check whether htick is accessible
+my $huskyBinDir = defined($ENV{HUSKYBINDIR}) ? $ENV{HUSKYBINDIR} : "";
+my $exe = getOS() ne 'UNIX' ? ".exe" : "";
+my $htick;
+if($huskyBinDir ne "" && -d $huskyBinDir)
+{
+    $htick   = normalize(catfile($huskyBinDir, "htick".$exe));
+}
+else
+{
+    $htick   = "htick".$exe;
+}
+my $htick_exists = grep(/htick/,
+    eval
+    {
+        no warnings 'all';
+        qx($htick -h);
+    }) > 1 ? 1 : 0;
+
+
 # test #1
 $fidoconfig = catfile($cfgdir, "14_rmFiles.cfg");
 my $error;
@@ -244,7 +268,7 @@ put(6, "test #1");
 like($error, qr/ReportTo is not defined in your fidoconfig/, "ReportTo is not defined");
 
 TEST2:
-# test #2 Report to an echo area
+# test #2 Report to an echo area (file areas are absent)
 $fidoconfig = normalize(catfile($cfgdir, "21_report.cfg"));
 $ENV{FIDOCONFIG} = $fidoconfig;
 init();
@@ -309,7 +333,7 @@ $num = unlink glob($files_to_delete);
 rmdir($fileboxname);
 
 TEST3:
-# test #3  Post report to netmail in Opus msgbase
+# test #3  Post report to netmail in Opus msgbase (file areas are absent)
 $ENV{FIDOCONFIG} = undef;
 $report = "";
 $fidoconfig = normalize(catfile($cfgdir, "22_report.cfg"));
@@ -357,7 +381,7 @@ for(my $i = 0; $i < @lines; $i++)
     }
 }
 my $sampleText = catfile($sampleDir, "20_report.cfg");
-open(FH, "<", $sampleText) or die("Cannot open $sampleText: $!");;
+open(FH, "<", $sampleText) or die("Cannot open $sampleText: $!");
 my @sample = grep {s/\n//} <FH>;
 close(FH);
 my $cmp = 1;
@@ -383,6 +407,151 @@ else
     }
 }
 is($cmp, 1, "test #3");
+# clean
+if($cmp == 1)
+{
+    $files_to_delete = catfile($netmailDir, "*");
+    unlink glob($files_to_delete);
+}
+$files_to_delete = catfile($outbound, "*");
+$num = unlink glob($files_to_delete);
+$files_to_delete = catfile($busyFileDir, "*.tic");
+$num = unlink glob($files_to_delete);
+$files_to_delete = catfile($ticOutbound, "*.tic");
+$num = unlink glob($files_to_delete);
+$files_to_delete = catfile($PassFileAreaDir, "*");
+$num = unlink glob($files_to_delete);
+$files_to_delete = catfile($fileboxname, "*");
+$num = unlink glob($files_to_delete);
+rmdir($fileboxname);
+
+# Skip the tests using htick if there is no htick
+goto END unless($htick_exists);
+
+
+TEST4:
+# test #4 Report to an echo area (file areas are absent)
+$fidoconfig = normalize(catfile($cfgdir, "23_report.cfg"));
+$ENV{FIDOCONFIG} = $fidoconfig;
+init();
+put(6, "test #4");
+# initialize JAM msgbase
+$srcdir = catdir($sampleDir, "jam");
+$destdir = catdir($ENV{MBASEDIR}, "jam");
+initJAM();
+# backup config
+$bak = "$fidoconfig" . ".bak";
+cp("$fidoconfig", "$bak") or die "Copy to $bak failed: $!";
+# create test data
+createBsoMail($outbound, $PassFileAreaDir, $ticOutbound, $busyFileDir, $loname);
+createFileboxMail($fileboxname, $loname);
+# run the tested functions
+unsubscribeLink();
+rmFilesFromOutbound();
+rmFilesFromFilebox();
+rmOrphanFilesFromPassFileAreaDir();
+rmOrphanFilesFromOutbound($outbound, 183);
+rmLinkDefinition();
+publishReport($subject, $fromname, \@header, \@footer);
+# test
+$sample = normalize(catfile($sampleDir, "qqq2.jdt"));
+$result = normalize(catfile($destdir, "qqq.jdt"));
+$reported = is(compare($result, $sample), 0, "report to JAM echobase");
+# restore config
+mv("$bak", "$fidoconfig") or die("Restoring $fidoconfig failed: $!");
+# clean
+if($reported)
+{
+    put(6, "Report was posted to qqq echo");
+    initJAM();
+}
+$files_to_delete = catfile($outbound, "*");
+$num = unlink glob($files_to_delete);
+$files_to_delete = catfile($busyFileDir, "*.tic");
+$num = unlink glob($files_to_delete);
+$files_to_delete = catfile($ticOutbound, "*.tic");
+$num = unlink glob($files_to_delete);
+$files_to_delete = catfile($PassFileAreaDir, "*");
+$num = unlink glob($files_to_delete);
+$files_to_delete = catfile($fileboxname, "*");
+$num = unlink glob($files_to_delete);
+rmdir($fileboxname);
+
+TEST5:
+# test #5  Post report to netmail in Opus msgbase
+$ENV{FIDOCONFIG} = undef;
+$report = "";
+$fidoconfig = normalize(catfile($cfgdir, "24_report.cfg"));
+$ENV{FIDOCONFIG} = $fidoconfig;
+init();
+put(6, "test #5");
+# backup config
+$bak = "$fidoconfig" . ".bak";
+cp("$fidoconfig", "$bak") or die "Copy to $bak failed: $!";
+# create test data
+createBsoMail($outbound, $PassFileAreaDir, $ticOutbound, $busyFileDir, $loname);
+createFileboxMail($fileboxname, $loname);
+# run the tested functions
+unsubscribeLink();
+rmFilesFromOutbound();
+rmFilesFromFilebox();
+rmOrphanFilesFromPassFileAreaDir();
+rmOrphanFilesFromOutbound($outbound, 183);
+rmLinkDefinition();
+publishReport($subject, $fromname, \@header, \@footer);
+# restore config
+mv("$bak", "$fidoconfig") or die("Restoring $fidoconfig failed: $!");
+# extract text from netmail
+opendir(DIR, $netmailDir) or die "Could not open $netmailDir";
+@netmailFiles = grep(/^\d+\.msg$/, readdir(DIR));
+closedir(DIR);
+($reportNetmail) = grep {
+                            my $file = $_; my $path = catfile($netmailDir, $file);
+                            open(FH, "<", $path) or die("Cannot open $path: $!");
+                            my @lines = <FH>; close(FH);
+                            grep(m%Removing link 2:345/678%, @lines) ? $file : undef
+                        } @netmailFiles;
+$reportPath = catfile($netmailDir, $reportNetmail);
+open(FH, "<", $reportPath) or die("Cannot open $reportPath: $!");
+$line = <FH>;
+close(FH);
+@lines = split /\r/, $line;
+for(my $i = 0; $i < @lines; $i++)
+{
+    if($lines[$i] =~ /^\001PID:/)
+    {
+        splice(@lines, $#lines, 1);
+        splice(@lines, 0, $i + 1);
+        last;
+    }
+}
+$sampleText = catfile($sampleDir, "20_report.cfg");
+open(FH, "<", $sampleText) or die("Cannot open $sampleText: $!");;
+@sample = grep {s/\n//} <FH>;
+close(FH);
+$cmp = 1;
+if(@lines != @sample)
+{
+    $cmp = 0;
+    put(6, "Size not equal");
+    my $numlines = @lines;
+    my $numsample = @sample;
+    put(6, "numlines=$numlines  numsample=$numsample");
+}
+else
+{
+    for(my $i = 0; $i < @lines; $i++)
+    {
+        if($lines[$i] ne $sample[$i])
+        {
+            $cmp = 0;
+            put(6, "Line number $i differs from the sample!!!");
+            put(6, "Line #$i: $lines[$i]");
+            last;
+        }
+    }
+}
+is($cmp, 1, "test #5");
 # clean
 if($cmp == 1)
 {
