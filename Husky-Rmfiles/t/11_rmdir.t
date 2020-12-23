@@ -11,6 +11,7 @@ use Test::More;
 use Fidoconfig::Token 2.0;
 
 # Remove the directory structure created in 01_mkdir.t
+#goto END;
 my $cwd = cwd();
 my @dirs = splitdir($cwd);
 my $t;
@@ -26,5 +27,6 @@ my $out = normalize(catdir($basedir, "out"));
 my $pass = normalize(catdir($basedir, "pass"));
 remove_tree($dupebase, $in, $log, $msg, $nodelist, $out, $pass);
 
+END:
 ok(1, "dummy");
 done_testing();
