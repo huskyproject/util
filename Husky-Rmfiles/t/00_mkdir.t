@@ -25,9 +25,9 @@ my $hpt_exists = grep(/hpt/,
   eval
   {
     no warnings 'all';
-    qx($hpt -h)
+    qx($hpt -h 2>&1)
   }) > 1 ? 1 : 0;
-$hpt_exists or die "Cannot access $hpt";
+$hpt_exists or print STDERR "\n\n####### Cannot access $hpt #######\n\n";
 
 # Create a directory structure for use in the later tests
 my $cwd = cwd();

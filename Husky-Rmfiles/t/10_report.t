@@ -252,7 +252,7 @@ my $htick_exists = grep(/htick/,
     eval
     {
         no warnings 'all';
-        qx($htick -h);
+        qx($htick -h 2>&1);
     }) > 1 ? 1 : 0;
 
 
