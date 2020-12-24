@@ -12,7 +12,7 @@ my $class = Module::Build->subclass(
 sub ACTION_test
 {
     my $self = shift;
-    my $dir = $ARGV[1];
+    my $dir = ($^O =~ /Win/) ? $ARGV[2] : $ARGV[1];
     $ENV{HUSKYBINDIR} = $dir if(defined($dir) && $dir ne "" && -d $dir);
     $self->SUPER::ACTION_test;
 }
