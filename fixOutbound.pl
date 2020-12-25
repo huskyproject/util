@@ -9,11 +9,11 @@ use Cwd 'abs_path';
 use File::Spec::Functions;
 use Fcntl qw(:flock);
 use Fidoconfig::Token 2.4;
-use Husky::Rmfiles 1.6;
+use Husky::Rmfiles 1.7;
 use strict;
 use warnings;
 
-our $VERSION = "1.3";
+our $VERSION = "1.4";
 
 sub version
 {
@@ -54,10 +54,9 @@ $help = 1 unless(@ARGV);
 
 Getopt::Long::Configure("auto_abbrev", "gnu_compat", "permute");
 GetOptions(
-            "config=s"      => \$fidoconfig,
-            "c=s"           => \$fidoconfig,
-            "age=i"         => \$age,
-            "a=i"           => \$age,
+            "config|c=s"    => \$fidoconfig,
+            "bindir=s"      => \$huskyBinDir,
+            "age|a=i"       => \$age,
             "report:s"      => \$report,
             "log!"          => \$log,
             "quiet!"        => \$quiet,
@@ -65,12 +64,10 @@ GetOptions(
             "report-list!"  => \$listreport,
             "log-list!"     => \$listlog,
             "term-list!"    => \$listterm,
-            "dry-run!"      => \$dryrun,
-            "d"             => \$dryrun,
-            "version"       => \&version,
-            "v"             => \&version,
-            "help"          => \$help,
-            "h"             => \$help,
+            "dry-run|d"     => sub {$dryrun = 1},
+            "run|nodry-run" => sub {$dryrun = 0},
+            "version|v"     => \&version,
+            "help|h"        => \$help,
           )
 or die("Error in command line arguments\n");
 
@@ -140,6 +137,7 @@ perl fixOutbound.pl [options]
 
   Options:
     --config path           path to fidoconfig
+    --bindir directory      the directory holding hpt if it is not in the PATH
     --age lower_limit       truncated bundles older than lower_limit days
                             will be deleted
     --report [area]         send a report to the echo or netmail area
@@ -152,6 +150,7 @@ perl fixOutbound.pl [options]
     --noterm-list           do not print the list of deleted files to the
                             terminal
     --dry-run               a trial run with no changes made
+    --run                   perform a real run when no other options specified
     --version               print version and exit
     --help                  print help and exit
 
@@ -179,6 +178,10 @@ instead of long option names with two dashes for some options.
 
 You have to supply full path to fidoconfig here if FIDOCONFIG environment
 variable is not defined. Otherwise you may omit the option.
+
+=item B<--bindir> directory
+
+You have to specify the directory where hpt resides if it is not in the PATH.
 
 =item B<-a> lower_limit
 
@@ -248,11 +251,19 @@ to print the list of deleted files to the terminal window.
 
 =item B<--dry-run>
 
-=item B<--nodry-run>
-
 If C<--dry-run> or C<-d> is used, perform a trial run with no changes made.
 Nothing is deleted, but the same output is produced as in a real run except the
-error messages that may appear during the actual run.
+error messages that may appear during the actual run. If you specified at least
+one option except C<--dry-run>, then C<--nodry-run> is assumed, i.e. the
+deletions are really made.
+
+=item B<--nodry-run>
+
+=item B<--run>
+
+If you want to perform a real run but you have not specified any other options,
+you must specify C<--nodry-run> or C<--run>. C<--run> is a synonym for
+C<--nodry-run>.
 
 =item B<-v>
 
@@ -264,7 +275,9 @@ Print the program version and exit
 
 =item B<--help>
 
-Print a brief help and exit
+Print a brief help and exit. If you have not used any options, then this is the
+default action to prevent unwanted program execution when you possibly wanted just
+to see program help.
 
 =back
 
