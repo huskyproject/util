@@ -192,16 +192,6 @@ sub init
         }
     }
 
-    $list = sub
-    {
-        my $res = 0;
-        $res |= 4 if($listterm);
-        $res |= 2 if($listlog);
-        $res |= 1 if($listreport);
-        return $res;
-    };
-    $all = 7;
-
     my $separateBundles;
     $commentChar = '#';
     ($path, $separateBundles) = findTokenValue($fidoconfig, "SeparateBundles");
