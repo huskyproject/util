@@ -1235,12 +1235,14 @@ sub publishReport
     }
     $hpt .= ".exe" if(getOS() ne 'UNIX');
     my $cmd = "$hpt post ";
+    my $msg;
     $cmd .= "-nf \"$fromname\" " if($fromname);
     if($reportToEcho)
     {
         $cmd .= "-e \"$report\" -af \"$address\" -nt \"All\"";
         $cmd .= " -s \"$subject\" -z \"Husky::Rmfiles\"";
         $cmd .= " -f loc -x \"$reportfile\"";
+        $msg = "A report to $report echo was successfully sent";
     }
     else
     {
@@ -1250,6 +1252,7 @@ sub publishReport
         $cmd .= "-af \"$address\" -nt \"$sysop\" -at \"$address\"";
         $cmd .= " -s \"$subject\" -z \"Husky::Rmfiles\"";
         $cmd .= " -f loc \"$reportfile\"";
+        $msg = "A report to netmail was successfully sent";
     }
 
     $ENV{FIDOCONFIG} = normalize($fidoconfig);
@@ -1257,6 +1260,7 @@ sub publishReport
     {
         my $exitcode = system("$cmd");
         lastError("system(\"$cmd\") failed: $!") if(($exitcode >> 8) != 0);
+        put(6, $msg);
     }
     else
     {
@@ -1266,6 +1270,7 @@ sub publishReport
         $ph->flush();
         my $exitcode = system("$postcmd");
         lastError("system(\"$postcmd\") failed: $!") if(($exitcode >> 8) != 0);
+        put(6, $msg);
     }
 } ## end sub publishReport
 
