@@ -8,12 +8,12 @@ use Config;
 use Cwd 'abs_path';
 use File::Spec::Functions;
 use Fcntl qw(:flock);
-use Fidoconfig::Token 2.4;
-use Husky::Rmfiles 1.7;
+use Fidoconfig::Token 2.5;
+use Husky::Rmfiles 1.9;
 use strict;
 use warnings;
 
-our $VERSION = "1.4";
+our $VERSION = "1.5";
 
 sub version
 {
@@ -46,6 +46,7 @@ my $age = 183;  # 183 days
 $log = 1;
 $listlog = 1;
 $listterm = 1;
+$listreport = 1;
 $dryrun = 0;
 $fidoconfig = $ENV{FIDOCONFIG} if defined $ENV{FIDOCONFIG};
 
@@ -122,6 +123,16 @@ for(my $i = $#dirs; $i >= 0; $i--)
 for my $outbound (@dirs)
 {
     rmOrphanFilesFromOutbound($outbound, $age);
+}
+
+if($report)
+{
+    my ($subject, $fromname, @header, @footer);
+    $subject  = "Deleting orphan files from outbound";
+    $fromname = "fixOutbound.pl";
+    @header   = (" ");
+    @footer   = (" ");
+    publishReport($subject, $fromname, \@header, \@footer);
 }
 
 __END__
