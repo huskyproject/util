@@ -31,6 +31,7 @@ $ENV{MBASEDIR} = catdir($basedir, "msg");
 $log = "rmLink.log";
 $listterm = 1;
 $listlog = 1;
+$huskyBinDir = $ENV{HUSKYBINDIR};
 
 # test#1
 $fidoconfig = catfile($cfgdir, "14_rmFiles.cfg");

@@ -16,7 +16,7 @@ our (
     );
 
 # The package version
-$VERSION = "1.8";
+$VERSION = "1.9";
 
 use Exporter;
 @ISA    = qw(Exporter);
@@ -49,7 +49,8 @@ my (
     $advisoryLock, $lh,              $defZone,     $defOutbound,
     $zone,         $net,             $node,        $point,
     $ASO,          $passFileAreaDir, $ticOutbound, $busyFileDir,
-    $OS,           $reportToEcho,    $list,        $all
+    $OS,           $reportToEcho,    $list,        $all,
+    $hpt,          $htick,
    );
 
 # Transliterate Windows path to Perl presentation
@@ -151,6 +152,43 @@ sub init
         {
             open($lh, ">>", $logfile) or die("Cannot open $logfile\n");
         }
+    }
+
+    if(defined($huskyBinDir) && $huskyBinDir ne "" && -d $huskyBinDir)
+    {
+        $hpt   = normalize(catfile($huskyBinDir, "hpt"));
+        $htick = normalize(catfile($huskyBinDir, "htick"));
+    }
+    else
+    {
+        $hpt   = "hpt";
+        $htick = "htick";
+    }
+    if(getOS() ne 'UNIX')
+    {
+        $hpt   .= ".exe";
+        $htick .= ".exe";
+    }
+    my $hpt_exists = grep(/hpt/,
+        eval
+        {
+            no warnings 'all';
+            qx($hpt -h 2>&1)
+        }) > 1 ? 1 : 0;
+    if(!$hpt_exists)
+    {
+        $report = "";
+        $hpt = "";
+    }
+    my $htick_exists = grep(/htick/,
+        eval
+        {
+            no warnings 'all';
+            qx($htick -h 2>&1)
+        }) > 1 ? 1 : 0;
+    if(!$htick_exists)
+    {
+        $htick = "";
     }
 
     if(defined($report) && !$report)
@@ -333,21 +371,20 @@ sub unsubscribeLink
     # Unsubscribe from all echos if the link is subscribed at least to one echo
     $module      = "hpt";
     $commentChar = '#';
-    my ($hpt, $htick);
     my ($tokenFile, $value, $linenum, @lines) =
       findTokenValue($fidoconfig, 'EchoArea', '=~', $link);
-    if($value ne "")
+    if($value eq "")
+    {
+        put($all, "$link was not subscribed to any echos");
+    }
+    elsif(!$hpt)
+    {
+        put($all, "hpt is not accessible, so unsubsribing from echos was skipped");
+    }
+    else
     {
         if(!$dryrun)
         {
-            if(defined($huskyBinDir) && $huskyBinDir ne "" && -d $huskyBinDir)
-            {
-                $hpt = normalize(catfile($huskyBinDir, "hpt"));
-            }
-            else
-            {
-                $hpt = "hpt";
-            }
             if($OS eq "UNIX")
             {
                 my $cmd      = "$hpt -c $fidoconfig afix -s $link '-*'";
@@ -356,7 +393,7 @@ sub unsubscribeLink
             }
             else
             {
-                my @cmd = ("$hpt".".exe", "-c", "\"$fidoconfig\"", "afix", "-s", "$link", "-*");
+                my @cmd = ("$hpt", "-c", "\"$fidoconfig\"", "afix", "-s", "$link", "-*");
                 my $exitcode = system(@cmd);
                 lastError("system(\"@cmd\") failed: $!") if(($exitcode >> 8) != 0);
             }
@@ -369,18 +406,18 @@ sub unsubscribeLink
     $commentChar = '#';
     ($tokenFile, $value, $linenum, @lines) =
       findTokenValue($fidoconfig, 'FileArea', '=~', $link);
-    if($value ne "")
+    if($value eq "")
+    {
+        put($all, "$link was not subscribed to any fileechos");
+    }
+    elsif(!$htick)
+    {
+        put($all, "htick is not accessible, so unsubsribing from file echos was skipped");
+    }
+    else
     {
         if(!$dryrun)
         {
-            if(defined($huskyBinDir) && $huskyBinDir ne "" && -d $huskyBinDir)
-            {
-                $htick = normalize(catfile($huskyBinDir, "htick"));
-            }
-            else
-            {
-                $htick = "htick";
-            }
             if($OS eq "UNIX")
             {
                 my $cmd = "$htick -c \"$fidoconfig\" ffix -s $link '-*'";
@@ -388,16 +425,12 @@ sub unsubscribeLink
             }
             else
             {
-                my @cmd = ("$htick".".exe", "-c", "\"$fidoconfig\"", "ffix", "-s", "$link", "-*");
+                my @cmd = ("$htick", "-c", "\"$fidoconfig\"", "ffix", "-s", "$link", "-*");
                 my $exitcode = system(@cmd);
                 lastError("system(\"@cmd\") failed: $!") if(($exitcode >> 8) != 0);
             }
         }
         put($all, "$link was unsubscribed from all fileechos");
-    }
-    else
-    {
-        put($all, "$link was not subscribed to any fileechos");
     }
     $module = "hpt";
 } ## end sub unsubscribeLink
@@ -989,6 +1022,12 @@ the ".bak" additional extension.
 
 sub rmLinkDefinition
 {
+    if(!$hpt)
+    {
+        put($all, "hpt is not accessible, so removing link definition is skipped");
+        return;
+    }
+
     my $sysop;
     $commentChar = '#';
     my ($file, $value, $linenum, @lines) =
@@ -1202,6 +1241,11 @@ in the report.
 sub publishReport
 {
     return if(!$report);
+    if(!$hpt)
+    {
+        put($all, "hpt is not accessible, so publishing a report is skipped");
+        return;
+    }
 
     my ($subject, $fromname, $rheader, $rfooter) = @_;
     lastError("Report subject is not defined, no report is published")
@@ -1214,16 +1258,6 @@ sub publishReport
     $fh->flush();
     @reportLines = ();
 
-    my $hpt;
-    if(defined($huskyBinDir) && $huskyBinDir ne "" && -d $huskyBinDir)
-    {
-        $hpt = normalize(catfile($huskyBinDir, "hpt"));
-    }
-    else
-    {
-        $hpt = "hpt";
-    }
-    $hpt .= ".exe" if(getOS() ne 'UNIX');
     my $cmd = "$hpt post ";
     my $msg;
     $cmd .= "-nf \"$fromname\" " if($fromname);
@@ -1232,7 +1266,7 @@ sub publishReport
         $cmd .= "-e \"$report\" -af \"$address\" -nt \"All\"";
         $cmd .= " -s \"$subject\" -z \"Husky::Rmfiles\"";
         $cmd .= " -f loc -x \"$reportfile\"";
-        $msg = "A report to $report echo was successfully sent";
+        $msg = "A report was sent to $report echo";
     }
     else
     {
@@ -1242,7 +1276,7 @@ sub publishReport
         $cmd .= "-af \"$address\" -nt \"$sysop\" -at \"$address\"";
         $cmd .= " -s \"$subject\" -z \"Husky::Rmfiles\"";
         $cmd .= " -f loc \"$reportfile\"";
-        $msg = "A report to netmail was successfully sent";
+        $msg = "A report was sent to netmail";
     }
 
     $ENV{FIDOCONFIG} = normalize($fidoconfig);
@@ -1256,7 +1290,7 @@ sub publishReport
     {
         my $postdir = tempdir(CLEANUP => 1);
         my ($ph, $postcmd) = tempfile("postXXXXXX", DIR => $postdir, SUFFIX => ".bat");
-        print $ph "$cmd\n";
+        print $ph "\@$cmd\n";
         $ph->flush();
         my $exitcode = system("$postcmd");
         lastError("system(\"$postcmd\") failed: $!") if(($exitcode >> 8) != 0);

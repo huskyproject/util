@@ -105,6 +105,7 @@ $log = "rmLink.log";
 $listterm = 1;
 $listlog = 1;
 my $fileBoxesDir = normalize(catdir($basedir, "out", "boxes"));
+$huskyBinDir = $ENV{HUSKYBINDIR};
 
 # test#1
 $fidoconfig = normalize(catfile($cfgdir, "12_rmFiles.cfg"));

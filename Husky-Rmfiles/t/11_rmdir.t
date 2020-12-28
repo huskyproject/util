@@ -10,8 +10,10 @@ use Cwd qw/cwd abs_path/;
 use Test::More;
 use Fidoconfig::Token 2.0;
 
-# Remove the directory structure created in 01_mkdir.t
+# Uncomment the next line to save log files
 #goto END;
+
+# Remove the directory structure created in 01_mkdir.t
 my $cwd = cwd();
 my @dirs = splitdir($cwd);
 my $t;

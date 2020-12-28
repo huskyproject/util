@@ -24,6 +24,8 @@ my $cfgdir = normalize(catdir($basedir, "cfg"));
 $ENV{MBASEDIR} = normalize(catdir($basedir, "msg"));
 $link = "1:23/456";
 $log = "rmLink.log";
+$listterm = 1;
+$listlog = 1;
 
 # Check whether htick is accessible
 my $huskyBinDir = defined($ENV{HUSKYBINDIR}) ? $ENV{HUSKYBINDIR} : "";

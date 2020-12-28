@@ -107,6 +107,7 @@ my $outbound = catdir($basedir, "out", "outbound");
 $log = "rmOrphan.log";
 $listterm = 1;
 $listlog = 1;
+$huskyBinDir = $ENV{HUSKYBINDIR};
 
 # test#1
 $fidoconfig = catfile($cfgdir, "14_rmFiles.cfg");

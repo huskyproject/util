@@ -12,6 +12,8 @@ use File::Spec::Functions;
 use Cwd 'abs_path';
 use 5.008;
 
+$huskyBinDir = $ENV{HUSKYBINDIR};
+
 $ENV{FIDOCONFIG} = undef;
 eval {init()};
 like($@, qr/^Please supply the path to fidoconfig/, "path to fidoconfig");
@@ -27,7 +29,7 @@ else
 }
 
 eval {init()};
-like($@, qr/^Please supply the link's FTN address/, "link FTN address");
+like($@, qr/^Please supply the link\'s FTN address/, "link FTN address");
 
 eval {Husky::Rmfiles::init("nolink");};
 is($@, "", "no link FTN address");
@@ -104,4 +106,5 @@ $link = "1:23/456";
 eval {init()};
 like($@, qr/Outbound is not defined/, "Outbound not defined");
 
+END:
 done_testing();
