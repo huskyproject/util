@@ -14,12 +14,12 @@ use Getopt::Long;
 use Pod::Usage;
 use Config;
 use Fcntl qw(:flock);
-use Fidoconfig::Token 2.4;
-use Husky::Rmfiles 1.6;
+use Fidoconfig::Token 2.5;
+use Husky::Rmfiles 1.9;
 use strict;
 use warnings;
 
-our $VERSION = "1.2";
+our $VERSION = "1.3";
 
 sub version
 {
@@ -56,10 +56,9 @@ $listterm = 1;
 $fidoconfig = $ENV{FIDOCONFIG} if defined $ENV{FIDOCONFIG};
 Getopt::Long::Configure("auto_abbrev", "gnu_compat", "permute");
 GetOptions( 
-            "config=s"      => \$fidoconfig,
-            "c=s"           => \$fidoconfig,
-            "address=s"     => \$link,
-            "a=s"           => \$link,
+            "config|c=s"    => \$fidoconfig,
+            "bindir=s"      => \$huskyBinDir,
+            "address|a=s"   => \$link,
             "delete!"       => \$delete,
             "d"             => \$delete,
             "backup!"       => \$backup,
@@ -72,10 +71,8 @@ GetOptions(
             "log-list!"     => \$listlog,
             "term-list!"    => \$listterm,
             "dry-run!"      => \$dryrun,
-            "version"       => \&version,
-            "v"             => \&version,
-            "help"          => \&usage,
-            "h"             => \&usage,
+            "version|v"     => \&version,
+            "help|h"        => \&usage,
           )
 or die("Error in command line arguments\n");
 if(!defined($link))
@@ -103,7 +100,7 @@ my ($path, $address) = findTokenValue($fidoconfig, "address");
 $subject = "Removing link $link";
 $fromname = "rmLink Robot";
 @header = ("  ", "$link did not pick up mail for 180 or more days.",
-           "I am deleting all his netmail, echomail and filechos.");
+           "I am deleting all his netmail, echomail and file echos.");
 @footer = ("$link has been removed from $address configuration files.", " ");
 publishReport($subject, $fromname, \@header, \@footer);
 
@@ -119,6 +116,7 @@ perl rmLink.pl [options]
 
   Options:
     --config path           path to fidoconfig
+    --bindir directory      the directory holding hpt if it is not in the PATH
     --address ftnAddress    the link address
     --delete                delete the link definition lines instead of
                             commenting them out
@@ -158,6 +156,10 @@ instead of long option names with two dashes for some options.
 
 You have to supply full path to fidoconfig here if FIDOCONFIG environment
 variable is not defined. Otherwise you may omit the option.
+
+=item B<--bindir> directory
+
+You have to specify the directory where hpt resides if it is not in the PATH.
 
 =item B<-a> ftnAddress
 

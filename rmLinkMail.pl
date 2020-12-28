@@ -15,12 +15,12 @@ use Pod::Usage;
 use Fcntl qw(:flock);
 use File::Spec;
 use Config;
-use Fidoconfig::Token 2.4;
-use Husky::Rmfiles 1.6;
+use Fidoconfig::Token 2.5;
+use Husky::Rmfiles 1.9;
 use strict;
 use warnings;
 
-our $VERSION = "1.2";
+our $VERSION = "1.3";
 
 sub version
 {
@@ -56,31 +56,22 @@ $fidoconfig = $ENV{FIDOCONFIG} if defined $ENV{FIDOCONFIG};
 
 Getopt::Long::Configure("auto_abbrev", "gnu_compat", "permute");
 GetOptions( 
-            "config=s"  => \$fidoconfig,
-            "c=s"       => \$fidoconfig,
-            "address=s" => \$link,
-            "a=s"       => \$link,
-            "n"         => \$netmail,
-            "netmail"   => \$netmail,
-            "echomail"  => \$echomail,
-            "e"         => \$echomail,
-            "fileecho"  => \$fileecho,
-            "f"         => \$fileecho,
-            "other-files"=>\$otherfile,
-            "o"         => \$otherfile,
-            "box"       => \$filebox,
-            "b"         => \$filebox,
-            "report:s"  => \$report,
-            "r:s"       => \$report,
-            "log!"      => \$log,
-            "l"         => \$log,
-            "quiet!"    => \$quiet,
-            "q"         => \$quiet,
-            "dry-run!"  => \$dryrun,
-            "version"   => \&version,
-            "v"         => \&version,
-            "help"      => \&usage,
-            "h"         => \&usage,
+            "config|c=s"    => \$fidoconfig,
+            "bindir=s"      => \$huskyBinDir,
+            "address|a=s"   => \$link,
+            "netmail|n"     => \$netmail,
+            "echomail|e"    => \$echomail,
+            "fileecho|f"    => \$fileecho,
+            "other-files|o" => \$otherfile,
+            "box|b"         => \$filebox,
+            "report|r:s"    => \$report,
+            "log!"          => \$log,
+            "l"             => \$log,
+            "quiet!"        => \$quiet,
+            "q"             => \$quiet,
+            "dry-run!"      => \$dryrun,
+            "version|v"     => \&version,
+            "help|h"        => \&usage,
           )
 or die("Error in command line arguments\n");
 
@@ -132,6 +123,7 @@ perl rmLinkMail.pl [options]
 
   Options:
     --config path           path to fidoconfig
+    --bindir directory      the directory holding hpt if it is not in the PATH
     --address ftnAddress    the link address
     --netmail               exclude netmail from the files to be deleted
     --echomail              exclude echomail from the files to be deleted
@@ -165,6 +157,10 @@ instead of long option names with two dashes.
 
 You have to supply full path to fidoconfig here if FIDOCONFIG environment
 variable is not defined. Otherwise you may omit the option.
+
+=item B<--bindir> directory
+
+You have to specify the directory where hpt resides if it is not in the PATH.
 
 =item B<-a> ftnAddress
 
