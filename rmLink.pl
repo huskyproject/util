@@ -15,11 +15,11 @@ use Pod::Usage;
 use Config;
 use Fcntl qw(:flock);
 use Fidoconfig::Token 2.5;
-use Husky::Rmfiles 1.9;
+use Husky::Rmfiles 1.10;
 use strict;
 use warnings;
 
-our $VERSION = "1.3";
+our $VERSION = "1.4";
 
 sub version
 {
@@ -75,16 +75,54 @@ GetOptions(
             "help|h"        => \&usage,
           )
 or die("Error in command line arguments\n");
+
+my $fatal = 0;
 if(!defined($link))
 {
-    print STDERR "\nPlease supply the link's FTN address\n\n";
-    usage();
+    print STDERR "\n#### Please supply the link FTN address ####\n\n";
+    $fatal = 1;
 }
 if (!(defined($fidoconfig) && -f $fidoconfig && -s $fidoconfig))
 {
-    print STDERR "\nPlease supply the path to fidoconfig\n\n";
-    usage();
+    print STDERR "\n#### Please supply the path to fidoconfig ####\n\n";
+    $fatal = 1;
 }
+
+my ($hpt, $htick);
+if(defined($huskyBinDir) && $huskyBinDir ne "" && -d $huskyBinDir)
+{
+    $hpt   = normalize(catfile($huskyBinDir, "hpt"));
+    $htick = normalize(catfile($huskyBinDir, "htick"));
+}
+else
+{
+    $hpt   = "hpt";
+    $htick = "htick";
+}
+if(getOS() ne 'UNIX')
+{
+    $hpt   .= ".exe";
+    $htick .= ".exe";
+}
+my $hpt_exists = grep(/hpt/,
+    eval
+    {
+        no warnings 'all';
+        qx($hpt -h 2>&1)
+    }) > 1 ? 1 : 0;
+my $htick_exists = grep(/htick/,
+    eval
+    {
+        no warnings 'all';
+        qx($htick -h 2>&1)
+    }) > 1 ? 1 : 0;
+if(!$hpt_exists && !$htick_exists)
+{
+    print STDERR "\n#### Please supply the directory where hpt and htick reside ####\n\n";
+    $fatal = 1;
+}
+
+usage() if($fatal);
 
 $log = "rmLink.log" if($log);
 
@@ -268,7 +306,7 @@ Print a brief help and exit
 =head1 EXIT CODE
 
 If the required operation is successfully done, the exit code is 0. If help is
-printed, the exit code is 1, otherwise it is 255.
+printed, the exit code is 1, otherwise it is more than 1.
 
 =head1 RESTRICTION
 

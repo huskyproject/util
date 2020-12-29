@@ -413,7 +413,8 @@ sub unsubscribeLink
     }
     elsif(!$htick)
     {
-        put($all, "htick is not accessible, so unsubsribing from file echos was skipped");
+        put($all, "htick is not accessible, so");
+        put($all, "unsubsribing from file echos was skipped");
     }
     else
     {
