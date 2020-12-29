@@ -9,11 +9,11 @@ use Cwd 'abs_path';
 use File::Spec::Functions;
 use Fcntl qw(:flock);
 use Fidoconfig::Token 2.5;
-use Husky::Rmfiles 1.9;
+use Husky::Rmfiles 1.10;
 use strict;
 use warnings;
 
-our $VERSION = "1.5";
+our $VERSION = "1.6";
 
 sub version
 {
@@ -295,7 +295,7 @@ to see program help.
 =head1 EXIT CODE
 
 If the required operation is successfully done, the exit code is 0. If help is
-printed, the exit code is 1, otherwise it is 255.
+printed, the exit code is 1, otherwise it is more than 1.
 
 =head1 RESTRICTION
 

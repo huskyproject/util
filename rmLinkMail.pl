@@ -16,11 +16,11 @@ use Fcntl qw(:flock);
 use File::Spec;
 use Config;
 use Fidoconfig::Token 2.5;
-use Husky::Rmfiles 1.9;
+use Husky::Rmfiles 1.10;
 use strict;
 use warnings;
 
-our $VERSION = "1.3";
+our $VERSION = "1.4";
 
 sub version
 {
@@ -257,7 +257,7 @@ Print a brief help and exit
 =head1 EXIT CODE
 
 If required operation is successfully done, the exit code is 0. If help or
-version is printed, the exit code is 1, otherwise it is 2.
+version is printed, the exit code is 1, otherwise it is more than 1.
 
 =head1 RESTRICTION
 
