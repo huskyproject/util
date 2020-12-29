@@ -62,49 +62,89 @@ like($errors, qr/ReportTo is not defined in your fidoconfig/, "empty ReportTo");
 
 $fidoconfig = catfile($cfgdir, "02a_init.cfg");
 $report = "";
-eval {init()};
-like($@, qr/Cannot find either echo or netmail area/, "echo not found");
+{
+    # redirect STDERR to a variable locally inside the block
+    open(local(*STDERR), '>', \$errors);
+    eval{init()};
+}
+like($errors, qr/Cannot find either echo or netmail area/, "echo not found");
 
 $report = undef;
 $fidoconfig = catfile($cfgdir, "02_init.cfg");
-eval {init()};
-like($@, qr/SeparateBundles mode is not supported/, "SeparateBundles");
+{
+    # redirect STDERR to a variable locally inside the block
+    open(local(*STDERR), '>', \$errors);
+    eval{init()};
+}
+like($errors, qr/SeparateBundles mode is not supported/, "SeparateBundles");
 
 $fidoconfig = catfile($cfgdir, "03_init.cfg");
-eval {init()};
-like($@, qr/advisoryLock should be a non-negative integer/, "advisoryLock");
+{
+    # redirect STDERR to a variable locally inside the block
+    open(local(*STDERR), '>', \$errors);
+    eval{init()};
+}
+like($errors, qr/advisoryLock should be a non-negative integer/, "advisoryLock");
 
 $fidoconfig = catfile($cfgdir, "04_init.cfg");
-eval {init()};
-like($@, qr/advisoryLock should be a non-negative integer/, "advisoryLock on");
+{
+    # redirect STDERR to a variable locally inside the block
+    open(local(*STDERR), '>', \$errors);
+    eval{init()};
+}
+like($errors, qr/advisoryLock should be a non-negative integer/, "advisoryLock on");
 
 $fidoconfig = catfile($cfgdir, "05_init.cfg");
 $link = "5020/1042";
-eval {init()};
-like($@, qr!but it should be zone:net/node!, "incorrect link address#1");
+{
+    # redirect STDERR to a variable locally inside the block
+    open(local(*STDERR), '>', \$errors);
+    eval{init()};
+}
+like($errors, qr!but it should be zone:net/node!, "incorrect link address#1");
 
 $link = "2:5020";
-eval {init()};
-like($@, qr!but it should be zone:net/node!, "incorrect link address#2");
+{
+    # redirect STDERR to a variable locally inside the block
+    open(local(*STDERR), '>', \$errors);
+    eval{init()};
+}
+like($errors, qr!but it should be zone:net/node!, "incorrect link address#2");
 
 $link = "/1042.1";
-eval {init()};
-like($@, qr!but it should be zone:net/node!, "incorrect link address#3");
+{
+    # redirect STDERR to a variable locally inside the block
+    open(local(*STDERR), '>', \$errors);
+    eval{init()};
+}
+like($errors, qr!but it should be zone:net/node!, "incorrect link address#3");
 
 $fidoconfig = catfile($cfgdir, "06_init.cfg");
 $link = "1:23/456";
-eval {init()};
-like($@, qr/Your FTN address is not defined/, "incorrect system address");
+{
+    # redirect STDERR to a variable locally inside the block
+    open(local(*STDERR), '>', \$errors);
+    eval{init()};
+}
+like($errors, qr/Your FTN address is not defined/, "incorrect system address");
 
 $fidoconfig = catfile($cfgdir, "07_init.cfg");
 $link = "1:23/456";
-eval {init()};
-like($@, qr!fileBoxesDir \'/home/user8CTpbI97/fido/boxes\' is not a directory!, "incorrect fileBoxesDir");
+{
+    # redirect STDERR to a variable locally inside the block
+    open(local(*STDERR), '>', \$errors);
+    eval{init()};
+}
+like($errors, qr!fileBoxesDir \'/home/user8CTpbI97/fido/boxes\' is not a directory!, "incorrect fileBoxesDir");
 
 $fidoconfig = catfile($cfgdir, "08_init.cfg");
 $link = "1:23/456";
-eval {init()};
-like($@, qr/Outbound is not defined/, "Outbound not defined");
+{
+    # redirect STDERR to a variable locally inside the block
+    open(local(*STDERR), '>', \$errors);
+    eval{init()};
+}
+like($errors, qr/Outbound is not defined/, "Outbound not defined");
 
 END:
 done_testing();

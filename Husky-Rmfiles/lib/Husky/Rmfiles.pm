@@ -16,7 +16,7 @@ our (
     );
 
 # The package version
-$VERSION = "1.9";
+$VERSION = "1.10";
 
 use Exporter;
 @ISA    = qw(Exporter);
@@ -340,7 +340,7 @@ sub put
 sub error
 {
     my ($level, $msg) = @_;
-    print STDERR "$msg\n" if(!$quiet && $level & 4);
+    print STDERR "$msg\n";
     my $date = strftime("%Y-%m-%d %H:%M:%S", localtime);
     print $lh "$date  $msg\n" if($log && $level & 2);
     push(@reportLines, $msg) if($report && $level & 1);
@@ -349,6 +349,7 @@ sub error
 sub lastError
 {
     my $msg = shift;
+    print STDERR "$msg\n";
     my $date = strftime("%Y-%m-%d %H:%M:%S", localtime);
     print $lh "$date  $msg\n" if($log);
     close($lh) if($log);
