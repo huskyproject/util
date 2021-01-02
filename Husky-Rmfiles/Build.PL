@@ -36,30 +36,31 @@ my $build = $class->new
     "requires" =>
     {
         "Carp" => 0,
-        "Fcntl" => 0,
-        "File::Find" => 0,
-        "File::Spec" => 0,
         "Config" => 0,
-        "File::Basename" => 0,
-        "File::Temp" => 0,
-        "POSIX" => 0,
+        "Fcntl" => 0,
         "Fidoconfig::Token" => 2.3,
+        "File::Basename" => 0,
         "File::Copy" => 0,
+        "File::Find" => 0,
+        "File::Spec::Functions" => 0,
+        "File::Temp" => 0,
         "IO::Handle" => 0,
         "perl" => "5.008",
+        "POSIX" => 0,
         "strict" => 0,
         "warnings" => 0
     },
     "test_requires" =>
     {
-        "Test::More" => "0.88",
-        "Fidoconfig::Token" => 2.2,
-        "File::Spec" => 0,
         "Cwd" => 0,
+        "diagnostics" => 0,
+        "Fidoconfig::Token" => 2.2,
         "File::Compare" => 0,
         "File::Copy" => 0,
+        "File::Path" => 0,
+        "File::Spec::Functions" => 0,
         "perl" => "5.008",
-        "diagnostics" => 0,
+        "Test::More" => "0.88",
         "strict" => 0,
         "warnings" => 0
     }

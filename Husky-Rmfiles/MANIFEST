@@ -1,6 +1,8 @@
 Build.PL
 lib/Husky/Rmfiles.pm
 MANIFEST			This list of files
+perl-Husky-Rmfiles.spec
+t/00_mkdir.t
 t/01_load.t
 t/02_OS.t
 t/03_init.t
@@ -11,6 +13,7 @@ t/07_rmOrphanFiles.t
 t/08_rmOrphanFilesFromOutbound.t
 t/09_rmLinkDefinition.t
 t/10_report.t
+t/11_rmdir.t
 t/fido/cfg/01_init.cfg
 t/fido/cfg/01w_init.cfg
 t/fido/cfg/02_init.cfg
@@ -37,6 +40,8 @@ t/fido/cfg/19_rmLink_2.cfg
 t/fido/cfg/20_report.cfg
 t/fido/cfg/21_report.cfg
 t/fido/cfg/22_report.cfg
+t/fido/cfg/23_report.cfg
+t/fido/cfg/24_report.cfg
 t/fido/cfg/sample/16_rmLink1.cfg
 t/fido/cfg/sample/17_rmLink1.cfg
 t/fido/cfg/sample/17_rmLink2.cfg
@@ -44,8 +49,10 @@ t/fido/cfg/sample/18_rmLink.cfg
 t/fido/cfg/sample/18_rmLink_d.cfg
 t/fido/cfg/sample/19_rmLink_2.cfg
 t/fido/cfg/sample/20_report.cfg
+t/fido/cfg/sample/21_report.cfg
 t/fido/cfg/sample/jam/qqq.jdt
 t/fido/cfg/sample/jam/qqq.jdx
 t/fido/cfg/sample/jam/qqq.jhr
 t/fido/cfg/sample/jam/qqq.jlr
 t/fido/cfg/sample/qqq.jdt
+t/fido/cfg/sample/qqq2.jdt

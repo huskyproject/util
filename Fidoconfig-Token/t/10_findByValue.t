@@ -7,22 +7,22 @@ use strict;
 use Test::More;
 use Fidoconfig::Token qw(:DEFAULT findTokenValue);
 use Cwd 'abs_path';
-use File::Spec;
+use File::Spec::Functions;
 
 $Fidoconfig::Token::module = "hpt";
 $Fidoconfig::Token::commentChar = '#';
-my $basedir = File::Spec->catdir(Cwd::abs_path("t"), "fido");
+my $basedir = catdir(Cwd::abs_path("t"), "fido");
 $ENV{BASEDIR} = $basedir;
-my $cfgdir = File::Spec->catdir($basedir, "cfg");
+my $cfgdir = catdir($basedir, "cfg");
 $ENV{CFGDIR} = $cfgdir;
 
 # test#1
-my $fidoconfig = File::Spec->catfile($cfgdir, "04_findByValue.cfg");
+my $fidoconfig = catfile($cfgdir, "04_findByValue.cfg");
 my ($file, $value, $linenum, @lines) = findTokenValue($fidoconfig, "Aka", "eq", "2:5020/4441");
 is($linenum, 5, "find AKA#1");
 
 # test#2
-$fidoconfig = File::Spec->catfile($cfgdir, "06_findByValue.cfg");
+$fidoconfig = catfile($cfgdir, "06_findByValue.cfg");
 ($file, $value, $linenum, @lines) = findTokenValue($fidoconfig, "EchoArea", "=~", qr/robots/i);
 is($linenum, 25, "myrobots instead of robots"); # incorrect
 

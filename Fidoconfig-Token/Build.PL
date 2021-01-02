@@ -22,18 +22,18 @@ my %module_build_args =
     "module_name" => "Fidoconfig::Token",
     "requires" =>
     {
-        "Config" => 0,
-        "File::Spec" => 0,
         "Carp" => 0,
+        "Config" => 0,
+        "File::Spec::Functions" => 0,
         "perl" => "5.008",
         "strict" => 0,
         "warnings" => 0
     },
     "test_requires" =>
     {
-        "Test::More" => "0.88",
         "Cwd" => 0,
         "diagnostics" => 0,
+        "Test::More" => "0.88",
         "strict" => 0,
         "warnings" => 0
     }
