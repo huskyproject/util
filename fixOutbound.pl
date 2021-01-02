@@ -2,14 +2,14 @@
 #
 # fixOutbound.pl
 #
-use Getopt::Long;
-use Pod::Usage;
-use Config;
 use Cwd 'abs_path';
-use File::Spec::Functions;
 use Fcntl qw(:flock);
 use Fidoconfig::Token 2.5;
+use File::Basename;
+use File::Spec::Functions;
+use Getopt::Long;
 use Husky::Rmfiles 1.10;
+use Pod::Usage;
 use strict;
 use warnings;
 
@@ -17,7 +17,6 @@ our $VERSION = "1.6";
 
 sub version
 {
-    use File::Basename;
     my $base = basename($0);
     print "$base  version=$VERSION\n";
     print "    uses Fidoconfig::Token v.$Fidoconfig::Token::VERSION\n";

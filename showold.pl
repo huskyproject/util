@@ -9,7 +9,7 @@
 #
 
 ##### There is nothing to change below this line #####
-use File::Spec;
+use File::Spec::Functions;
 use File::Find;
 use Config;
 use Fidoconfig::Token 2.4;
