@@ -379,7 +379,14 @@ for(my $i = 0; $i < @lines; $i++)
     if($lines[$i] =~ /^\001PID:/)
     {
         splice(@lines, $#lines, 1);
-        splice(@lines, 0, $i + 1);
+        if($lines[$i + 1] =~ /^\001FLAGS/)
+        {
+            splice(@lines, 0, $i + 2);
+        }
+        else
+        {
+            splice(@lines, 0, $i + 1);
+        }
         last;
     }
 }
