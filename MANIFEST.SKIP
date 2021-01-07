@@ -1,0 +1,145 @@
+
+#!start included /usr/share/perl5/vendor_perl/ExtUtils/MANIFEST.SKIP
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+\bSCCS\b
+,v$
+\B\.svn\b
+\B\.git\b
+\B\.gitignore\b
+\b_darcs\b
+\B\.cvsignore$
+
+# Avoid VMS specific MakeMaker generated files
+\bDescrip.MMS$
+\bDESCRIP.MMS$
+\bdescrip.mms$
+
+# Avoid Makemaker generated and utility files.
+\bMANIFEST\.bak
+\bMakefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib\.ts$
+\bpm_to_blib$
+\bblibdirs\.ts$         # 6.18 through 6.25 generated this
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build/
+\bBuild.bat$
+\bBuild.COM$
+\bBUILD.COM$
+\bbuild.com$
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+\.tmp$
+\.#
+\.rej$
+
+# Avoid OS-specific files/dirs
+# Mac OSX metadata
+\B\.DS_Store
+# Mac OSX SMB mount metadata files
+\B\._
+
+# Avoid Devel::Cover and Devel::CoverX::Covered files.
+\bcover_db\b
+\bcovered\b
+ 
+# Avoid MYMETA files
+^MYMETA\.
+#!end included /usr/share/perl5/vendor_perl/ExtUtils/MANIFEST.SKIP
+
+# Avoid configuration metadata file
+^MYMETA\.
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\bBuild.bat$
+\b_build
+\bBuild.COM$
+\bBUILD.COM$
+\bbuild.com$
+^MANIFEST\.SKIP
+
+# Avoid archives of this distribution
+\bHusky-Rmfiles-[\d\.\_]+
+
+Fidoconfig-Token/Build.PL
+Fidoconfig-Token/lib/Fidoconfig/Token.pm
+Fidoconfig-Token/MANIFEST
+Fidoconfig-Token/MANIFEST.SKIP
+Fidoconfig-Token/perl-Fidoconfig-Token.spec
+Fidoconfig-Token/t/01_load.t
+Fidoconfig-Token/t/02_OS.t
+Fidoconfig-Token/t/03_norm.t
+Fidoconfig-Token/t/04_strip.t
+Fidoconfig-Token/t/05_expandVars.t
+Fidoconfig-Token/t/06_cmpPattern.t
+Fidoconfig-Token/t/07_boolExpr.t
+Fidoconfig-Token/t/08_parseIf.t
+Fidoconfig-Token/t/09_findTokenValue.t
+Fidoconfig-Token/t/10_findByValue.t
+Fidoconfig-Token/t/fido/cfg/01_findTokenValue.cfg
+Fidoconfig-Token/t/fido/cfg/02_findTokenValue.cfg
+Fidoconfig-Token/t/fido/cfg/03_findTokenValue.cfg
+Fidoconfig-Token/t/fido/cfg/04_findByValue.cfg
+Fidoconfig-Token/t/fido/cfg/05_tokenFile
+Fidoconfig-Token/t/fido/cfg/06_findByValue.cfg
+Fidoconfig-Token/t/fido/cfg/07_findTokenValue.cfg
+Fidoconfig-Token/t/fido/cfg/08_findTokenValue.cfg
+Husky-Rmfiles/Build.PL
+Husky-Rmfiles/lib/Husky/Rmfiles.pm
+Husky-Rmfiles/MANIFEST
+Husky-Rmfiles/MANIFEST.SKIP
+Husky-Rmfiles/perl-Husky-Rmfiles.spec
+Husky-Rmfiles/t/00_mkdir.t
+Husky-Rmfiles/t/01_load.t
+Husky-Rmfiles/t/02_OS.t
+Husky-Rmfiles/t/03_init.t
+Husky-Rmfiles/t/04_unsubscribe.t
+Husky-Rmfiles/t/05_rmFilesFromOutbound.t
+Husky-Rmfiles/t/06_rmFilesFromFilebox.t
+Husky-Rmfiles/t/07_rmOrphanFiles.t
+Husky-Rmfiles/t/08_rmOrphanFilesFromOutbound.t
+Husky-Rmfiles/t/09_rmLinkDefinition.t
+Husky-Rmfiles/t/10_report.t
+Husky-Rmfiles/t/11_rmdir.t
+Husky-Rmfiles/t/fido/cfg/01_init.cfg
+Husky-Rmfiles/t/fido/cfg/01w_init.cfg
+Husky-Rmfiles/t/fido/cfg/02_init.cfg
+Husky-Rmfiles/t/fido/cfg/02a_init.cfg
+Husky-Rmfiles/t/fido/cfg/03_init.cfg
+Husky-Rmfiles/t/fido/cfg/04_init.cfg
+Husky-Rmfiles/t/fido/cfg/05_init.cfg
+Husky-Rmfiles/t/fido/cfg/06_init.cfg
+Husky-Rmfiles/t/fido/cfg/07_init.cfg
+Husky-Rmfiles/t/fido/cfg/08_init.cfg
+Husky-Rmfiles/t/fido/cfg/09_unsub.cfg
+Husky-Rmfiles/t/fido/cfg/09w_unsub.cfg
+Husky-Rmfiles/t/fido/cfg/10_unsub.cfg
+Husky-Rmfiles/t/fido/cfg/11_rmFiles.cfg
+Husky-Rmfiles/t/fido/cfg/12_rmFiles.cfg
+Husky-Rmfiles/t/fido/cfg/13_rmFiles.cfg
+Husky-Rmfiles/t/fido/cfg/14_rmFiles.cfg
+Husky-Rmfiles/t/fido/cfg/15_rmLink.cfg
+Husky-Rmfiles/t/fido/cfg/16_rmLink.cfg
+Husky-Rmfiles/t/fido/cfg/17_rmLink.cfg
+Husky-Rmfiles/t/fido/cfg/18_rmLink.cfg
+Husky-Rmfiles/t/fido/cfg/sample/18_rmLink_d.cfg
+Husky-Rmfiles/t/fido/cfg/sample/19_rmLink_2.cfg
+Husky-Rmfiles/t/fido/cfg/sample/20_report.cfg
+Husky-Rmfiles/t/fido/cfg/sample/21_report.cfg
+Husky-Rmfiles/t/fido/cfg/sample/jam/qqq.jdt
+Husky-Rmfiles/t/fido/cfg/sample/jam/qqq.jdx
+Husky-Rmfiles/t/fido/cfg/sample/jam/qqq.jhr
+Husky-Rmfiles/t/fido/cfg/sample/jam/qqq.jlr
+Husky-Rmfiles/t/fido/cfg/sample/qqq.jdt
+Husky-Rmfiles/t/fido/cfg/sample/qqq2.jdt

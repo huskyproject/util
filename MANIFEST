@@ -1,0 +1,10 @@
+.perltidyrc
+bin/fixOutbound.pl
+bin/rmLink.pl
+bin/rmLinkMail.pl
+bin/showold.pl
+Build.PL
+MANIFEST			This list of files
+perl-Husky-util.spec
+README.md
+t/happy_util.t
