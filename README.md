@@ -40,48 +40,6 @@ Prerequisites
 It is supposed that hpt is installed. If your config contains FileArea lines,
 then it is supposed that htick is also installed.
 
-Installation in a UNIX-like OS
-==============================
-
-Before installing Fidoconfig::Token and Husky::Rmfiles make sure version 0.28
-or newer of Module::Build is installed. If the module is not installed, you may
-install it either using your OS packaging system or from CPAN:
-
-    sudo cpanm Module::Build
-
-To install Fidoconfig::Token package run the following:
-
-    pushd Fidoconfig-Token
-    perl Build.PL
-    ./Build
-    ./Build test
-    sudo ./Build install
-    popd
-
-To install Husky::Rmfiles run the following:
-
-    pushd Husky-Rmfiles
-    perl Build.PL
-    ./Build
-
-The next command depends on whether hpt and htick binaries are in the PATH. If they are,
-the next command is
-
-    ./Build test
-
-If not, you have to specify the directory where hpt and htick binaries reside.
-
-    ./Build test directory_with_binaries
-
-After that you may install the package.
-
-    sudo ./Build install
-    popd
-
-Now the two packages are installed and you may copy the utilities mentioned
-above (showold.pl and others) to the directory you like.
-
-
 Installation in Windows
 =======================
 
@@ -135,3 +93,45 @@ After that you may install the package.
 If it says that you don't have a C compiler, ignore it. Now the two packages
 are installed and you may copy the utilities mentioned above (showold.pl and
 others) to the directory you like.
+
+Installation in a UNIX-like OS
+==============================
+
+Before installing Fidoconfig::Token and Husky::Rmfiles make sure version 0.28
+or newer of Module::Build is installed. If the module is not installed, you may
+install it either using your OS packaging system or from CPAN:
+
+    sudo cpanm Module::Build
+
+To install Fidoconfig::Token package run the following:
+
+    pushd Fidoconfig-Token
+    perl Build.PL
+    ./Build
+    ./Build test
+    sudo ./Build install
+    popd
+
+To install Husky::Rmfiles run the following:
+
+    pushd Husky-Rmfiles
+    perl Build.PL
+    ./Build
+
+The next command depends on whether hpt and htick binaries are in the PATH. If they are,
+the next command is
+
+    ./Build test
+
+If not, you have to specify the directory where hpt and htick binaries reside.
+
+    ./Build test directory_with_binaries
+
+After that you may install the package.
+
+    sudo ./Build install
+    popd
+
+Now the two packages are installed and you may copy the utilities mentioned
+above (showold.pl and others) to the directory you like.
+
