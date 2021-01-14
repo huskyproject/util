@@ -5,7 +5,7 @@
 # Author: Michael Dukelsky, 2:5020/1042
 #
 
-# Replace the lines between the two paretheses with your versions
+# Replace the lines between the two parentheses with your versions
 # of already built RPMs of hpt and the libraries it depends on.
 # The filenames should begin with huskylib, smapi, fidoconf, areafix, hpt.
 hptlist=(
