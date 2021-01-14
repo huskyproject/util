@@ -58,8 +58,9 @@ If Module::Build package is not installed, run
 in the command line window with Administrator rights to start Perl Package 
 manager. After the Perl Package manager has started, select
 View -> All Packages from its menu, find Module-Build package and install it.
-You may now close Perl Package manager. After that you may return to the
-directory with our utilities and this README file.
+Install Test::Simple the same way if it is not yet installed. You may now close
+Perl Package manager. After that you may return to the directory with our
+utilities and this README file.
 
 To install Fidoconfig::Token package run the following commands:
 
@@ -96,6 +97,46 @@ others) to the directory you like.
 
 Installation in a UNIX-like OS
 ==============================
+
+Before installation in any UNIX-like OS make sure Module::Build, Test::Simple
+are installed.
+
+Fedora, RHEL and the like
+-------------------------
+
+If you run Fedora, Centos Stream, RHEL, Amazon Linux 2, Centos and other Linux
+distributions repackaged from RHEL, you may use "build_util_rpm" script for
+building RPM packages perl-Fidoconfig-Token, perl-Husky-Rmfiles and
+perl-Husky-util. Before that you should install "mock". It is also supposed
+that you have prebuilt RPMs for hpt and the libraries it depends on in some
+directory. The "build_util_rpm" script has a special place at its beginning
+where you have to enter the filenames of these prebuilt RPM packages between
+two parentheses. Some versions of the packages are already there so you have to
+replace them by your versions. You may read a short help for using the script
+by running
+
+    build_util_rpm -h
+
+Other rpm-based Linux distributions
+-----------------------------------
+
+You may build RPM packages using the .spec files
+
+    Fidoconfig-Token/perl-Fidoconfig-Token.spec
+    Husky-Rmfiles/perl-Husky-Rmfiles.spec
+    perl-Husky-util.spec
+
+Make a tarball for Husky-util with this command
+
+    tar --exclude .git \
+    --exclude Fidoconfig-Token \
+    --exclude Husky-Rmfiles \
+    -czf Husky-util-$ver_major.$ver_minor.tar.gz util
+
+You may find $ver_major and $ver_minor at the beginning of perl-Husky-util.spec
+
+Other UNIX-like OSes
+--------------------
 
 Before installing Fidoconfig::Token and Husky::Rmfiles make sure version 0.28
 or newer of Module::Build is installed. If the module is not installed, you may
