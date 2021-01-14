@@ -25,6 +25,8 @@ show_help()
 Clone git repository and build RPMs for Husky Perl utilities and for the Perl
 modules they depend on. This script may be used in Fedora, Centos Stream, RHEL,
 Amazon Linux 2, Centos and other Linux distributions repackaged from RHEL.
+Before using the script you have to replace filenames with your versions of
+RPMs for hpt and the libraries it depends on at the beginning of the script.
 
 Usage:
     build_util_rpm [-b|--build] [{--rootdir|--rootdirectory}{ |=}{DIRECTORY}]
