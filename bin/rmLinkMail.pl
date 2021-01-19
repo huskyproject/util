@@ -120,19 +120,19 @@ rmLinkMail.pl - remove netmail, echomail and files of a link
 perl rmLinkMail.pl [options]
 
   Options:
-    --config path           path to fidoconfig
-    --bindir directory      the directory holding hpt if it is not in the PATH
-    --address ftnAddress    the link address
-    --netmail               exclude netmail from the files to be deleted
-    --echomail              exclude echomail from the files to be deleted
-    --fileecho              exclude fileechomail from the files to be deleted
-    --other-files           exclude other files in the link's filebox
-    --box                   do not delete an empty filebox
-    --report                send a report to the echo or netmail area
-    --nolog                 do not log anything in the rmLinkMail.log file
-    --quiet                 do not print to terminal window
-    --version               print version and exit
-    --help                  print help and exit
+    --config path         path to fidoconfig
+    --bindir directory    the directory holding hpt if it is not in the PATH
+    --address ftnAddress  the link address
+    --netmail             exclude netmail from the files to be deleted
+    --echomail            exclude echomail from the files to be deleted
+    --fileecho            exclude fileechomail from the files to be deleted
+    --other-files         exclude other files in the link's filebox
+    --box                 do not delete an empty filebox
+    --report              send a report to the echo or netmail area
+    --nolog               do not log anything in the rmLinkMail.log file
+    --quiet               do not print to terminal window
+    --version             print version and exit
+    --help                print help and exit
 
   To print full documentation run `perldoc rmLinkMail.pl`.
 

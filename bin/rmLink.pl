@@ -152,23 +152,23 @@ rmLink.pl - remove a link
 perl rmLink.pl [options]
 
   Options:
-    --config path           path to fidoconfig
-    --bindir directory      the directory holding hpt if it is not in the PATH
-    --address ftnAddress    the link address
-    --delete                delete the link definition lines instead of
-                            commenting them out
-    --backup                backup configuration file before changing
-    --report [area]         send a report to the echo or netmail area
-    --nolog                 do not log the actions in the rmLink.log file
-    --quiet                 do not print to terminal window
-    --report-list           include the listing of deleted files in the report
-    --nolog-list            do not include the list of deleted files
-                            in the log file
-    --noterm-list           do not print the list of deleted files to the
-                            terminal
-    --dry-run               perform a trial run with no changes made
-    --version               print version and exit
-    --help                  print help and exit
+    --config path         path to fidoconfig
+    --bindir directory    the directory holding hpt if it is not in the PATH
+    --address ftnAddress  the link address
+    --delete              delete the link definition lines instead of
+                          commenting them out
+    --backup              backup configuration file before changing
+    --report [area]       send a report to the echo or netmail area
+    --nolog               do not log the actions in the rmLink.log file
+    --quiet               do not print to terminal window
+    --report-list         include the listing of deleted files in the report
+    --nolog-list          do not include the list of deleted files
+                          in the log file
+    --noterm-list         do not print the list of deleted files to the
+                          terminal
+    --dry-run             perform a trial run with no changes made
+    --version             print version and exit
+    --help                print help and exit
 
   To print full documentation run `perldoc rmLink.pl`.
 

@@ -146,23 +146,23 @@ __END__
 perl fixOutbound.pl [options]
 
   Options:
-    --config path           path to fidoconfig
-    --bindir directory      the directory holding hpt if it is not in the PATH
-    --age lower_limit       truncated bundles older than lower_limit days
-                            will be deleted
-    --report [area]         send a report to the echo or netmail area
-    --nolog                 do not log the actions in the fixOutbound.log file
-    --quiet                 do not print to terminal window
-    --noreport-list         exclude the listing of deleted files from the
-                            report
-    --nolog-list            do not include the list of deleted files
-                            in the log file
-    --noterm-list           do not print the list of deleted files to the
-                            terminal
-    --dry-run               a trial run with no changes made
-    --run                   perform a real run when no other options specified
-    --version               print version and exit
-    --help                  print help and exit
+    --config path        path to fidoconfig
+    --bindir directory   the directory holding hpt if it is not in the PATH
+    --age lower_limit    truncated bundles older than lower_limit days
+                         will be deleted
+    --report [area]      send a report to the echo or netmail area
+    --nolog              do not log the actions in the fixOutbound.log file
+    --quiet              do not print to terminal window
+    --noreport-list      exclude the listing of deleted files from the
+                         report
+    --nolog-list         do not include the list of deleted files
+                         in the log file
+    --noterm-list        do not print the list of deleted files to the
+                         terminal
+    --dry-run            a trial run with no changes made
+    --run                perform a real run when no other options specified
+    --version            print version and exit
+    --help               print help and exit
 
   To view full documentation run `perldoc fixOutbound.pl`.
 
