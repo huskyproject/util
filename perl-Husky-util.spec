@@ -1,5 +1,5 @@
 %global ver_major 1
-%global ver_minor 8
+%global ver_minor 9
 %global relnum 1
 
 %global module Husky-util

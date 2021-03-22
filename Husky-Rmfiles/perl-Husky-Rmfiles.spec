@@ -1,5 +1,5 @@
 %global ver_major 1
-%global ver_minor 10
+%global ver_minor 11
 %global relnum 1
 
 %global module Husky-Rmfiles

@@ -16,7 +16,7 @@ our (
     );
 
 # The package version
-$VERSION = "1.10";
+$VERSION = "1.11";
 
 use Exporter;
 @ISA    = qw(Exporter);
@@ -929,15 +929,25 @@ sub rmOrphanFilesFromPassFileAreaDir
         {
             lastError("Cannot open $passFileAreaDir directory ($!)");
         }
-        my @files =
-          grep(-f normalize(catfile($passFileAreaDir, $_)) && !/\.tic$/i, readdir(DIR));
-        closedir(DIR);
-
-        lastError("Cannot open $ticOutbound directory ($!)")
-          if(!opendir(DIR, $ticOutbound));
-        my @tics =
-          grep(-f normalize(catfile($ticOutbound, $_)) && /\.tic$/i, readdir(DIR));
-        closedir(DIR);
+        my @files = grep(-f normalize(catfile($passFileAreaDir, $_)) && !/\.tic$/i,
+                         readdir(DIR));
+        if($ticOutbound -eq $passFileAreaDir)
+        {
+            my @tics = grep(-f normalize(catfile($passFileAreaDir, $_)) && /\.tic$/i,
+                            readdir(DIR));
+            closedir(DIR);
+        }
+        else
+        {
+            closedir(DIR);
+            if(!opendir(DIR, $ticOutbound))
+            {
+                lastError("Cannot open $ticOutbound directory ($!)")
+            }
+            my @tics = grep(-f normalize(catfile($ticOutbound, $_)) && /\.tic$/i,
+                            readdir(DIR));
+            closedir(DIR);
+        }
 
         put($all, "Deleting orphan files from PassFileAreaDir");
         my @usedFiles = ();
