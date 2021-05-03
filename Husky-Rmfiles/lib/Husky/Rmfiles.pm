@@ -925,15 +925,16 @@ sub rmOrphanFilesFromPassFileAreaDir
 {
     if($passFileAreaDir && -d $passFileAreaDir)
     {
+        my @tics;
         if(!opendir(DIR, $passFileAreaDir))
         {
             lastError("Cannot open $passFileAreaDir directory ($!)");
         }
         my @files = grep(-f normalize(catfile($passFileAreaDir, $_)) && !/\.tic$/i,
                          readdir(DIR));
-        if($ticOutbound -eq $passFileAreaDir)
+        if($ticOutbound eq $passFileAreaDir)
         {
-            my @tics = grep(-f normalize(catfile($passFileAreaDir, $_)) && /\.tic$/i,
+            @tics = grep(-f normalize(catfile($passFileAreaDir, $_)) && /\.tic$/i,
                             readdir(DIR));
             closedir(DIR);
         }
@@ -944,7 +945,7 @@ sub rmOrphanFilesFromPassFileAreaDir
             {
                 lastError("Cannot open $ticOutbound directory ($!)")
             }
-            my @tics = grep(-f normalize(catfile($ticOutbound, $_)) && /\.tic$/i,
+            @tics = grep(-f normalize(catfile($ticOutbound, $_)) && /\.tic$/i,
                             readdir(DIR));
             closedir(DIR);
         }
