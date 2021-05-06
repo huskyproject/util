@@ -289,12 +289,12 @@ sub initJAM
     if(-f catfile($destdir, "qqq.jhr"))
     {
         my $files_to_delete = catfile($destdir, "*");
-        unlink glob($files_to_delete);
+        unlink glob($files_to_delete) or die "Cannot unlink file(s): $!";
     }
     my $files_to_copy = catfile($srcdir, "qqq.*");
     for my $file (glob($files_to_copy))
     {
-        cp($file, $destdir);
+        cp($file, $destdir) or die "Cannot copy $file to $destdir: $!";
     }
 }
 initJAM();
