@@ -79,19 +79,20 @@ C<module> - it is the program name to which some configuration chunk
 
 =item *
 
-C<commentChar> - the character used to mark a comment. On default C<'#'> is used
-                 in fidoconfig so if you start searching a token from the main 
-                 file, which may be the value of C<FIDOCONFIG> environment
-                 variable, then you must set C<$commentChar>
-                 to C<'#'>.
+C<commentChar> - the character used to mark a comment. On default, C<'#'> is
+                 used in fidoconfig, so if you start searching for a token
+                 from the main file, which may be the value of the
+                 C<FIDOCONFIG> environment variable, then you must set
+                 C<$commentChar> to C<'#'>.
 
 =item *
 
 C<valueType> - the value type you want to find using findTokenValue() or
-               findAllTokenValues(). If you want to find an integer value, then
-               assign the string "integer" to the variable before calling
-               either of the two subroutines and assign undef to the variable
-               after the call. In any other case leave the variable undefined.
+               findAllTokenValues(). If you want to find an integer value,
+               assign the string "integer" to the variable before
+               calling either of the two subroutines and assign C<undef> to the
+               variable after the call. In any other case, leave the variable
+               undefined.
 
 =back
 
