@@ -4,11 +4,11 @@
 #
 use Cwd 'abs_path';
 use Fcntl qw(:flock);
-use Fidoconfig::Token 2.5;
+use Fidoconfig::Token;
 use File::Basename;
 use File::Spec::Functions;
 use Getopt::Long;
-use Husky::Rmfiles 1.10;
+use Husky::Rmfiles;
 use Pod::Usage;
 use strict;
 use warnings;

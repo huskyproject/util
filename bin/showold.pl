@@ -5,16 +5,17 @@
 # Created by Pavel Gulchouck 2:463/68@fidonet
 # Fixed by Stas Degteff 2:5080/102@fidonet
 # Modified by Michael Dukelsky 2:5020/1042@fidonet
-# version 2.2
 #
 
 ##### There is nothing to change below this line #####
 use File::Spec::Functions;
 use File::Find;
 use Config;
-use Fidoconfig::Token 2.4;
+use Fidoconfig::Token;
 use strict;
 use warnings;
+
+our $VERSION = "2.2";
 
 my ($fidoconfig, $module, $defZone, 
     $defOutbound, @dirs, @boxesDirs, @asoFiles,

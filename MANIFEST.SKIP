@@ -72,6 +72,9 @@
 # Avoid archives of this distribution
 \bHusky-Rmfiles-[\d\.\_]+
 
+build_util_rpm
+cvsdate.h
+uninstall_perl_module.pl
 Fidoconfig-Token/Build.PL
 Fidoconfig-Token/lib/Fidoconfig/Token.pm
 Fidoconfig-Token/MANIFEST
@@ -133,6 +136,17 @@ Husky-Rmfiles/t/fido/cfg/15_rmLink.cfg
 Husky-Rmfiles/t/fido/cfg/16_rmLink.cfg
 Husky-Rmfiles/t/fido/cfg/17_rmLink.cfg
 Husky-Rmfiles/t/fido/cfg/18_rmLink.cfg
+Husky-Rmfiles/t/fido/cfg/19_rmLink_1.cfg
+Husky-Rmfiles/t/fido/cfg/19_rmLink_2.cfg
+Husky-Rmfiles/t/fido/cfg/20_report.cfg
+Husky-Rmfiles/t/fido/cfg/21_report.cfg
+Husky-Rmfiles/t/fido/cfg/22_report.cfg
+Husky-Rmfiles/t/fido/cfg/23_report.cfg
+Husky-Rmfiles/t/fido/cfg/24_report.cfg
+Husky-Rmfiles/t/fido/cfg/sample/16_rmLink1.cfg
+Husky-Rmfiles/t/fido/cfg/sample/17_rmLink1.cfg
+Husky-Rmfiles/t/fido/cfg/sample/17_rmLink2.cfg
+Husky-Rmfiles/t/fido/cfg/sample/18_rmLink.cfg
 Husky-Rmfiles/t/fido/cfg/sample/18_rmLink_d.cfg
 Husky-Rmfiles/t/fido/cfg/sample/19_rmLink_2.cfg
 Husky-Rmfiles/t/fido/cfg/sample/20_report.cfg
@@ -143,3 +157,4 @@ Husky-Rmfiles/t/fido/cfg/sample/jam/qqq.jhr
 Husky-Rmfiles/t/fido/cfg/sample/jam/qqq.jlr
 Husky-Rmfiles/t/fido/cfg/sample/qqq.jdt
 Husky-Rmfiles/t/fido/cfg/sample/qqq2.jdt
+
