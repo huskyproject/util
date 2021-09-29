@@ -4,6 +4,7 @@ bin/rmLink.pl
 bin/rmLinkMail.pl
 bin/showold.pl
 Build.PL
+INSTALL
 MANIFEST			This list of files
 perl-Husky-util.spec
 README.md
