@@ -1,7 +1,6 @@
 Build.PL
 lib/Husky/Rmfiles.pm
 MANIFEST			This list of files
-perl-Husky-Rmfiles.spec
 t/00_mkdir.t
 t/01_load.t
 t/02_OS.t
