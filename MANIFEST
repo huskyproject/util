@@ -6,6 +6,5 @@ bin/showold.pl
 Build.PL
 INSTALL
 MANIFEST			This list of files
-perl-Husky-util.spec
 README.md
 t/happy_util.t
