@@ -1,7 +1,6 @@
 Build.PL
 lib/Fidoconfig/Token.pm
 MANIFEST			This list of files
-perl-Fidoconfig-Token.spec
 t/01_load.t
 t/02_OS.t
 t/03_norm.t
