@@ -18,7 +18,10 @@ rmLink_DST=$(BINDIR_DST)rmLink.pl
 
 PERL5LIB1=../Fidoconfig-Token/blib/lib
 PERL5LIB2=Fidoconfig-Token/blib/lib:Husky/Rmfiles/blib/lib
-
+perl5lib=
+ifeq ($(shell uname -s),FeeBSD)
+    perl5lib=env PERL5LIB=$(LIBDIR)/perl5
+endif
 .PHONY: util_all util_build rmfiles_test rmfiles_build token_test token_build \
         util_install util_clean rmfiles_clean token_clean \
         util_distclean rmfiles_distclean token_distclean \
@@ -145,7 +148,7 @@ else
 endif
 
 rmfiles_uninstall:
-	-[ -f $(rmfiles_DST) ] && perl $(util_ROOTDIR)uninstall_perl_module.pl Husky::Rmfiles ||:
+	-[ -f $(rmfiles_DST) ] && $(perl5lib) perl $(util_ROOTDIR)uninstall_perl_module.pl Husky::Rmfiles ||:
 
 token_uninstall:
-	-[ -f $(token_DST) ] && perl $(util_ROOTDIR)uninstall_perl_module.pl Fidoconfig::Token ||:
+	-[ -f $(token_DST) ] && $(perl5lib) perl $(util_ROOTDIR)uninstall_perl_module.pl Fidoconfig::Token ||:
