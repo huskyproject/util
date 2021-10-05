@@ -19,7 +19,7 @@ rmLink_DST=$(BINDIR_DST)rmLink.pl
 PERL5LIB1=../Fidoconfig-Token/blib/lib
 PERL5LIB2=Fidoconfig-Token/blib/lib:Husky/Rmfiles/blib/lib
 perl5lib=
-ifeq ($(shell uname -s),FeeBSD)
+ifeq ($(shell uname -s),FreeBSD)
     perl5lib=env PERL5LIB=$(LIBDIR)/perl5
 endif
 .PHONY: util_all util_build rmfiles_test rmfiles_build token_test token_build \
