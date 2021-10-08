@@ -9,19 +9,20 @@
 utils=fixOutbound.pl rmLink.pl rmLinkMail.pl showold.pl
 utils_DST=$(addprefix $(BINDIR_DST),$(utils))
 
+installsitelib=$(shell perl -e 'use Config qw(config_vars); config_vars(qw(installsitelib));' | cut -d\' -f2)
+installsiteman1dir=$(shell perl -e 'use Config qw(config_vars); config_vars(qw(installsiteman1dir));' | cut -d\' -f2)
+installsiteman3dir=$(shell perl -e 'use Config qw(config_vars); config_vars(qw(installsiteman3dir));' | cut -d\' -f2)
+
 fixOutbound_BLD=$(util_ROOTDIR)blib$(DIRSEP)script$(DIRSEP)fixOutbound.pl
 token_BLD=$(util_token)blib$(DIRSEP)lib$(DIRSEP)Fidoconfig$(DIRSEP)Token.pm
-token_DST=$(DESTDIR)$(PERLDATADIR)$(DIRSEP)Fidoconfig$(DIRSEP)Token.pm
+token_DST=$(DESTDIR)$(installsitelib)$(DIRSEP)Fidoconfig$(DIRSEP)Token.pm
 rmfiles_BLD=$(util_rmfiles)blib$(DIRSEP)lib$(DIRSEP)Husky$(DIRSEP)Rmfiles.pm
-rmfiles_DST=$(DESTDIR)$(PERLDATADIR)$(DIRSEP)Husky$(DIRSEP)Rmfiles.pm
+rmfiles_DST=$(DESTDIR)$(installsitelib)$(DIRSEP)Husky$(DIRSEP)Rmfiles.pm
 rmLink_DST=$(BINDIR_DST)rmLink.pl
 
 PERL5LIB1=../Fidoconfig-Token/blib/lib
 PERL5LIB2=Fidoconfig-Token/blib/lib:Husky/Rmfiles/blib/lib
-perl5lib=
-ifeq ($(shell uname -s),FreeBSD)
-    perl5lib=env PERL5LIB=$(LIBDIR)/perl5
-endif
+
 .PHONY: util_all util_build rmfiles_test rmfiles_build token_test token_build \
         util_install util_clean rmfiles_clean token_clean \
         util_distclean rmfiles_distclean token_distclean \
@@ -38,7 +39,7 @@ $(fixOutbound_BLD): $(util_ROOTDIR)Build
 $(util_ROOTDIR)Build: $(rmfiles_BLD)
 	cd $(util_ROOTDIR); perl Build.PL \
 	--install_path script=$(BINDIR_DST) \
-	--install_path bindoc=$(DESTDIR)$(MAN1DIR)
+	--install_path bindoc=$(DESTDIR)$(installsiteman1dir)
 
 
 $(rmfiles_BLD): $(util_rmfiles)Build
@@ -46,9 +47,8 @@ $(rmfiles_BLD): $(util_rmfiles)Build
 
 $(util_rmfiles)Build: $(token_BLD)
 	cd $(util_rmfiles); perl Build.PL \
-	--install_path lib=$(DESTDIR)$(PERLDATADIR) \
-	--install_path arch=$(LIBDIR_DST)perl5 \
-	--install_path libdoc=$(DESTDIR)$(MAN3DIR)
+	--install_path lib=$(DESTDIR)$(installsitelib) \
+	--install_path libdoc=$(DESTDIR)$(installsiteman3dir)
 
 
 $(token_BLD): $(util_token)Build
@@ -56,9 +56,8 @@ $(token_BLD): $(util_token)Build
 
 $(util_token)Build:
 	cd $(util_token); perl Build.PL \
-	--install_path lib=$(DESTDIR)$(PERLDATADIR) \
-	--install_path arch=$(LIBDIR_DST)perl5 \
-	--install_path libdoc=$(DESTDIR)$(MAN3DIR)
+	--install_path lib=$(DESTDIR)$(installsitelib) \
+	--install_path libdoc=$(DESTDIR)$(installsiteman3dir)
 
 
 # Test
@@ -98,11 +97,14 @@ else
 		cd $(util_ROOTDIR); .$(DIRSEP)Build install uninst=1; \
 		$(TOUCH) $(utils_DST)
 
-    $(rmfiles_DST): $(token_DST)
+    $(rmfiles_DST): $(token_DST) | $(installsitelib)
 		cd $(util_rmfiles); .$(DIRSEP)Build install uninst=1
 
-    $(token_DST):
+    $(token_DST): | $(installsitelib)
 		cd $(util_token); .$(DIRSEP)Build install uninst=1
+
+    $(installsitelib):
+		[ -d $@ ] || $(MKDIR) $(MKDIROPT) $@
 endif
 
 # Clean
@@ -148,7 +150,7 @@ else
 endif
 
 rmfiles_uninstall:
-	-[ -f $(rmfiles_DST) ] && $(perl5lib) perl $(util_ROOTDIR)uninstall_perl_module.pl Husky::Rmfiles ||:
+	-[ -f $(rmfiles_DST) ] && perl $(util_ROOTDIR)uninstall_perl_module.pl Husky::Rmfiles ||:
 
 token_uninstall:
-	-[ -f $(token_DST) ] && $(perl5lib) perl $(util_ROOTDIR)uninstall_perl_module.pl Fidoconfig::Token ||:
+	-[ -f $(token_DST) ] && perl $(util_ROOTDIR)uninstall_perl_module.pl Fidoconfig::Token ||:
