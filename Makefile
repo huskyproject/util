@@ -9,9 +9,11 @@
 utils=fixOutbound.pl rmLink.pl rmLinkMail.pl showold.pl
 utils_DST=$(addprefix $(BINDIR_DST),$(utils))
 
-installsitelib=$(shell perl -e 'use Config qw(config_vars); config_vars(qw(installsitelib));' | cut -d\' -f2)
-installsiteman1dir=$(shell perl -e 'use Config qw(config_vars); config_vars(qw(installsiteman1dir));' | cut -d\' -f2)
-installsiteman3dir=$(shell perl -e 'use Config qw(config_vars); config_vars(qw(installsiteman3dir));' | cut -d\' -f2)
+ifeq ($(PREFIX),/usr/local)
+    installsitelib=$(shell perl -e 'use Config qw(config_vars); config_vars(qw(installsitelib));' | cut -d\' -f2)
+else
+    installsitelib=$(PREFIX)/share/perl5
+endif
 
 fixOutbound_BLD=$(util_ROOTDIR)blib$(DIRSEP)script$(DIRSEP)fixOutbound.pl
 token_BLD=$(util_token)blib$(DIRSEP)lib$(DIRSEP)Fidoconfig$(DIRSEP)Token.pm
@@ -39,7 +41,7 @@ $(fixOutbound_BLD): $(util_ROOTDIR)Build
 $(util_ROOTDIR)Build: $(rmfiles_BLD)
 	cd $(util_ROOTDIR); perl Build.PL \
 	--install_path script=$(BINDIR_DST) \
-	--install_path bindoc=$(DESTDIR)$(installsiteman1dir)
+	--install_path bindoc=$(DESTDIR)$(MAN1DIR)
 
 
 $(rmfiles_BLD): $(util_rmfiles)Build
@@ -48,7 +50,7 @@ $(rmfiles_BLD): $(util_rmfiles)Build
 $(util_rmfiles)Build: $(token_BLD)
 	cd $(util_rmfiles); perl Build.PL \
 	--install_path lib=$(DESTDIR)$(installsitelib) \
-	--install_path libdoc=$(DESTDIR)$(installsiteman3dir)
+	--install_path libdoc=$(DESTDIR)$(MAN3DIR)
 
 
 $(token_BLD): $(util_token)Build
@@ -57,7 +59,7 @@ $(token_BLD): $(util_token)Build
 $(util_token)Build:
 	cd $(util_token); perl Build.PL \
 	--install_path lib=$(DESTDIR)$(installsitelib) \
-	--install_path libdoc=$(DESTDIR)$(installsiteman3dir)
+	--install_path libdoc=$(DESTDIR)$(MAN3DIR)
 
 
 # Test
