@@ -141,11 +141,11 @@ else
 		$(MV) Husky-Rmfiles.3pm.gz Husky::Rmfiles.3pm.gz ||:
 
     $(token_gz): $(token_DIR_BLD)/Token.pm | $(DESTDIR)$(MAN3DIR)
-		cd $(util_token)lib; \
+		@cd $(util_token)lib; \
 		pod2man -d $(util_date) Fidoconfig/Token.pm | gzip > $@
 
     $(rmfiles_gz): $(rmfiles_DIR_BLD)/Rmfiles.pm | $(DESTDIR)$(MAN3DIR)
-		cd $(util_rmfiles)lib; \
+		@cd $(util_rmfiles)lib; \
 		pod2man -d $(util_date) Husky/Rmfiles.pm | gzip > $@
 
     $(DESTDIR)$(MAN3DIR):
