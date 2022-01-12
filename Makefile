@@ -167,7 +167,6 @@ token_clean:
 util_distclean: rmfiles_distclean
 	-cd $(util_ROOTDIR); \
 	[ -f .$(DIRSEP)Build ] && .$(DIRSEP)Build distclean ||:
-	-$(RM) $(RMOPT) $(util_ROOTDIR)cvsdate.h
 
 rmfiles_distclean: token_distclean
 	-cd $(util_rmfiles); \
