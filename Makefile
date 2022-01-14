@@ -30,8 +30,6 @@ rmLink_DST=$(BINDIR_DST)rmLink.pl
 PERL5LIB1=../Fidoconfig-Token/blib/lib
 PERL5LIB2=Fidoconfig-Token/blib/lib:Husky/Rmfiles/blib/lib
 
-$(eval util_date=$(shell cd util; cat cvsdate.h | $(GREP) -Po 'char\s+cvs_date\[\]\s*=\s*"\K\d+-\d+-\d+'))
-
 .PHONY: util_all util_build rmfiles_test rmfiles_build token_test token_build \
         util_install util_install_man1 util_install_man3 util_clean \
         rmfiles_clean token_clean substitute_colons \
@@ -121,7 +119,7 @@ else
 
     $(utils_man_DST): $(DESTDIR)$(MAN1DIR)/%.1.gz: | $(DESTDIR)$(MAN1DIR)
 		cd util/bin; \
-		pod2man -d $(util_date) $* | gzip > $@
+		pod2man -d $(util_cvsdate) $* | gzip > $@
 endif
 
 ifndef MAN3DIR
@@ -142,11 +140,11 @@ else
 
     $(token_gz): $(token_DIR_BLD)/Token.pm | $(DESTDIR)$(MAN3DIR)
 		@cd $(util_token)lib; \
-		pod2man -d $(util_date) Fidoconfig/Token.pm | gzip > $@
+		pod2man -d $(util_cvsdate) Fidoconfig/Token.pm | gzip > $@
 
     $(rmfiles_gz): $(rmfiles_DIR_BLD)/Rmfiles.pm | $(DESTDIR)$(MAN3DIR)
 		@cd $(util_rmfiles)lib; \
-		pod2man -d $(util_date) Husky/Rmfiles.pm | gzip > $@
+		pod2man -d $(util_cvsdate) Husky/Rmfiles.pm | gzip > $@
 
     $(DESTDIR)$(MAN3DIR):
 		[ -d $@ ] || $(MKDIR) $(MKDIROPT) $@
