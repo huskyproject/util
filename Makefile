@@ -30,14 +30,14 @@ rmLink_DST=$(BINDIR_DST)rmLink.pl
 PERL5LIB1=../Fidoconfig-Token/blib/lib
 PERL5LIB2=Fidoconfig-Token/blib/lib:Husky/Rmfiles/blib/lib
 
-.PHONY: util_all util_build rmfiles_test rmfiles_build token_test token_build \
+.PHONY: util_build rmfiles_test rmfiles_build token_test token_build \
         util_install util_install_man1 util_install_man3 util_clean \
         rmfiles_clean token_clean substitute_colons \
         util_distclean rmfiles_distclean token_distclean \
         util_uninstall rmfiles_uninstall util_man_uninstall token_uninstall
 
 # Build
-util_all: $(fixOutbound_BLD) ;
+util_build: $(fixOutbound_BLD) ;
 
 $(fixOutbound_BLD): $(util_ROOTDIR)Build
 	cd $(util_ROOTDIR); \
