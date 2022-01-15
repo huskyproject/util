@@ -164,15 +164,15 @@ token_clean:
 # Distclean
 util_distclean: rmfiles_distclean
 	-cd $(util_ROOTDIR); \
-	[ -f .$(DIRSEP)Build ] && .$(DIRSEP)Build distclean ||:
+	[ -f .$(DIRSEP)Build ] && .$(DIRSEP)Build realclean ||:
 
 rmfiles_distclean: token_distclean
 	-cd $(util_rmfiles); \
-	[ -f .$(DIRSEP)Build ] && .$(DIRSEP)Build distclean ||:
+	[ -f .$(DIRSEP)Build ] && .$(DIRSEP)Build realclean ||:
 
 token_distclean:
 	-cd $(util_token); \
-	[ -f .$(DIRSEP)Build ] && .$(DIRSEP)Build distclean ||:
+	[ -f .$(DIRSEP)Build ] && .$(DIRSEP)Build realclean ||:
 
 
 # Uninstall
