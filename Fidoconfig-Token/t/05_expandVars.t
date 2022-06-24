@@ -1,7 +1,6 @@
 #
 # t/05_expandVars.t
 #
-use diagnostics;
 use warnings;
 use strict;
 use Test::More;

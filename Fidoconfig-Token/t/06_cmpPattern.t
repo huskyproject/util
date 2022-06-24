@@ -1,7 +1,6 @@
 #
 # t/06_cmpPattern.t
 #
-use diagnostics;
 use warnings;
 use strict;
 use Test::More;

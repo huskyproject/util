@@ -1,7 +1,6 @@
 #
 # t/08_parseIf.t
 #
-use diagnostics;
 use warnings;
 use strict;
 use Test::More;

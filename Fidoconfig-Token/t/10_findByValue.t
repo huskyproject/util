@@ -1,7 +1,6 @@
 #
 # t/10_findByValue.t
 #
-use diagnostics;
 use warnings;
 use strict;
 use Test::More;

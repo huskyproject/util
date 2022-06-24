@@ -2,7 +2,6 @@
 # A script for testing Husky::Rmfiles
 # t/03_init.t
 #
-use diagnostics;
 use warnings;
 use strict;
 use Test::More;

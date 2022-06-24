@@ -1,7 +1,6 @@
 #
 # t/04_strip.t
 #
-use diagnostics;
 use warnings;
 use strict;
 use Test::More;

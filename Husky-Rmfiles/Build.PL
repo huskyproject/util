@@ -53,7 +53,6 @@ my $build = $class->new
     "test_requires" =>
     {
         "Cwd" => 0,
-        "diagnostics" => 0,
         "Fidoconfig::Token" => 2.2,
         "File::Compare" => 0,
         "File::Copy" => 0,

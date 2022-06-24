@@ -2,7 +2,6 @@
 # A script for testing Husky::Rmfiles
 # t/05_rmFilesFromOutbound.t
 #
-use diagnostics -warntrace;
 use warnings;
 use strict;
 use Test::More;

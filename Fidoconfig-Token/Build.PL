@@ -32,7 +32,6 @@ my %module_build_args =
     "test_requires" =>
     {
         "Cwd" => 0,
-        "diagnostics" => 0,
         "Test::More" => "0.88",
         "strict" => 0,
         "warnings" => 0

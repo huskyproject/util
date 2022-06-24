@@ -1,7 +1,6 @@
 #
 # t/03_norm.t
 #
-use diagnostics;
 use warnings;
 use strict;
 use Test::More;

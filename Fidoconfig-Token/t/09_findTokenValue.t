@@ -1,7 +1,6 @@
 #
 # t/09_findTokenValue.t
 #
-use diagnostics;
 use warnings;
 use strict;
 use Test::More;

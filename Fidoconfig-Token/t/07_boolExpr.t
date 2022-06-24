@@ -1,7 +1,6 @@
 #
 # t/07_boolExpr.t
 #
-use diagnostics;
 use warnings;
 use strict;
 use Test::More;
