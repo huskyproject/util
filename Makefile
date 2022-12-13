@@ -3,7 +3,7 @@
 #
 # This file is part of util, part of the Husky fidonet software project
 # Use with GNU make v.3.82 or later
-# Requires: husky enviroment
+# Requires: husky environment
 #
 
 ifdef RPM_BUILD_ROOT
@@ -145,9 +145,6 @@ else
     $(rmfiles_gz): $(rmfiles_DIR_BLD)/Rmfiles.pm | $(DESTDIR)$(MAN3DIR)
 		@cd $(util_rmfiles)lib; \
 		pod2man -d $(util_cvsdate) Husky/Rmfiles.pm | gzip > $@
-
-    $(DESTDIR)$(MAN3DIR):
-		[ -d $@ ] || $(MKDIR) $(MKDIROPT) $@
 endif
 
 # Clean
