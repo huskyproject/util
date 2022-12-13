@@ -90,7 +90,7 @@ token_test: $(token_BLD)
 # Install
 util_install: $(rmLink_DST) util_install_man1 util_install_man3 ;
 
-    $(rmLink_DST): $(rmfiles_DST) $(utils_BLD)
+    $(rmLink_DST): $(rmfiles_DST) $(utils_BLD) | $(DESTDIR)$(BINDIR)
 		install $(utils_BLD) $(BINDIR_DST); \
 		$(TOUCH) $(utils_DST)
 
