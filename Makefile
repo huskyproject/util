@@ -113,13 +113,16 @@ ifndef MAN1DIR
 else
     utils_with_man := $(filter-out showold.pl,$(utils))
     utils_man_DST  := $(addprefix $(DESTDIR)$(MAN1DIR)/,\
-                        $(addsuffix .1.gz,$(utils_with_man)))
+                        $(addsuffix .1$(_COMPR),$(utils_with_man)))
 
     util_install_man1: $(utils_man_DST) ;
 
-    $(utils_man_DST): $(DESTDIR)$(MAN1DIR)/%.1.gz: | $(DESTDIR)$(MAN1DIR)
-		cd util/bin; \
-		pod2man -d $(util_cvsdate) $* | gzip > $@
+    $(utils_man_DST): $(DESTDIR)$(MAN1DIR)/%.1$(_COMPR): | $(DESTDIR)$(MAN1DIR)
+    ifdef COMPRESS
+		cd util/bin; pod2man -d $(util_cvsdate) $* | $(COMPRESS) > $@
+    else
+		cd util/bin; pod2man -d $(util_cvsdate) $* > $@
+    endif
 endif
 
 ifndef MAN3DIR
@@ -130,21 +133,31 @@ else
     # instead of '::' and then rename them. Unfortunately, as a consequence,
     # the rules are always run.
 
-    token_gz := $(DESTDIR)$(MAN3DIR)/Fidoconfig-Token.3pm.gz
-    rmfiles_gz := $(DESTDIR)$(MAN3DIR)/Husky-Rmfiles.3pm.gz
+    token_COMPR := $(DESTDIR)$(MAN3DIR)/Fidoconfig-Token.3pm$(_COMPR)
+    rmfiles_COMPR := $(DESTDIR)$(MAN3DIR)/Husky-Rmfiles.3pm$(_COMPR)
 
-    util_install_man3: $(token_gz) $(rmfiles_gz)
+    util_install_man3: $(token_COMPR) $(rmfiles_COMPR)
 		-@cd $(DESTDIR)$(MAN3DIR); \
-		$(MV) Fidoconfig-Token.3pm.gz Fidoconfig::Token.3pm.gz; \
-		$(MV) Husky-Rmfiles.3pm.gz Husky::Rmfiles.3pm.gz ||:
+		$(MV) Fidoconfig-Token.3pm$(_COMPR) Fidoconfig::Token.3pm$(_COMPR); \
+		$(MV) Husky-Rmfiles.3pm$(_COMPR) Husky::Rmfiles.3pm$(_COMPR) ||:
 
-    $(token_gz): $(token_DIR_BLD)/Token.pm | $(DESTDIR)$(MAN3DIR)
+    $(token_COMPR): $(token_DIR_BLD)/Token.pm | $(DESTDIR)$(MAN3DIR)
+    ifdef COMPRESS
 		@cd $(util_token)lib; \
-		pod2man -d $(util_cvsdate) Fidoconfig/Token.pm | gzip > $@
+		pod2man -d $(util_cvsdate) Fidoconfig/Token.pm | $(COMPRESS) > $@
+    else
+		@cd $(util_token)lib; \
+		pod2man -d $(util_cvsdate) Fidoconfig/Token.pm > $@
+    endif
 
-    $(rmfiles_gz): $(rmfiles_DIR_BLD)/Rmfiles.pm | $(DESTDIR)$(MAN3DIR)
+    $(rmfiles_COMPR): $(rmfiles_DIR_BLD)/Rmfiles.pm | $(DESTDIR)$(MAN3DIR)
+    ifdef COMPRESS
 		@cd $(util_rmfiles)lib; \
-		pod2man -d $(util_cvsdate) Husky/Rmfiles.pm | gzip > $@
+		pod2man -d $(util_cvsdate) Husky/Rmfiles.pm | $(COMPRESS) > $@
+    else
+		@cd $(util_rmfiles)lib; \
+		pod2man -d $(util_cvsdate) Husky/Rmfiles.pm > $@
+    endif
 endif
 
 # Clean
@@ -191,10 +204,10 @@ endif
 
 ifdef MAN3DIR
     util_man3_uninstall:
-		-$(RM) $(RMOPT) $(DESTDIR)$(MAN3DIR)$(DIRSEP)Fidoconfig::Token.3pm.gz
-		-$(RM) $(RMOPT) $(DESTDIR)$(MAN3DIR)$(DIRSEP)Husky::Rmfiles.3pm.gz
-		-$(RM) $(RMOPT) $(DESTDIR)$(MAN3DIR)$(DIRSEP)Fidoconfig-Token.3pm.gz
-		-$(RM) $(RMOPT) $(DESTDIR)$(MAN3DIR)$(DIRSEP)Husky-Rmfiles.3pm.gz
+		-$(RM) $(RMOPT) $(DESTDIR)$(MAN3DIR)$(DIRSEP)Fidoconfig::Token.3pm$(_COMPR)
+		-$(RM) $(RMOPT) $(DESTDIR)$(MAN3DIR)$(DIRSEP)Husky::Rmfiles.3pm$(_COMPR)
+		-$(RM) $(RMOPT) $(DESTDIR)$(MAN3DIR)$(DIRSEP)Fidoconfig-Token.3pm$(_COMPR)
+		-$(RM) $(RMOPT) $(DESTDIR)$(MAN3DIR)$(DIRSEP)Husky-Rmfiles.3pm$(_COMPR)
 else
     util_man3_uninstall: ;
 endif
