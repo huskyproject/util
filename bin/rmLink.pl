@@ -19,7 +19,7 @@ use Pod::Usage;
 use strict;
 use warnings;
 
-our $VERSION = "1.4";
+our $VERSION = "1.5";
 
 sub version
 {
@@ -46,6 +46,9 @@ unless(flock(SELF, LOCK_EX | LOCK_NB))
 
 # Just check that the current OS is supported
 getOS();
+
+my ($fidoconfig, $huskyBinDir, $link, $delete, $backup, $report, $log, $quiet,
+    $listreport, $listlog, $listterm, $dryrun);
 
 # Values on default
 $log = 1;
