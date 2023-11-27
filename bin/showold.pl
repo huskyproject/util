@@ -11,11 +11,11 @@
 use File::Spec::Functions;
 use File::Find;
 use Config;
-use Fidoconfig::Token;
+use Fidoconfig::Token qw(findTokenValue getOS normalize isOn $commentChar);
 use strict;
 use warnings;
 
-our $VERSION = "2.2";
+our $VERSION = "2.3";
 
 my ($fidoconfig, $module, $defZone, 
     $defOutbound, @dirs, @boxesDirs, @asoFiles,

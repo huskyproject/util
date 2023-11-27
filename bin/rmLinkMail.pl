@@ -12,14 +12,18 @@
 #
 use Getopt::Long;
 use Fcntl qw(:flock);
-use Fidoconfig::Token;
+use Fidoconfig::Token qw(getOS);
 use File::Basename;
-use Husky::Rmfiles;
+use Husky::Rmfiles qw(init rmFilesFromOutbound rmFilesFromFilebox
+  rmOrphanFilesFromPassFileAreaDir publishReport
+  $fidoconfig $link $delete $backup $report $log
+  $quiet $netmail $echomail $fileecho $otherfile $filebox
+  $listterm $listlog $listreport $dryrun $huskyBinDir);
 use Pod::Usage;
 use strict;
 use warnings;
 
-our $VERSION = "1.4";
+our $VERSION = "1.5";
 
 sub version
 {

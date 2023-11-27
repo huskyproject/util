@@ -4,16 +4,18 @@
 #
 use Cwd 'abs_path';
 use Fcntl qw(:flock);
-use Fidoconfig::Token;
+use Fidoconfig::Token qw(findTokenValue getOS $commentChar);
 use File::Basename;
 use File::Spec::Functions;
 use Getopt::Long;
-use Husky::Rmfiles;
+use Husky::Rmfiles qw(init publishReport rmOrphanFilesFromOutbound lastError
+    $fidoconfig $report $log $quiet $listterm $listlog $listreport $dryrun
+    $huskyBinDir);
 use Pod::Usage;
 use strict;
 use warnings;
 
-our $VERSION = "1.6";
+our $VERSION = "1.7";
 
 sub version
 {
