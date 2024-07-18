@@ -508,7 +508,19 @@ sub rmFilesFromLo
 
     return unless(@files);
 
-    put($all, "Deleting echomail and tics from outbound");
+    if(!$echomail && !$fileecho)
+    {
+        put($all, "Deleting echomail and tics from outbound");
+    }
+    elsif(!$echomail && $fileecho)
+    {
+        put($all, "Deleting echomail from outbound");
+    }
+    elsif($echomail && !$fileecho)
+    {
+        put($all, "Deleting tics from outbound");
+    }
+
     # if some lines were deleted from @lines, write @lines back to lofile
     if(!$dryrun && @lines && (@lines != $initial_lines_num))
     {
