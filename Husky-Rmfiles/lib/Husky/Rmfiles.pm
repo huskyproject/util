@@ -349,7 +349,6 @@ sub error
 sub lastError
 {
     my $msg = shift;
-    print STDERR "$msg\n";
     my $date = strftime("%Y-%m-%d %H:%M:%S", localtime);
     print $lh "$date  $msg\n" if($log);
     close($lh) if($log);
