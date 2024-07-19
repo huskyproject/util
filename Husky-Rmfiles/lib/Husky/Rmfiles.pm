@@ -578,7 +578,8 @@ sub rmFilesFromOutbound
         my $loname = $style eq "aso" ? $asoname : $bsoname;
 
         my $bsy = normalize(catfile($outbound, "$loname.bsy"));
-        if(-f $bsy)
+        my $BSY;
+        open($BSY, ">", $bsy) or do
         {
             error($all, "\nBusy flag $bsy found!");
             error(
@@ -653,6 +654,8 @@ sub rmFilesFromOutbound
             deleteFiles(@ticsToRemove);
         }
     } ## end if(-d $busyFileDir)
+    close($BSY);
+    unlink($bsy);
 } ## end sub rmFilesFromOutbound
 
 =head2 rmFilesFromFilebox
