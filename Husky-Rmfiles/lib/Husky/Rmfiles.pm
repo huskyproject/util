@@ -468,12 +468,14 @@ sub rmFilesFromLo
     lastError("Can't open $lofile $!") if(!open(LO, "<", $lofile));
     my @lines = readline(LO);
     close(LO);
+    my $initial_lines_num = @lines;
 
     my @files = ();
 
     # Remove echobundles and tics
-    foreach my $line (@lines)
+    for(my $i = $#lines; $i >= 0; $i--)
     {
+        my $line = $lines[$i];
         $line =~ s/[\n\r]//;
         my $directive = substr($line, 0, 1);
         my $fullname = $line;
@@ -484,12 +486,36 @@ sub rmFilesFromLo
             (!$fileecho && $basename =~ /\.tic$/i))
         {
             push(@files, $fullname);
+
+            # If both $echomail==0 and $fileecho==0, then the lofile will be
+            # deleted. But if only one of them is equal to zero, then
+            # we should delete the corresponding lines from the lofile.
+            if((!$echomail || !$fileecho) && ($echomail || $fileecho))
+            {
+                if(!$echomail)
+                {
+                    # $echomail == 0 && $fileecho == 1
+                    splice(@lines, $i, 1);
+                }
+                else
+                {
+                    # $echomail == 1 && $fileecho == 0
+                    splice(@lines, --$i, 2);
+                }
+            }
         }
     }
 
     return unless(@files);
 
     put($all, "Deleting echomail and tics from outbound");
+    # if some lines were deleted from @lines, write @lines back to lofile
+    if(!$dryrun && @lines && (@lines != $initial_lines_num))
+    {
+        lastError("Can't open $lofile $!") if(!open(LO, ">", $lofile));
+        print LO @lines;
+        close(LO);
+    }
     deleteFiles(@files);
 } ## end sub rmFilesFromLo
 
