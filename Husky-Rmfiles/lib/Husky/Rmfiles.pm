@@ -235,6 +235,11 @@ sub init
     ($path, $separateBundles) = findTokenValue($fidoconfig, "SeparateBundles");
     lastError("SeparateBundles mode is not supported") if(isOn($separateBundles));
 
+    my $bundleNameStyle;
+    $commentChar = '#';
+    ($path, $bundleNameStyle) = findTokenValue($fidoconfig, "bundleNameStyle");
+    $ASO = $bundleNameStyle =~ /^amiga$/i ? 1 : 0;
+
     $commentChar = '#';
     $Fidoconfig::Token::valueType = "integer";
     ($path, $advisoryLock) = findTokenValue($fidoconfig, "advisoryLock");
@@ -548,7 +553,7 @@ really deleted.
 
 sub rmFilesFromOutbound
 {
-    my $outbound;
+    my ($outbound, $bsy, $BSY);
     $defOutbound = normalize($defOutbound);
     if(!-d $defOutbound)
     {
@@ -556,79 +561,74 @@ sub rmFilesFromOutbound
         return;
     }
 
-    # Flow filename
-    my $asoname = "$zone.$net.$node.$point";
-    my $bsoname = sprintf("%04x%04x", $net, $node);
-
-    # Outbound hex extension
-    my $hexzone = sprintf("%03x", $zone);
-    my $bsooutbound = ($zone != $defZone) ? "$defOutbound.$hexzone" : $defOutbound;
-    $bsooutbound = "" if(!-d $bsooutbound);
-    if($bsooutbound && $point)
+    my $loname;
+    if($ASO)
     {
-        $bsooutbound = normalize(catdir($bsooutbound, $bsoname . ".pnt"));
-        $bsoname = sprintf("%08x", $point);
-        $bsooutbound = "" if(!-d $bsooutbound);
+        $loname = "$zone.$net.$node.$point";
+        $outbound = $defOutbound;
     }
-
-    for my $style ("aso", "bso")
+    else
     {
-        $outbound = $style eq "aso" ? $defOutbound : $bsooutbound;
-        next unless($outbound);
-        my $loname = $style eq "aso" ? $asoname : $bsoname;
-
-        my $bsy = normalize(catfile($outbound, "$loname.bsy"));
-        my $BSY;
-        open($BSY, ">", $bsy) or do
+        $loname = sprintf("%04x%04x", $net, $node);
+        my $hexzone = sprintf("%03x", $zone);
+        $outbound = ($zone != $defZone) ? "$defOutbound.$hexzone" : $defOutbound;
+        $outbound = "" if(! -d $outbound);
+        if($outbound && $point)
         {
-            error($all, "\nBusy flag $bsy found!");
-            error(
-                $all,
-                "You may run the script again after the software that has set the flag removes it."
-            );
-            lastError("If the busy flag is stale, you may remove it manually.");
+            $outbound = normalize(catdir($outbound, $loname . ".pnt"));
+            $loname = sprintf("%08x", $point);
+            $outbound = "" if(!-d $outbound);
         }
+    }
+    $bsy = normalize(catfile($outbound, $loname . ".bsy"));
+    open($BSY, ">", $bsy) or do
+    {
+        error($all, "\nBusy flag $bsy found!");
+        error(
+            $all,
+            "You may run the script again after the software that has set the flag removes it."
+        );
+    };
 
-        # Remove echomail and tics from $outbound
-        my $flowFile;
-        my $getFlowFile = sub
+    # Remove echomail and tics from $outbound
+    my $flowFile;
+    my $getFlowFile = sub
+    {
+        return if($File::Find::dir ne $outbound);
+        if(-f $File::Find::name &&
+            basename($File::Find::name) =~ /^$loname\.[icdfh]lo$/i)
         {
-            return if($File::Find::dir ne $outbound);
-            if(-f $File::Find::name &&
-                basename($File::Find::name) =~ /^$loname\.[icdfh]lo$/i)
-            {
-                $flowFile = $File::Find::name;
-            }
-        };
-        find($getFlowFile, $outbound);
-        rmFilesFromLo($flowFile) if($flowFile && -f $flowFile);
-
-        # Remove flow files
-        my @filesToRemove;
-        my $getFlowFileToRemove = sub
-        {
-            return if($File::Find::dir ne $outbound);
-            if(-f $File::Find::name)
-            {
-                my $base = basename($File::Find::name);
-                if(!$echomail && !$fileecho && $base =~ /^$loname\.[icdfh]lo$/i ||
-                    !$netmail && $base =~ /^$loname\.[icdoh]ut$/i ||
-                    !$netmail &&
-                    !$echomail &&
-                    !$fileecho &&
-                    ($base =~ /^$loname\.try$/i || $base =~ /^$loname\.hld$/i))
-                {
-                    push(@filesToRemove, $File::Find::name);
-                }
-            }
-        };
-        find($getFlowFileToRemove, $outbound);
-        if(@filesToRemove)
-        {
-            put($all, "Deleting flow files from outbound");
-            deleteFiles(@filesToRemove);
+            $flowFile = $File::Find::name;
         }
-    } ## end for my $style ("aso", "bso"...)
+    };
+    find($getFlowFile, $outbound);
+    rmFilesFromLo($flowFile) if($flowFile && -f $flowFile);
+
+    # Remove flow files
+    my @filesToRemove;
+    my $getFlowFileToRemove = sub
+    {
+        return if($File::Find::dir ne $outbound);
+        if(-f $File::Find::name)
+        {
+            my $base = basename($File::Find::name);
+            if(!$echomail && !$fileecho && $base =~ /^$loname\.[icdfh]lo$/i ||
+                !$netmail && $base =~ /^$loname\.[icdoh]ut$/i ||
+                !$netmail &&
+                !$echomail &&
+                !$fileecho &&
+                ($base =~ /^$loname\.try$/i || $base =~ /^$loname\.hld$/i))
+            {
+                push(@filesToRemove, $File::Find::name);
+            }
+        }
+    };
+    find($getFlowFileToRemove, $outbound);
+    if(@filesToRemove)
+    {
+        put($all, "Deleting flow files from outbound");
+        deleteFiles(@filesToRemove);
+    }
 
     if(-d $busyFileDir)
     {
@@ -974,9 +974,9 @@ sub rmOrphanFilesFromPassFileAreaDir
                          readdir(DIR));
         if($ticOutbound eq $passFileAreaDir)
         {
+            rewinddir(DIR) or lastError("Cannot rewind readdir() to the beginning of $passFileAreaDir");
             @tics = grep(-f normalize(catfile($passFileAreaDir, $_)) && /\.tic$/i,
                             readdir(DIR));
-            closedir(DIR);
         }
         else
         {
@@ -987,8 +987,8 @@ sub rmOrphanFilesFromPassFileAreaDir
             }
             @tics = grep(-f normalize(catfile($ticOutbound, $_)) && /\.tic$/i,
                             readdir(DIR));
-            closedir(DIR);
         }
+        closedir(DIR);
 
         put($all, "Deleting orphan files from PassFileAreaDir");
         my @usedFiles = ();
