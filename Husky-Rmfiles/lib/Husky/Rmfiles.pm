@@ -12,11 +12,12 @@ our (@ISA, @EXPORT, $VERSION);
 our (
      $fidoconfig, $link,    $delete,     $backup,   $report,    $log,
      $quiet,      $netmail, $echomail,   $fileecho, $otherfile, $filebox,
-     $listterm,   $listlog, $listreport, $dryrun,   $huskyBinDir
+     $listterm,   $listlog, $listreport, $dryrun,   $huskyBinDir,
+     $passOnly
     );
 
 # The package version
-$VERSION = "1.11";
+$VERSION = "2.0";
 
 use Exporter;
 @ISA    = qw(Exporter);
@@ -25,7 +26,7 @@ use Exporter;
   rmOrphanFilesFromOutbound put error lastError
   $fidoconfig $link $delete $backup $report $log
   $quiet $netmail $echomail $fileecho $otherfile $filebox
-  $listterm $listlog $listreport $dryrun $huskyBinDir);
+  $listterm $listlog $listreport $dryrun $huskyBinDir $passOnly);
 
 #@EXPORT_OK = qw(put error lastError);
 
@@ -307,6 +308,11 @@ sub init
             $ticOutbound = $passFileAreaDir;
         }
     }
+    elsif($passOnly)
+    {
+        error(2, "You used \"--pass-only\" but passFileAreaDir in your fidoconfig");
+        lastError("is not defined or does not exist");
+    }
 
     $module = "hpt";
 
@@ -504,7 +510,22 @@ sub rmFilesFromLo
                 else
                 {
                     # $echomail == 1 && $fileecho == 0
-                    splice(@lines, --$i, 2);
+                    if($passOnly)
+                    {
+                        # delete files and their tics from passthrough file echos only
+                        if($fullname =~ /^$passFileAreaDir/)
+                        {
+                            splice(@lines, --$i, 2);
+                        }
+                        else
+                        {
+                            pop(@files);
+                        }
+                    }
+                    else
+                    {
+                        splice(@lines, --$i, 2);
+                    }
                 }
             }
         }

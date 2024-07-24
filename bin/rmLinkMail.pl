@@ -18,12 +18,12 @@ use Husky::Rmfiles qw(init rmFilesFromOutbound rmFilesFromFilebox
   rmOrphanFilesFromPassFileAreaDir publishReport
   $fidoconfig $link $delete $backup $report $log
   $quiet $netmail $echomail $fileecho $otherfile $filebox
-  $listterm $listlog $listreport $dryrun $huskyBinDir);
+  $listterm $listlog $listreport $dryrun $huskyBinDir $passOnly);
 use Pod::Usage;
 use strict;
 use warnings;
 
-our $VERSION = "1.5";
+our $VERSION = "2.0";
 
 sub version
 {
@@ -51,7 +51,7 @@ unless(flock(SELF, LOCK_EX | LOCK_NB))
 # Just check that the current OS is supported
 getOS();
 
-$quiet = $netmail = $echomail = $fileecho = $otherfile = $filebox = 0;
+$quiet = $netmail = $echomail = $fileecho = $otherfile = $filebox = $passOnly = 0;
 $log = 1;
 
 $fidoconfig = $ENV{FIDOCONFIG} if defined $ENV{FIDOCONFIG};
@@ -64,6 +64,7 @@ GetOptions(
             "netmail|n"     => \$netmail,
             "echomail|e"    => \$echomail,
             "fileecho|f"    => \$fileecho,
+            "pass-only|p"    => \$passOnly,
             "other-files|o" => \$otherfile,
             "box|b"         => \$filebox,
             "report|r:s"    => \$report,
@@ -77,6 +78,11 @@ GetOptions(
           )
 or die("Error in command line arguments\n");
 
+if($fileecho && $passOnly)
+{
+    print STDERR "\n\"--fileecho\" and \"--pass-only\" options cannot be used together\n\n";
+    usage();
+}
 
 if (!(defined($fidoconfig) && -f $fidoconfig && -s $fidoconfig))
 {
@@ -130,6 +136,7 @@ perl rmLinkMail.pl [options]
     --netmail             exclude netmail from the files to be deleted
     --echomail            exclude echomail from the files to be deleted
     --fileecho            exclude fileechomail from the files to be deleted
+    --pass-only           delete tics only from passthrough file echos
     --other-files         exclude other files in the link's filebox
     --box                 do not delete an empty filebox
     --report              send a report to the echo or netmail area
@@ -185,6 +192,14 @@ Exclude echomail from the files to be deleted.
 =item B<--fileecho>
 
 Exclude fileechomail from the files to be deleted.
+
+=item B<-p>
+
+=item B<--pass-only>
+
+Delete tics only from passthrough file echos.
+Conflicts with --fileecho. This option may be used for deleting files
+of the paused link.
 
 =item B<-o>
 
