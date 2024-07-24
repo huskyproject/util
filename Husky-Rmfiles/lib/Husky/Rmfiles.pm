@@ -49,7 +49,7 @@ my (
     $address,      $fileBoxesDir,    $logfile,     $lockFile,
     $advisoryLock, $lh,              $defZone,     $defOutbound,
     $zone,         $net,             $node,        $point,
-    $ASO,          $passFileAreaDir, $ticOutbound, $busyFileDir,
+    $passFileAreaDir, $ticOutbound, $busyFileDir,
     $OS,           $reportToEcho,    $list,        $all,
     $hpt,          $htick,
    );
@@ -235,11 +235,6 @@ sub init
     $commentChar = '#';
     ($path, $separateBundles) = findTokenValue($fidoconfig, "SeparateBundles");
     lastError("SeparateBundles mode is not supported") if(isOn($separateBundles));
-
-    my $bundleNameStyle;
-    $commentChar = '#';
-    ($path, $bundleNameStyle) = findTokenValue($fidoconfig, "bundleNameStyle");
-    $ASO = $bundleNameStyle =~ /^amiga$/i ? 1 : 0;
 
     $commentChar = '#';
     $Fidoconfig::Token::valueType = "integer";
@@ -583,73 +578,78 @@ sub rmFilesFromOutbound
     }
 
     my $loname;
-    if($ASO)
+    for my $style ("aso", "bso")
     {
-        $loname = "$zone.$net.$node.$point";
-        $outbound = $defOutbound;
-    }
-    else
-    {
-        $loname = sprintf("%04x%04x", $net, $node);
-        my $hexzone = sprintf("%03x", $zone);
-        $outbound = ($zone != $defZone) ? "$defOutbound.$hexzone" : $defOutbound;
-        $outbound = "" if(! -d $outbound);
-        if($outbound && $point)
+        if($style eq "aso")
         {
-            $outbound = normalize(catdir($outbound, $loname . ".pnt"));
-            $loname = sprintf("%08x", $point);
-            $outbound = "" if(!-d $outbound);
+            $loname = "$zone.$net.$node.$point";
+            $outbound = $defOutbound;
         }
-    }
-    $bsy = normalize(catfile($outbound, $loname . ".bsy"));
-    open($BSY, ">", $bsy) or do
-    {
-        error($all, "\nBusy flag $bsy found!");
-        error(
-            $all,
-            "You may run the script again after the software that has set the flag removes it."
-        );
-    };
-
-    # Remove echomail and tics from $outbound
-    my $flowFile;
-    my $getFlowFile = sub
-    {
-        return if($File::Find::dir ne $outbound);
-        if(-f $File::Find::name &&
-            basename($File::Find::name) =~ /^$loname\.[icdfh]lo$/i)
+        else
         {
-            $flowFile = $File::Find::name;
-        }
-    };
-    find($getFlowFile, $outbound);
-    rmFilesFromLo($flowFile) if($flowFile && -f $flowFile);
-
-    # Remove flow files
-    my @filesToRemove;
-    my $getFlowFileToRemove = sub
-    {
-        return if($File::Find::dir ne $outbound);
-        if(-f $File::Find::name)
-        {
-            my $base = basename($File::Find::name);
-            if(!$echomail && !$fileecho && $base =~ /^$loname\.[icdfh]lo$/i ||
-                !$netmail && $base =~ /^$loname\.[icdoh]ut$/i ||
-                !$netmail &&
-                !$echomail &&
-                !$fileecho &&
-                ($base =~ /^$loname\.try$/i || $base =~ /^$loname\.hld$/i))
+            $loname = sprintf("%04x%04x", $net, $node);
+            my $hexzone = sprintf("%03x", $zone);
+            $outbound = ($zone != $defZone) ? "$defOutbound.$hexzone" : $defOutbound;
+            $outbound = "" if(! -d $outbound);
+            if($outbound && $point)
             {
-                push(@filesToRemove, $File::Find::name);
+                $outbound = normalize(catdir($outbound, $loname . ".pnt"));
+                $loname = sprintf("%08x", $point);
+                $outbound = "" if(!-d $outbound);
             }
         }
-    };
-    find($getFlowFileToRemove, $outbound);
-    if(@filesToRemove)
-    {
-        put($all, "Deleting flow files from outbound");
-        deleteFiles(@filesToRemove);
-    }
+        $bsy = normalize(catfile($outbound, $loname . ".bsy"));
+        open($BSY, ">", $bsy) or do
+        {
+            error($all, "\nBusy flag $bsy found!");
+            error(
+                $all,
+                "You may run the script again after the software that has set the flag removes it."
+            );
+        };
+
+        # Remove echomail and tics from $outbound
+        my $flowFile;
+        my $getFlowFile = sub
+        {
+            return if($File::Find::dir ne $outbound);
+            if(-f $File::Find::name &&
+                basename($File::Find::name) =~ /^$loname\.[icdfh]lo$/i)
+            {
+                $flowFile = $File::Find::name;
+            }
+        };
+        find($getFlowFile, $outbound);
+        rmFilesFromLo($flowFile) if($flowFile && -f $flowFile);
+
+        # Remove flow files
+        my @filesToRemove;
+        my $getFlowFileToRemove = sub
+        {
+            return if($File::Find::dir ne $outbound);
+            if(-f $File::Find::name)
+            {
+                my $base = basename($File::Find::name);
+                if(!$echomail && !$fileecho && $base =~ /^$loname\.[icdfh]lo$/i ||
+                    !$netmail && $base =~ /^$loname\.[icdoh]ut$/i ||
+                    !$netmail &&
+                    !$echomail &&
+                    !$fileecho &&
+                    ($base =~ /^$loname\.try$/i || $base =~ /^$loname\.hld$/i))
+                {
+                    push(@filesToRemove, $File::Find::name);
+                }
+            }
+        };
+        find($getFlowFileToRemove, $outbound);
+        if(@filesToRemove)
+        {
+            put($all, "Deleting flow files from outbound");
+            deleteFiles(@filesToRemove);
+        }
+        close($BSY);
+        unlink($bsy);
+    } ## end for my $style ("aso", "bso")
 
     if(-d $busyFileDir)
     {
@@ -675,8 +675,6 @@ sub rmFilesFromOutbound
             deleteFiles(@ticsToRemove);
         }
     } ## end if(-d $busyFileDir)
-    close($BSY);
-    unlink($bsy);
 } ## end sub rmFilesFromOutbound
 
 =head2 rmFilesFromFilebox
