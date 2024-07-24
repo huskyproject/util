@@ -15,9 +15,9 @@ use Fidoconfig::Token qw(findTokenValue getOS normalize isOn $commentChar);
 use strict;
 use warnings;
 
-our $VERSION = "2.3";
+our $VERSION = "2.4";
 
-my ($fidoconfig, $module, $defZone, 
+my ($fidoconfig, $module, $defZone, $passFileAreaDir,
     $defOutbound, @dirs, @boxesDirs, @asoFiles,
     %minmtime, %netmail, %echomail, %files);
 my $commentChar = '#';
@@ -240,7 +240,7 @@ sub allFilesInBSO
                 }
                 $files{$node} += $size;
             }
-            else
+            elsif($passFileAreaDir ne "" && /^$passFileAreaDir/)
             {
                 $files{$node} += $size;
             }
@@ -367,6 +367,15 @@ if($fileBoxesDir ne "")
 $defOutbound ne "" or die "\nOutbound is not defined\n";
 -d $defOutbound or die "\nOutbound \'$defOutbound\' is not a directory\n";
 $defOutbound = normalize($defOutbound);
+
+$Fidoconfig::Token::module = "htick";
+$Fidoconfig::Token::commentChar = '#';
+($path, $passFileAreaDir) = findTokenValue($fidoconfig, "passFileAreaDir");
+if($passFileAreaDir ne "")
+{
+    -d $passFileAreaDir or die "\npassFileAreaDir \'$passFileAreaDir\' is not a directory\n";
+    $passFileAreaDir = normalize($passFileAreaDir);
+}
 
 @dirs = listOutbounds($defOutbound);
 @boxesDirs = listFileBoxes($fileBoxesDir) if($fileBoxesDir ne "");
