@@ -17,7 +17,7 @@ our (
     );
 
 # The package version
-$VERSION = "2.0";
+$VERSION = "2.1";
 
 use Exporter;
 @ISA    = qw(Exporter);
@@ -31,7 +31,7 @@ use Exporter;
 #@EXPORT_OK = qw(put error lastError);
 
 use Carp;
-use Fcntl qw(:flock);
+use Fcntl qw(:flock :mode O_CREAT O_RDWR O_EXCL);
 use File::Find qw(&find);
 use File::Spec::Functions;
 use Config;
@@ -599,14 +599,19 @@ sub rmFilesFromOutbound
             }
         }
         $bsy = normalize(catfile($outbound, $loname . ".bsy"));
-        open($BSY, ">", $bsy) or do
+        sysopen($BSY, $bsy, O_CREAT | O_RDWR | O_EXCL, S_IRUSR | S_IWUSR) or do
         {
-            error($all, "\nBusy flag $bsy found!");
-            error(
-                $all,
-                "You may run the script again after the software that has set the flag removes it."
-            );
+            if($!{EEXIST})
+            {
+                lastError("\nLink $link is busy: flag $bsy found!");
+            }
+            else
+            {
+                lastError("\nCannot create $bsy for $link ($!)");
+            }
         };
+        print $BSY $$;
+        close($BSY);
 
         # Remove echomail and tics from $outbound
         my $flowFile;
@@ -647,7 +652,6 @@ sub rmFilesFromOutbound
             put($all, "Deleting flow files from outbound");
             deleteFiles(@filesToRemove);
         }
-        close($BSY);
         unlink($bsy);
     } ## end for my $style ("aso", "bso")
 
