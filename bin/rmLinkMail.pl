@@ -23,7 +23,7 @@ use Pod::Usage;
 use strict;
 use warnings;
 
-our $VERSION = "2.0";
+our $VERSION = "2.1";
 
 sub version
 {
@@ -142,6 +142,7 @@ perl rmLinkMail.pl [options]
     --report              send a report to the echo or netmail area
     --nolog               do not log anything in the rmLinkMail.log file
     --quiet               do not print to terminal window
+    --dry-run             perform a trial run without any real changes
     --version             print version and exit
     --help                print help and exit
 
